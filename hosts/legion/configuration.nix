@@ -13,6 +13,10 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelModules = [ "uinput" "uhid" "hid_lenovo_go" ];
 
+  # CachyOS handheld variant: BORE scheduler + Steam Deck/ROG Ally/MSI Claw
+  # HID quirks, tuned for gaming handhelds like the Legion Go.
+  boot.kernelPackages = pkgs.linuxPackages_cachyos-deckify;
+
   # --- APU AMD (Z1 Extreme) ---
   hardware.graphics = {
     enable = true;

@@ -1,7 +1,7 @@
 # Shared config applied to ALL machines.
 { config, pkgs, lib, username, ... }:
 {
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
   # --- Nix / flakes ---
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -57,12 +57,14 @@
   # --- SSH ---
   services.openssh.enable = true;
 
+  # --- Firmware updates (fwupdmgr) ---
+  services.fwupd.enable = true;
 
   environment.systemPackages = with pkgs; [
     git
     vim
     wget
     curl
-    htop
+    btop
   ];
 }

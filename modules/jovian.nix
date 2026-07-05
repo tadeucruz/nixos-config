@@ -23,5 +23,10 @@
   # Note: no display manager — Jovian's autoStart manages the session directly.
   services.desktopManager.plasma6.enable = true;
 
+  programs.steam = {
+    enable = true;
+    extraCompatPackages = with pkgs; [ proton-ge-bin ];
+  };
+
   nixpkgs.config.permittedInsecurePackages = [ "pnpm-9.15.9" ];
 }

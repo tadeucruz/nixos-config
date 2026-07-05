@@ -19,9 +19,13 @@
       url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # linuxPackages_cachyos (htpc): carries the out-of-tree HDMI 2.1 VRR/FRL
+    # patchset that hasn't landed in mainline yet.
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, chaotic, ... }@inputs:
     let
       system = "x86_64-linux";
       username = "tadeucruz";
@@ -46,9 +50,19 @@
     in
     {
       nixosConfigurations = {
-        htpc   = mkHost nixpkgs        "htpc"   [ jovian.nixosModules.default ];
+        htpc   = mkHost nixpkgs        "htpc"   [
+          jovian.nixosModules.default
+          chaotic.nixosModules.nyx-cache
+          chaotic.nixosModules.nyx-overlay
+          chaotic.nixosModules.nyx-registry
+        ];
         g15    = mkHost nixpkgs-stable "g15"    [ ];
-        legion = mkHost nixpkgs        "legion" [ jovian.nixosModules.default ];
+        legion = mkHost nixpkgs        "legion" [
+          jovian.nixosModules.default
+          chaotic.nixosModules.nyx-cache
+          chaotic.nixosModules.nyx-overlay
+          chaotic.nixosModules.nyx-registry
+        ];
       };
     };
 }
