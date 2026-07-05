@@ -1,17 +1,12 @@
-# Shared gaming stack (Steam + gamescope + controllers).
+# Shared gaming stack (Steam + controllers).
+# Gamescope is intentionally not configured here — Jovian manages it on htpc/legion.
 { config, pkgs, lib, ... }:
 {
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = true;
     remotePlay.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
-  };
-
-  programs.gamescope = {
-    enable = true;
-    capSysNice = true;
   };
 
   programs.gamemode.enable = true;
@@ -22,6 +17,5 @@
 
   environment.systemPackages = with pkgs; [
     mangohud
-    gamescope
   ];
 }

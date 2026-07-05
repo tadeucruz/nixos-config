@@ -4,6 +4,7 @@
   home.username = username;
   home.homeDirectory = "/home/${username}";
   home.stateVersion = "26.05";
+  home.enableNixpkgsReleaseCheck = false;
 
   programs.home-manager.enable = true;
 

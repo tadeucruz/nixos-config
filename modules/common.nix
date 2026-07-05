@@ -1,6 +1,8 @@
 # Shared config applied to ALL machines.
 { config, pkgs, lib, username, ... }:
 {
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
   # --- Nix / flakes ---
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
@@ -28,7 +30,7 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Tadeu Cruz";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "gamemode" "i2c" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" "gamemode" "i2c" "input" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/cjwPFM4oVlrqYLY5LxeExIc/qPOH+AQzlPMeV+s9l"
@@ -54,6 +56,7 @@
 
   # --- SSH ---
   services.openssh.enable = true;
+
 
   environment.systemPackages = with pkgs; [
     git

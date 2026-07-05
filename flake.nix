@@ -6,8 +6,8 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     awcc = {
@@ -15,15 +15,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-
-    # Uncomment when ready to use Jovian (SteamOS-like kernel) on the Legion Go:
-    # jovian = {
-    #   url = "github:Jovian-Experiments/Jovian-NixOS";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    jovian = {
+      url = "github:Jovian-Experiments/Jovian-NixOS";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, ... }@inputs:
     let
       system = "x86_64-linux";
       username = "tadeucruz";
@@ -48,9 +46,9 @@
     in
     {
       nixosConfigurations = {
-        htpc   = mkHost nixpkgs        "htpc"   [ ];
+        htpc   = mkHost nixpkgs        "htpc"   [ jovian.nixosModules.default ];
         g15    = mkHost nixpkgs-stable "g15"    [ ];
-        legion = mkHost nixpkgs        "legion" [ ];
+        legion = mkHost nixpkgs        "legion" [ jovian.nixosModules.default ];
       };
     };
 }

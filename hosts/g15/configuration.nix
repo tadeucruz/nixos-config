@@ -13,7 +13,6 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Required by AWCC for fan/thermal control on Alienware/Dell G-series.
   boot.kernelModules = [ "acpi_call" ];

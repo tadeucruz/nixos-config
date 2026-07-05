@@ -1,19 +1,17 @@
 # legion — Legion Go (APU AMD Z1 Extreme). Handheld.
-# Starting simple: stock kernel + handheld-daemon.
-# If hardware support is lacking, plug in Jovian (input already prepared in flake.nix).
 { config, pkgs, lib, username, hostname, ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ../../modules/common.nix
-    ../../modules/gaming.nix
+    ../../modules/jovian.nix
   ];
 
   networking.hostName = hostname;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.kernelModules = [ "amdgpu" ];
+  boot.kernelModules = [ "uinput" "uhid" "hid_lenovo_go" ];
 
   # --- APU AMD (Z1 Extreme) ---
   hardware.graphics = {
@@ -21,24 +19,23 @@
     enable32Bit = true;
   };
 
-  # The Legion Go screen is mounted rotated 90°. Adjust if image comes out sideways
-  # (left_side_up / right_side_up / upside_down).
-  boot.kernelParams = [ "video=eDP-1:panel_orientation=right_side_up" ];
+  # Legion Go-specific decky-loader plugin: https://github.com/aarron-lee/LegionGoRemapper
+  jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
+  systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  # Handheld Daemon: controls, TDP, buttons and Legion Go RGB.
-  # (Requires recent nixpkgs. Comment this block if eval complains about the option.)
-  services.handheld-daemon = {
-    enable = true;
-    user = username;
-  };
+  # hid_lenovo_go rebinds HID interfaces at boot before the session is active,
+  # so logind's uaccess never applies. Static GROUP bypasses the race condition.
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", KERNELS=="0003:28DE:12FE.*", MODE="0660", GROUP="input"
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="17ef", TAG+="uaccess", MODE="0666"
+  '';
 
-  # Boot directly into a Steam/gamescope session (same approach as htpc).
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "${pkgs.gamescope}/bin/gamescope --steam -e -- steam -tenfoot -steamdeck";
-      user = username;
-    };
+  # InputPlumber starts before hid_lenovo_go's boot-time HID rebind settles,
+  # so it can grab the Legion Go's evdev/hidraw nodes mid-flux and end up with
+  # an empty CompositeDevice (no gamepad) until manually restarted.
+  systemd.services.inputplumber = {
+    after = [ "systemd-udevd.service" ];
+    wants = [ "systemd-udevd.service" ];
   };
 
   system.stateVersion = "26.05";
