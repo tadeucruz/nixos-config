@@ -12,9 +12,13 @@
   # CachyOS RC kernel: carries the out-of-tree HDMI 2.1 VRR/FRL patchset that
   # hasn't landed in mainline amdgpu yet (confirmed missing on linuxPackages_testing
   # 7.2-rc1 — no vrr_capable property on the HDMI connector at all). Provided by
-  # the chaotic-nyx flake input. No binary cache for the -rc variant, so this
-  # compiles locally on rebuild. Risk accepted.
-  boot.kernelPackages = pkgs.linuxPackages_cachyos-rc;
+  # the nix-cachyos-kernel flake input (pinned overlay, cached). Risk accepted.
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
+
+  # ryzen_smu doesn't build against this RC kernel (cpuid_eax/cpuid_ebx
+  # implicit-declaration errors — the out-of-tree module hasn't caught up
+  # with a kernel header change in 7.2-rc1 yet).
+  hardware.cpu.amd.ryzen-smu.enable = false;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -50,8 +54,8 @@
   fileSystems."/nix".options = [ "compress=zstd" "noatime" "space_cache=v2" "discard=async" ];
 
   # --- Extra data drive ---
-  fileSystems."/mnt/GAMES" = {
-    device = "/dev/disk/by-uuid/e14d894e-2f48-41d1-a74c-ea8a75aa7e8c";
+  fileSystems."/GAMES" = {
+    device = "/dev/disk/by-uuid/be622b96-26c5-4ff2-b740-7bab4dd6fa9d";
     fsType = "btrfs";
     options = [ "defaults" "noatime" "compress=zstd" "discard=async" "space_cache=v2" "nofail" ];
   };

@@ -92,6 +92,6 @@
   };
 
   home.packages = with pkgs; [
-    btop
+    ryzenadj
   ];
 }

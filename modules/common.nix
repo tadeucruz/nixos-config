@@ -30,7 +30,7 @@
   users.users.${username} = {
     isNormalUser = true;
     description = "Tadeu Cruz";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "gamemode" "i2c" "input" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" "gamemode" "i2c" "input" "uinput" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/cjwPFM4oVlrqYLY5LxeExIc/qPOH+AQzlPMeV+s9l"
@@ -57,8 +57,27 @@
   # --- SSH ---
   services.openssh.enable = true;
 
+  # --- mDNS (zero-config) — reach machines as <hostname>.local ---
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      addresses = true;
+    };
+  };
+
   # --- Firmware updates (fwupdmgr) ---
   services.fwupd.enable = true;
+
+  hardware.cpu.amd.ryzen-smu.enable = lib.mkDefault true;
+
+  # --- Boot splash ---
+  boot.plymouth.enable = true;
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
+  boot.kernelParams = [ "quiet" "splash" ];
 
   environment.systemPackages = with pkgs; [
     git

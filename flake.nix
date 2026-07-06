@@ -20,15 +20,22 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # linuxPackages_cachyos (htpc): carries the out-of-tree HDMI 2.1 VRR/FRL
-    # patchset that hasn't landed in mainline yet.
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    # CachyOS kernel variants (htpc, legion). "release" branch = prebuilt + cached.
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, chaotic, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, nix-cachyos-kernel, ... }@inputs:
     let
       system = "x86_64-linux";
       username = "tadeucruz";
+
+      # "pinned" overlay = exact nixpkgs revision the kernel was cached against,
+      # required for binary cache hits (avoids compiling the kernel locally).
+      cachyosKernel = {
+        nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ];
+        nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
+        nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+      };
 
       mkHost = nixpkgsSource: hostname: extraModules:
         nixpkgsSource.lib.nixosSystem {
@@ -50,19 +57,9 @@
     in
     {
       nixosConfigurations = {
-        htpc   = mkHost nixpkgs        "htpc"   [
-          jovian.nixosModules.default
-          chaotic.nixosModules.nyx-cache
-          chaotic.nixosModules.nyx-overlay
-          chaotic.nixosModules.nyx-registry
-        ];
+        htpc   = mkHost nixpkgs        "htpc"   [ jovian.nixosModules.default cachyosKernel ];
         g15    = mkHost nixpkgs-stable "g15"    [ ];
-        legion = mkHost nixpkgs        "legion" [
-          jovian.nixosModules.default
-          chaotic.nixosModules.nyx-cache
-          chaotic.nixosModules.nyx-overlay
-          chaotic.nixosModules.nyx-registry
-        ];
+        legion = mkHost nixpkgs        "legion" [ jovian.nixosModules.default cachyosKernel ];
       };
     };
 }
