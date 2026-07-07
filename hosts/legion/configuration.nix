@@ -27,34 +27,14 @@
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  # hid_lenovo_go rebinds HID interfaces at boot before the session is active,
-  # so logind's uaccess never applies. Static GROUP bypasses the race condition.
-  services.udev.extraRules = ''
-    KERNEL=="hidraw*", KERNELS=="0003:28DE:12FE.*", MODE="0660", GROUP="input"
-    # SUBSYSTEMS=="usb", ATTRS{idVendor}=="17ef", TAG+="uaccess", MODE="0666"
-  '';
-
-  # InputPlumber starts before hid_lenovo_go's boot-time HID rebind settles,
-  # so it can grab the Legion Go's evdev/hidraw nodes mid-flux and end up with
-  # an empty CompositeDevice (no gamepad) until manually restarted.
-  systemd.services.inputplumber = {
-    after = [ "systemd-udevd.service" ];
-    wants = [ "systemd-udevd.service" ];
-  };
-
-  # InputPlumber ships a joystick-to-mouse profile but nothing loads it
-  # automatically — Jovian just runs it with the default (gamepad-only)
-  # profile. Load mouse_keyboard_wasd.yaml when the KDE desktop session
-  # starts (OnlyShowIn=KDE keeps this from firing inside the gamescope
-  # session, where a real gamepad is wanted instead).
-  environment.etc."xdg/autostart/inputplumber-desktop-profile.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=InputPlumber desktop mouse profile
-    OnlyShowIn=KDE;
-    Exec=${pkgs.systemd}/bin/busctl call org.shadowblip.InputPlumber /org/shadowblip/InputPlumber/CompositeDevice0 org.shadowblip.Input.CompositeDevice LoadProfilePath s ${pkgs.inputplumber}/share/inputplumber/profiles/mouse_keyboard_wasd.yaml
-    X-KDE-autostart-phase=1
-  '';
+  # InputPlumber bundles its own udev rules/hwdb (e.g. 99-inputplumber-device-setup.rules),
+  # which re-apply the hid-lenovo-go sysfs quirks (os_mode=linux, imu_bypass_enable,
+  # touchpad/vibration_enable) on every add/change/bind of the controller's HID
+  # interfaces. RPM/pacman packaging installs these automatically; Nix does not
+  # wire a package's bundled udev rules in on its own. Without this, the Legion Go
+  # never leaves its default firmware mode and InputPlumber's CompositeDevice ends
+  # up empty until manually restarted.
+  services.udev.packages = [ pkgs.inputplumber ];
 
   # Tuning for the btrfs subvolumes defined in hardware-configuration.nix.
   # Kept here (not there) since that file gets overwritten by nixos-generate-config.
