@@ -20,7 +20,6 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       ll = "ls -alh";
-      # rebuild the current machine from the repo root:
       rebuild = "sudo nixos-rebuild switch --flake .#$(hostname)";
       update  = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
     };

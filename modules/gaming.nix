@@ -1,5 +1,4 @@
-# Shared gaming stack (Steam + controllers).
-# Gamescope is intentionally not configured here — Jovian manages it on htpc/legion.
+# Shared gaming stack (Steam + controllers). Gamescope is managed by Jovian on htpc/legion, not here.
 { config, pkgs, lib, ... }:
 {
   programs.steam = {
@@ -11,9 +10,8 @@
 
   programs.gamemode.enable = true;
 
-  # Controller support
-  hardware.steam-hardware.enable = true; # udev rules for Steam Controller / Deck
-  hardware.xpadneo.enable = true;        # Xbox controllers over Bluetooth
+  hardware.steam-hardware.enable = true;
+  hardware.xpadneo.enable = true;
 
   environment.systemPackages = with pkgs; [
     mangohud

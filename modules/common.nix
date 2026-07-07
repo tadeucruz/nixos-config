@@ -3,7 +3,6 @@
 {
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
-  # --- Nix / flakes ---
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
   nix.gc = {
@@ -13,7 +12,6 @@
   };
   nixpkgs.config.allowUnfree = true;
 
-  # --- Locale / timezone ---
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -23,10 +21,8 @@
   };
   console.keyMap = "br-abnt2";
 
-  # --- Networking ---
   networking.networkmanager.enable = true;
 
-  # --- User ---
   users.users.${username} = {
     isNormalUser = true;
     description = "Tadeu Cruz";
@@ -38,11 +34,9 @@
   };
   programs.zsh.enable = true;
 
-  # --- Bluetooth (controllers / headphones) ---
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  # --- Audio (PipeWire) ---
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -51,13 +45,11 @@
     pulse.enable = true;
   };
 
-  # --- Swap ---
   zramSwap.enable = true;
 
-  # --- SSH ---
   services.openssh.enable = true;
 
-  # --- mDNS (zero-config) — reach machines as <hostname>.local ---
+  # reach machines as <hostname>.local
   services.avahi = {
     enable = true;
     nssmdns4 = true;
@@ -68,12 +60,10 @@
     };
   };
 
-  # --- Firmware updates (fwupdmgr) ---
   services.fwupd.enable = true;
 
   hardware.cpu.amd.ryzen-smu.enable = lib.mkDefault true;
 
-  # --- Boot splash ---
   boot.plymouth.enable = true;
   boot.consoleLogLevel = 3;
   boot.initrd.verbose = false;

@@ -20,7 +20,6 @@
 
   services.awcc.enable = true;
 
-  # --- Hybrid GPU: Radeon 680M (iGPU) + Nvidia (dGPU) ---
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.graphics = {
@@ -42,11 +41,9 @@
         enable = true;
         enableOffloadCmd = true; # enables `nvidia-offload <app>` helper command
       };
-      # >>> REPLACE with real bus IDs from this machine <<<
-      # Run:  lspci | grep -E 'VGA|3D'
-      # Convert address (e.g. 06:00.0 -> "PCI:6:0:0").
-      amdgpuBusId = "PCI:116:0:0"; # iGPU Radeon
-      nvidiaBusId = "PCI:1:0:0"; # dGPU Nvidia
+      # Placeholder — replace with real bus IDs from `lspci | grep -E 'VGA|3D'` (06:00.0 -> "PCI:6:0:0").
+      amdgpuBusId = "PCI:116:0:0";
+      nvidiaBusId = "PCI:1:0:0";
     };
   };
 
