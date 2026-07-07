@@ -10,6 +10,14 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 | `g15`    | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, GNOME + gaming, PRIME     |
 | `legion` | Legion Go — APU AMD Z1 Extreme             | Handheld, stock kernel + HHD      |
 
+## Tooling
+
+- This Mac has no local Nix install, but Docker Desktop is installed. Run Nix commands (e.g. `nix flake lock`) via:
+  ```
+  docker run --rm -v "$PWD":/repo -w /repo nixos/nix:latest \
+    nix --extra-experimental-features 'nix-command flakes' flake lock
+  ```
+
 ## Key decisions already made
 
 - **No Jovian on htpc or g15.** htpc uses greetd autologin into gamescope+Steam (Big Picture). g15 uses full GNOME desktop with PRIME offload.
