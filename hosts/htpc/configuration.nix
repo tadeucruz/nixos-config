@@ -9,17 +9,9 @@
 
   networking.hostName = hostname;
 
-  # CachyOS RC kernel: carries the out-of-tree HDMI 2.1 VRR/FRL patchset that
-  # hasn't landed in mainline amdgpu yet (confirmed missing on linuxPackages_testing
-  # 7.2-rc1 — no vrr_capable property on the HDMI connector at all). Provided by
-  # the nix-cachyos-kernel flake input (pinned overlay, cached). Risk accepted.
-  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
-
-  # ryzen_smu doesn't build against this RC kernel (cpuid_eax/cpuid_ebx
-  # implicit-declaration errors — the out-of-tree module hasn't caught up
-  # with a kernel header change in 7.2-rc1 yet).
-  hardware.cpu.amd.ryzen-smu.enable = false;
-
+  # Back on the default NixOS kernel (dropped the CachyOS RC kernel that carried
+  # an out-of-tree HDMI 2.1 VRR/FRL patchset). VRR on this HDMI-connected TV is
+  # unavailable until that lands in mainline amdgpu (tracking: Linux 7.2).
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.kernelModules = [ "amdgpu" ];
