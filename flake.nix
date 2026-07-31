@@ -12,7 +12,7 @@
 
     awcc = {
       url = "github:tr1xem/AWCC";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
     jovian = {

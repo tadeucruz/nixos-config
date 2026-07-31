@@ -37,6 +37,7 @@ modules/common.nix             # shared: nix settings, locale BR, user, audio, B
 modules/gaming.nix             # Steam + gamemode + controllers (citadel + g15 — legion gets Steam via Jovian)
 modules/jovian.nix             # gamescope+Steam session + KDE fallback (legion only)
 modules/desktop.nix            # full KDE Plasma 6 desktop (citadel + g15)
+modules/btrfs-tuning.nix       # shared btrfs mount options + fstrim (citadel + legion)
 hosts/<host>/configuration.nix # per-host system config
 hosts/<host>/hardware-configuration.nix  # see placeholder note above
 home/common.nix                # shared dotfiles: git, zsh, starship, firefox

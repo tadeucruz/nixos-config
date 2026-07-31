@@ -18,6 +18,7 @@ modules/
   common.nix           # nix/flakes, BR locale, user, audio, bluetooth, ssh, zram, fwupd
   gaming.nix            # Steam + gamemode + ProtonGE + controllers (citadel + g15)
   desktop.nix            # full KDE Plasma 6 desktop + printing + Syncthing + Bitwarden (citadel + g15)
+  btrfs-tuning.nix       # shared btrfs mount options + fstrim (citadel + legion)
   jovian.nix              # SteamOS-like gamescope session + KDE fallback (legion only)
 hosts/
   citadel/  | g15/  | legion/
