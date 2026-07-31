@@ -1,10 +1,11 @@
-# htpc — AMD desktop (CPU + GPU), SteamOS-like experience via Jovian.
+# citadel — AMD desktop (CPU + GPU). Gaming PC, normal desktop like g15.
 { config, pkgs, lib, username, hostname, ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ../../modules/common.nix
-    ../../modules/jovian.nix
+    ../../modules/desktop.nix
+    ../../modules/gaming.nix
   ];
 
   networking.hostName = hostname;

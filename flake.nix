@@ -1,5 +1,5 @@
 {
-  description = "NixOS config for 3 machines: htpc (AMD), g15 (AMD+Nvidia), legion (handheld)";
+  description = "NixOS config for 3 machines: citadel (AMD), g15 (AMD+Nvidia), legion (handheld)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -46,9 +46,9 @@
     in
     {
       nixosConfigurations = {
-        htpc   = mkHost nixpkgs        "htpc"   [ jovian.nixosModules.default ];
-        g15    = mkHost nixpkgs-stable "g15"    [ ];
-        legion = mkHost nixpkgs        "legion" [ jovian.nixosModules.default ];
+        citadel = mkHost nixpkgs        "citadel" [ ];
+        g15     = mkHost nixpkgs-stable "g15"     [ ];
+        legion  = mkHost nixpkgs        "legion"  [ jovian.nixosModules.default ];
       };
     };
 }

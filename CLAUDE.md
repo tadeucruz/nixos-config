@@ -4,11 +4,11 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 
 ## Machines
 
-| Host     | Hardware                                   | Role                              |
-| -------- | ------------------------------------------ | --------------------------------- |
-| `htpc`   | AMD desktop (CPU + GPU)                    | HTPC, SteamOS-like (no Jovian)    |
-| `g15`    | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, GNOME + gaming, PRIME     |
-| `legion` | Legion Go — APU AMD Z1 Extreme             | Handheld, stock kernel + HHD      |
+| Host     | Hardware                                   | Role                                        |
+| -------- | ------------------------------------------ | -------------------------------------------- |
+| `citadel`| AMD desktop (CPU + GPU)                    | Gaming PC, full KDE Plasma 6 desktop (like g15, no Jovian) |
+| `g15`    | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, full KDE Plasma 6 desktop + gaming, PRIME |
+| `legion` | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + KDE fallback |
 
 ## Tooling
 
@@ -20,24 +20,27 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 
 ## Key decisions already made
 
-- **No Jovian on htpc or g15.** htpc uses greetd autologin into gamescope+Steam (Big Picture). g15 uses full GNOME desktop with PRIME offload.
-- **Legion Go: no Jovian for now.** Using stock kernel + `services.handheld-daemon`. Jovian input is commented out in `flake.nix` — enable if hardware support proves insufficient.
-- **Username:** `tadeu` (single variable in `flake.nix`, applies everywhere).
-- **nixpkgs channel:** `nixos-unstable`.
+- **Jovian on legion only.** gamescope+Steam session (`jovian.steam.autoStart`) with KDE Plasma 6 as the fallback desktop (`modules/jovian.nix`). No display manager — Jovian's `autoStart` manages the session directly.
+- **citadel and g15: no Jovian, full KDE desktop.** Both use `modules/desktop.nix` + `modules/gaming.nix` (normal desktop session, SDDM login manager). g15 additionally has PRIME offload + AWCC fan control (Nvidia dGPU + Dell-specific).
+- **legion: no CachyOS kernel.** Uses the default NixOS kernel (`linuxPackages_latest` from `modules/common.nix`). Controller support comes from InputPlumber (`services.udev.packages = [ pkgs.inputplumber ]` for the `hid-lenovo-go` quirks) plus decky-loader + LegionGoRemapper.
+- **Username:** `tadeucruz` (single variable in `flake.nix`, applies everywhere).
+- **nixpkgs channel:** `citadel` and `legion` track `nixos-unstable`; `g15` tracks `nixos-26.05` (stable, used infrequently).
 - **Home Manager:** integrated into the flake (`home-manager.nixosModules.home-manager`), not standalone.
 - **g15 PRIME bus IDs** in `hosts/g15/configuration.nix` are **placeholders** — must be replaced with real values from `lspci | grep -E 'VGA|3D'` on the machine.
-- **All 3 `hardware-configuration.nix` files are placeholders** — must be regenerated with `nixos-generate-config` on each physical machine.
+- **`hosts/g15/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` are placeholders** — must be regenerated with `nixos-generate-config` on each physical machine. `hosts/citadel/hardware-configuration.nix` is already the real, machine-generated one.
 
 ## File layout
 
 ```
 flake.nix                      # inputs + mkHost helper + 3 nixosConfigurations
-modules/common.nix             # shared: nix settings, locale BR, user, audio, BT, SSH
-modules/gaming.nix             # Steam + gamescope + gamemode + controllers (htpc + legion + g15)
-modules/desktop.nix            # GNOME/Wayland (g15 only)
+modules/common.nix             # shared: nix settings, locale BR, user, audio, BT, SSH, zram, fwupd
+modules/gaming.nix             # Steam + gamemode + controllers (citadel + g15 — legion gets Steam via Jovian)
+modules/jovian.nix             # gamescope+Steam session + KDE fallback (legion only)
+modules/desktop.nix            # full KDE Plasma 6 desktop (citadel + g15)
 hosts/<host>/configuration.nix # per-host system config
-hosts/<host>/hardware-configuration.nix  # PLACEHOLDER
-home/common.nix                # shared dotfiles: git, zsh, starship
+hosts/<host>/hardware-configuration.nix  # see placeholder note above
+home/common.nix                # shared dotfiles: git, zsh, starship, firefox
+home/jovian.nix                # shared Home Manager config for Jovian machines (legion only)
 home/<host>.nix                # per-host user overrides
 ```
 
@@ -50,7 +53,5 @@ home/<host>.nix                # per-host user overrides
 
 ## Pending tasks
 
-1. Replace `hosts/*/hardware-configuration.nix` with output of `nixos-generate-config` on each machine.
+1. Replace `hosts/g15/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` with output of `nixos-generate-config` on each machine.
 2. Fix g15 PRIME bus IDs in `hosts/g15/configuration.nix`.
-3. Decide whether to enable Jovian on the Legion Go (input already in `flake.nix`, commented out).
-4. Confirm `services.handheld-daemon` exists in the nixpkgs revision in use (recent unstable required).

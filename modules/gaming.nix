@@ -1,4 +1,4 @@
-# Shared gaming stack (Steam + controllers). Gamescope is managed by Jovian on htpc/legion, not here.
+# Shared gaming stack (Steam + controllers). Gamescope is managed by Jovian on legion, not here.
 { config, pkgs, lib, ... }:
 {
   programs.steam = {

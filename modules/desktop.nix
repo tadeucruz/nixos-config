@@ -1,4 +1,4 @@
-# Full desktop environment (used only on g15 — general-purpose laptop).
+# Full desktop environment (used on citadel and g15).
 { config, pkgs, lib, username, ... }:
 {
   services.desktopManager.plasma6.enable = true;

@@ -1,4 +1,4 @@
-# Applied to htpc and legion.
+# Applied to legion only.
 { pkgs, username, ... }:
 {
   jovian = {
