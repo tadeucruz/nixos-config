@@ -1,4 +1,4 @@
 { ... }:
 {
-  imports = [ ./common.nix ];
+  imports = [ ./common.nix ./desktop.nix ];
 }

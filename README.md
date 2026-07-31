@@ -25,8 +25,9 @@ hosts/
     hardware-configuration.nix # ⚠️ regenerate with nixos-generate-config on each machine
 home/
   common.nix           # shared dotfiles (git, zsh, starship, firefox)
+  desktop.nix          # shared Home Manager config for desktop machines (citadel + g15)
   jovian.nix           # shared Home Manager config for Jovian machines (legion only)
-  citadel.nix | g15.nix | legion.nix
+  citadel.nix | g15.nix | legion.nix  # citadel and g15 are identical (common + desktop)
 ```
 
 ## Fresh install — step by step

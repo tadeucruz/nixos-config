@@ -40,6 +40,7 @@ modules/desktop.nix            # full KDE Plasma 6 desktop (citadel + g15)
 hosts/<host>/configuration.nix # per-host system config
 hosts/<host>/hardware-configuration.nix  # see placeholder note above
 home/common.nix                # shared dotfiles: git, zsh, starship, firefox
+home/desktop.nix               # shared Home Manager config for desktop machines (citadel + g15) — identical imports
 home/jovian.nix                # shared Home Manager config for Jovian machines (legion only)
 home/<host>.nix                # per-host user overrides
 ```

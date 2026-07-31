@@ -4,7 +4,10 @@
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.auto-optimise-store = true;
+  nix.optimise = {
+    automatic = true;
+    dates = [ "weekly" ];
+  };
   nix.gc = {
     automatic = true;
     dates = "weekly";
