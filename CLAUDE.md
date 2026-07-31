@@ -10,14 +10,6 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 | `g15`    | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, full KDE Plasma 6 desktop + gaming, PRIME |
 | `legion` | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + KDE fallback |
 
-## Tooling
-
-- This Mac has no local Nix install, but Docker Desktop is installed. Run Nix commands (e.g. `nix flake lock`) via:
-  ```
-  docker run --rm -v "$PWD":/repo -w /repo nixos/nix:latest \
-    nix --extra-experimental-features 'nix-command flakes' flake lock
-  ```
-
 ## Key decisions already made
 
 - **Jovian on legion only.** gamescope+Steam session (`jovian.steam.autoStart`) with KDE Plasma 6 as the fallback desktop (`modules/jovian.nix`). No display manager — Jovian's `autoStart` manages the session directly.
