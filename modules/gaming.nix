@@ -13,7 +13,9 @@
   hardware.steam-hardware.enable = true;
   hardware.xpadneo.enable = true;
 
-  environment.systemPackages = with pkgs; [
-    mangohud
-  ];
+  # Proton on Wayland; force off Steam Deck identification since these are desktop machines.
+  environment.sessionVariables = {
+    PROTON_ENABLE_WAYLAND = "1";
+    SteamDeck = "0";
+  };
 }

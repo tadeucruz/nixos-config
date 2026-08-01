@@ -11,6 +11,13 @@
 
   networking.hostName = hostname;
 
+  # Physical keyboard is BR ABNT2, unlike the US default shared with citadel/legion.
+  console.keyMap = "br-abnt2";
+  services.xserver.xkb = {
+    layout = "br";
+    variant = "";
+  };
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 

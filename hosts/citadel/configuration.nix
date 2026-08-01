@@ -36,5 +36,14 @@
     options = [ "defaults" "noatime" "compress=zstd" "discard=async" "space_cache=v2" "nofail" ];
   };
 
+  # Game stream host for Moonlight clients (e.g. legion). Uses AMD VAAPI/VCN
+  # hardware encoding via the libva stack configured above.
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true; # required for KMS screen capture under Plasma Wayland
+    openFirewall = true;
+  };
+
   system.stateVersion = "26.05";
 }

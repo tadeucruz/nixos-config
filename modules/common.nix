@@ -22,7 +22,7 @@
     LC_MONETARY = "pt_BR.UTF-8";
     LC_NUMERIC  = "pt_BR.UTF-8";
   };
-  console.keyMap = "br-abnt2";
+  console.keyMap = lib.mkDefault "us-acentos";
 
   networking.networkmanager.enable = true;
 

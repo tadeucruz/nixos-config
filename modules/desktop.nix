@@ -4,12 +4,16 @@
   services.desktopManager.plasma6.enable = true;
   services.displayManager.plasma-login-manager.enable = true;
 
-  services.xserver.xkb = {
-    layout = "br";
-    variant = "";
+  services.xserver.xkb = lib.mkDefault {
+    layout = "us";
+    variant = "intl";
   };
 
   services.printing.enable = true;
+
+  # RGB lighting control (motherboard/peripherals); auto-detects AMD i2c support
+  # from hardware.cpu.amd.updateMicrocode set in each host's hardware-configuration.nix.
+  services.hardware.openrgb.enable = true;
 
   services.syncthing = {
     enable = true;
