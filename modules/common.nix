@@ -4,6 +4,10 @@
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Lets this user's machine push locally-built (unsigned) closures to this host
+  # over SSH for remote deploys (nixos-rebuild --target-host), e.g. building on
+  # citadel and deploying to legion.
+  nix.settings.trusted-users = [ "root" username ];
   nix.optimise = {
     automatic = true;
     dates = [ "weekly" ];
