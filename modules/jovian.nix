@@ -28,13 +28,6 @@
     xserver.enable = false;
   };
 
-  # Preload GameMode into the whole gamescope session (Steam + games), since
-  # there is no per-title Launch Options step in Gaming Mode's XDG autostart.
-  systemd.user.services.gamescope-session.environment = {
-    LD_PRELOAD = "libgamemodeauto.so.0";
-    LD_LIBRARY_PATH = "${pkgs.gamemode.lib}/lib";
-  };
-
   # Create Steam CEF debugging file if it doesn't exist for Decky Loader.
   systemd.services.steam-cef-debug = lib.mkIf config.jovian.decky-loader.enable {
     description = "Create Steam CEF debugging file";
