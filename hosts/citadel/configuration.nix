@@ -54,6 +54,10 @@
     autoStart = true;
     capSysAdmin = true; # required for KMS screen capture under Plasma Wayland
     openFirewall = true;
+    settings = {
+      encoder = "vulkan";
+      vk_rc_mode = 2; # CBR
+    };
   };
 
   system.stateVersion = "26.05";
