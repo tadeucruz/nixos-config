@@ -69,7 +69,19 @@
 
   services.fwupd.enable = true;
 
-  hardware.cpu.amd.ryzen-smu.enable = lib.mkDefault true;
+  services.syncthing = {
+    enable = true;
+    user = username;
+    dataDir = "/home/${username}";
+  };
+
+  # nixpkgs.config.permittedInsecurePackages doesn't merge cleanly across
+  # separate modules (one definition silently wins over the other, even with
+  # lib.mkAfter), so every entry lives here in one place instead.
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-39.8.10" # bitwarden-desktop's bundled Electron version
+    "pnpm-9.15.9"       # decky-loader's frontend build (jovian.nix, legion only)
+  ];
 
   boot.plymouth.enable = true;
   boot.consoleLogLevel = 3;
@@ -82,5 +94,6 @@
     wget
     curl
     btop
+    bitwarden-desktop
   ];
 }

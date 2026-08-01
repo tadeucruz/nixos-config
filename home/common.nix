@@ -93,4 +93,8 @@
   home.packages = with pkgs; [
     ryzenadj
   ];
+
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "$HOME/.bitwarden-ssh-agent.sock";
+  };
 }

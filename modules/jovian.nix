@@ -21,7 +21,7 @@
   # decky-loader's frontend build needs pnpm_9, which nixpkgs currently flags as
   # insecure (batch of CVEs affecting every pnpm version, not specific to this one).
   # Only used at build time, not run as a service, so the exposure is low.
-  nixpkgs.config.permittedInsecurePackages = [ "pnpm-9.15.9" ];
+  # (Allowed in modules/common.nix — see comment there for why.)
 
   # Create Steam CEF debugging file if it doesn't exist for Decky Loader.
   systemd.services.steam-cef-debug = lib.mkIf config.jovian.decky-loader.enable {

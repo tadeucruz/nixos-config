@@ -1,4 +1,4 @@
 { pkgs, ... }:
 {
-  imports = [ ./common.nix ./jovian.nix ];
+  imports = [ ./common.nix ./gaming.nix ];
 }

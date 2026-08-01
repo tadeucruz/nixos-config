@@ -1,5 +1,7 @@
-# Shared gaming stack (Steam + controllers). Gamescope is managed by Jovian on legion, not here.
-{ config, pkgs, lib, ... }:
+# Shared gaming stack (citadel + g15 + legion). Gamescope/session integration
+# is handled separately by Jovian on legion; this covers the generic Steam
+# features useful everywhere.
+{ pkgs, ... }:
 {
   programs.steam = {
     enable = true;
@@ -12,10 +14,4 @@
 
   hardware.steam-hardware.enable = true;
   hardware.xpadneo.enable = true;
-
-  # Proton on Wayland; force off Steam Deck identification since these are desktop machines.
-  environment.sessionVariables = {
-    PROTON_ENABLE_WAYLAND = "1";
-    SteamDeck = "0";
-  };
 }

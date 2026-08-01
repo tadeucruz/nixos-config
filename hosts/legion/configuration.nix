@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/common.nix
+    ../../modules/gaming.nix
     ../../modules/jovian.nix
     ../../modules/btrfs-tuning.nix
   ];

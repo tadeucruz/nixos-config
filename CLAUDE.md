@@ -32,9 +32,9 @@ modules/desktop.nix            # full KDE Plasma 6 desktop (citadel + g15)
 modules/btrfs-tuning.nix       # shared btrfs mount options + fstrim (citadel + legion)
 hosts/<host>/configuration.nix # per-host system config
 hosts/<host>/hardware-configuration.nix  # see placeholder note above
-home/common.nix                # shared dotfiles: git, zsh, starship, firefox
-home/desktop.nix               # shared Home Manager config for desktop machines (citadel + g15) — identical imports
-home/jovian.nix                # shared Home Manager config for Jovian machines (legion only)
+home/common.nix                # shared dotfiles: git, zsh, starship, firefox, bitwarden SSH agent
+home/development.nix           # dev tooling (vscode, claude-code) — citadel + g15 only
+home/gaming.nix                # mangohud, protonplus — citadel + g15 + legion
 home/<host>.nix                # per-host user overrides
 ```
 

@@ -1,14 +1,9 @@
-# Shared Home Manager config for desktop machines (citadel + g15).
+# Shared Home Manager config for gaming (citadel + g15 + legion).
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    vscode
-    claude-code
+    protonplus
   ];
-
-  home.sessionVariables = {
-    SSH_AUTH_SOCK = "$HOME/.bitwarden-ssh-agent.sock";
-  };
 
   programs.mangohud = {
     enable = true;
