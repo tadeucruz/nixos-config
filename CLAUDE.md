@@ -44,8 +44,3 @@ home/<host>.nix                # per-host user overrides
 - Conversation with the user happens in Portuguese.
 - Keep modules flat — avoid deep nesting or extra abstraction layers unless clearly needed.
 - `system.stateVersion` is `"26.05"` on all hosts (NixOS 26.05).
-
-## Pending tasks
-
-1. Replace `hosts/g15/hardware-configuration.nix` with output of `nixos-generate-config` on the machine (legion's is already done).
-2. Fix g15 PRIME bus IDs in `hosts/g15/configuration.nix`.
