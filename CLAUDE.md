@@ -19,7 +19,7 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 - **nixpkgs channel:** `citadel` and `legion` track `nixos-unstable`; `g15` tracks `nixos-26.05` (stable, used infrequently).
 - **Home Manager:** integrated into the flake (`home-manager.nixosModules.home-manager`), not standalone.
 - **g15 PRIME bus IDs** in `hosts/g15/configuration.nix` are **placeholders** — must be replaced with real values from `lspci | grep -E 'VGA|3D'` on the machine.
-- **`hosts/g15/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` are placeholders** — must be regenerated with `nixos-generate-config` on each physical machine. `hosts/citadel/hardware-configuration.nix` is already the real, machine-generated one.
+- **`hosts/g15/hardware-configuration.nix` is still a placeholder** — must be regenerated with `nixos-generate-config` on the physical machine. `hosts/citadel/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` are already the real, machine-generated ones.
 
 ## File layout
 
@@ -47,5 +47,5 @@ home/<host>.nix                # per-host user overrides
 
 ## Pending tasks
 
-1. Replace `hosts/g15/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` with output of `nixos-generate-config` on each machine.
+1. Replace `hosts/g15/hardware-configuration.nix` with output of `nixos-generate-config` on the machine (legion's is already done).
 2. Fix g15 PRIME bus IDs in `hosts/g15/configuration.nix`.
