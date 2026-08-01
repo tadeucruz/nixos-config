@@ -1,100 +1,69 @@
 # Shared Home Manager config across all 3 machines.
-{ config, pkgs, lib, username, ... }:
 {
-  home.username = username;
-  home.homeDirectory = "/home/${username}";
-  home.stateVersion = "26.05";
-  home.enableNixpkgsReleaseCheck = false;
-
-  programs.home-manager.enable = true;
-
-  programs.git = {
-    enable = true;
-    settings.user.name  = "Tadeu Cruz";
-    settings.user.email = "tadeucruz@gmail.com";
-  };
-
-  programs.zsh = {
-    enable = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    shellAliases = {
-      ll = "ls -alh";
-      rebuild = "sudo nixos-rebuild switch --flake .#$(hostname)";
-      update  = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
+  config,
+  pkgs,
+  lib,
+  username,
+  ...
+}:
+{
+  home = {
+    enableNixpkgsReleaseCheck = false;
+    homeDirectory = "/home/${username}";
+    packages = with pkgs; [ ryzenadj ];
+    sessionVariables = {
+      SSH_AUTH_SOCK = "$HOME/.bitwarden-ssh-agent.sock";
     };
+    stateVersion = "26.05";
+    inherit username;
   };
 
-  programs.starship.enable = true;
+  programs = {
+    firefox = {
+      enable = true;
 
-  programs.firefox = {
-    enable = true;
+      policies = {
+        AppAutoUpdate = false;
+        BackgroundAppUpdate = false;
+        DisableTelemetry = true;
+        DisablePocket = true;
+        OfferToSaveLogins = false;
 
-    policies = {
-      AppAutoUpdate   = false;
-      BackgroundAppUpdate = false;
-      DisableTelemetry = true;
-      DisablePocket    = true;
-      OfferToSaveLogins = false;
-
-      ExtensionSettings = {
-        "uBlock0@raymondhill.net" = {
-          install_url       = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-          installation_mode = "force_installed";
-          updates_disabled  = true;
+        ExtensionSettings = {
+          "uBlock0@raymondhill.net" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+            installation_mode = "force_installed";
+            updates_disabled = true;
+          };
         };
+      };
+
+      profiles.tadeucruz.search = {
+        force = true;
+        default = "ddg";
+        privateDefault = "ddg";
       };
     };
 
-    profiles.tadeucruz.search = {
-      force          = true;
-      default        = "ddg";
-      privateDefault = "ddg";
+    git = {
+      enable = true;
+      settings.user.name = "Tadeu Cruz";
+      settings.user.email = "tadeucruz@gmail.com";
+    };
 
-      engines = {
-        "Nix Packages" = {
-          urls = [{
-            template = "https://search.nixos.org/packages";
-            params = [
-              { name = "channel"; value = "unstable"; }
-              { name = "query";   value = "{searchTerms}"; }
-            ];
-          }];
-          icon           = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = [ "@np" ];
-        };
+    home-manager.enable = true;
 
-        "NixOS Options" = {
-          urls = [{
-            template = "https://search.nixos.org/options";
-            params = [
-              { name = "channel"; value = "unstable"; }
-              { name = "query";   value = "{searchTerms}"; }
-            ];
-          }];
-          icon           = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = [ "@no" ];
-        };
+    starship.enable = true;
 
-        "NixOS Wiki" = {
-          urls = [{
-            template = "https://wiki.nixos.org/w/index.php";
-            params = [
-              { name = "search"; value = "{searchTerms}"; }
-            ];
-          }];
-          icon           = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = [ "@nw" ];
-        };
+    zsh = {
+      enable = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+      shellAliases = {
+        ll = "ls -alh";
+        rebuild = "sudo nixos-rebuild switch --flake .#$(hostname)";
+        update = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
       };
     };
-  };
-
-  home.packages = with pkgs; [
-    ryzenadj
-  ];
-
-  home.sessionVariables = {
-    SSH_AUTH_SOCK = "$HOME/.bitwarden-ssh-agent.sock";
   };
 }

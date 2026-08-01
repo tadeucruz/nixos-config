@@ -2,9 +2,26 @@
 # hardware-configuration.nix, since nixos-generate-config overwrites that file.
 { ... }:
 {
-  fileSystems."/".options = [ "compress=zstd" "noatime" "space_cache=v2" "discard=async" ];
-  fileSystems."/home".options = [ "compress=zstd" "noatime" "space_cache=v2" "discard=async" ];
-  fileSystems."/nix".options = [ "compress=zstd" "noatime" "space_cache=v2" "discard=async" ];
+  fileSystems = {
+    "/".options = [
+      "compress=zstd"
+      "discard=async"
+      "noatime"
+      "space_cache=v2"
+    ];
+    "/home".options = [
+      "compress=zstd"
+      "discard=async"
+      "noatime"
+      "space_cache=v2"
+    ];
+    "/nix".options = [
+      "compress=zstd"
+      "discard=async"
+      "noatime"
+      "space_cache=v2"
+    ];
+  };
 
   services.fstrim.enable = true;
 }

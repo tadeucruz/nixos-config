@@ -2,31 +2,40 @@
   description = "NixOS config for 3 machines: citadel (AMD), g15 (AMD+Nvidia), legion (handheld)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
+    awcc = {
+      url = "github:tr1xem/AWCC";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    awcc = {
-      url = "github:tr1xem/AWCC";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
-
     jovian = {
       url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, jovian, ... }@inputs:
+  outputs =
+    {
+      home-manager,
+      jovian,
+      nixpkgs,
+      nixpkgs-stable,
+      self,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
       username = "tadeucruz";
 
-      mkHost = nixpkgsSource: hostname: extraModules:
+      mkHost =
+        nixpkgsSource: hostname: extraModules:
         nixpkgsSource.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit inputs username hostname; };
@@ -41,14 +50,17 @@
               home-manager.extraSpecialArgs = { inherit inputs username hostname; };
               home-manager.users.${username} = import ./home/${hostname}.nix;
             }
-          ] ++ extraModules;
+          ]
+          ++ extraModules;
         };
     in
     {
+      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
+
       nixosConfigurations = {
-        citadel = mkHost nixpkgs        "citadel" [ ];
-        g15     = mkHost nixpkgs-stable "g15"     [ ];
-        legion  = mkHost nixpkgs        "legion"  [ jovian.nixosModules.default ];
+        citadel = mkHost nixpkgs "citadel" [ ];
+        g15 = mkHost nixpkgs-stable "g15" [ ];
+        legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };
     };
 }

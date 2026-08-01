@@ -1,5 +1,12 @@
 # citadel — AMD desktop (CPU + GPU). Gaming PC, normal desktop like g15.
-{ config, pkgs, lib, username, hostname, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  hostname,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -9,16 +16,26 @@
     ../../modules/btrfs-tuning.nix
   ];
 
-  networking.hostName = hostname;
+  boot = {
+    initrd.kernelModules = [ "amdgpu" ];
+    loader = {
+      efi.canTouchEfiVariables = true;
+      systemd-boot.enable = true;
+    };
+  };
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.kernelModules = [ "amdgpu" ];
-
-  # HDMI VRR is stuck behind an unmerged amdgpu patch (tracking upstream progress).
-  boot.kernelParams = [
-    "amdgpu.dcfeaturemask=0x400"
-  ];
+  fileSystems."/GAMES" = {
+    device = "/dev/disk/by-uuid/be622b96-26c5-4ff2-b740-7bab4dd6fa9d";
+    fsType = "btrfs";
+    options = [
+      "compress=zstd"
+      "defaults"
+      "discard=async"
+      "noatime"
+      "nofail"
+      "space_cache=v2"
+    ];
+  };
 
   hardware.graphics = {
     enable = true;
@@ -30,14 +47,8 @@
     ];
   };
 
-  fileSystems."/GAMES" = {
-    device = "/dev/disk/by-uuid/be622b96-26c5-4ff2-b740-7bab4dd6fa9d";
-    fsType = "btrfs";
-    options = [ "defaults" "noatime" "compress=zstd" "discard=async" "space_cache=v2" "nofail" ];
-  };
+  networking.hostName = hostname;
 
-  # Game stream host for Moonlight clients (e.g. legion). Uses AMD VAAPI/VCN
-  # hardware encoding via the libva stack configured above.
   services.sunshine = {
     enable = true;
     autoStart = true;

@@ -1,5 +1,13 @@
 # g15 — Dell G15 5525: AMD Ryzen 6800H (iGPU Radeon 680M) + Nvidia dGPU. Laptop.
-{ config, pkgs, lib, inputs, username, hostname, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  username,
+  hostname,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -9,48 +17,55 @@
     inputs.awcc.nixosModules.default
   ];
 
+  boot = {
+    extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+    kernelModules = [ "acpi_call" ];
+    loader = {
+      efi.canTouchEfiVariables = true;
+      systemd-boot.enable = true;
+    };
+  };
+
+  console.keyMap = "br-abnt2";
+
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+
+    nvidia = {
+      modesetting.enable = true;
+      nvidiaSettings = true;
+      open = true;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+
+      powerManagement.enable = true;
+      powerManagement.finegrained = true; # powers off dGPU when idle (saves battery)
+
+      prime = {
+        amdgpuBusId = "PCI:116:0:0";
+        nvidiaBusId = "PCI:1:0:0";
+
+        offload = {
+          enable = true;
+          enableOffloadCmd = true;
+        };
+      };
+    };
+  };
+
   networking.hostName = hostname;
 
-  # Physical keyboard is BR ABNT2, unlike the US default shared with citadel/legion.
-  console.keyMap = "br-abnt2";
-  services.xserver.xkb = {
-    layout = "br";
-    variant = "";
-  };
+  services = {
+    awcc.enable = true;
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # Required by AWCC for fan/thermal control on Alienware/Dell G-series.
-  boot.kernelModules = [ "acpi_call" ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
-
-  services.awcc.enable = true;
-
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    open = true; 
-
-    powerManagement.enable = true;
-    powerManagement.finegrained = true; # powers off dGPU when idle (saves battery)
-
-    prime = {
-      offload = {
-        enable = true;
-        enableOffloadCmd = true; # enables `nvidia-offload <app>` helper command
+    xserver = {
+      videoDrivers = [ "nvidia" ];
+      xkb = {
+        layout = "br";
+        variant = "";
       };
-      # Placeholder — replace with real bus IDs from `lspci | grep -E 'VGA|3D'` (06:00.0 -> "PCI:6:0:0").
-      amdgpuBusId = "PCI:116:0:0";
-      nvidiaBusId = "PCI:1:0:0";
     };
   };
 
