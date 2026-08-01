@@ -2,7 +2,9 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    vscode
     claude-code
+    go
+    jdk
+    vscode
   ];
 }
