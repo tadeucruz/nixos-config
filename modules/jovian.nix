@@ -16,8 +16,6 @@
     decky-loader.enable = true;
   };
 
-  services.libinput.enable = true;
-
   # No display manager: Jovian's autoStart manages the session directly.
   services.desktopManager.plasma6.enable = true;
 
@@ -35,5 +33,17 @@
       ExecStart = "/bin/sh -c 'mkdir -p ~/.steam/steam && [ ! -f ~/.steam/steam/.cef-enable-remote-debugging ] && touch ~/.steam/steam/.cef-enable-remote-debugging || true'";
     };
     wantedBy = [ "multi-user.target" ];
+  };
+
+  # Trying Handheld Daemon (hhd-dev/hhd) instead of InputPlumber for the Legion Go
+  # controller: it emits a plain evdev virtual gamepad that works outside Steam too,
+  # instead of InputPlumber's deck-uhid (Steam-only). Both want exclusive control of
+  # the raw controller HID, and jovian.steam.enable turns InputPlumber on
+  # unconditionally, so force it off here.
+  services.inputplumber.enable = lib.mkForce false;
+  services.handheld-daemon = {
+    enable = true;
+    user = username;
+    ui.enable = true;
   };
 }
