@@ -19,7 +19,7 @@
     [Desktop Entry]
     Type=Application
     Name=Steam
-    Exec=steam -silent -pipewire
+    Exec=gamemoderun steam -silent -pipewire
     Icon=steam
     Terminal=false
   '';
