@@ -21,7 +21,6 @@
   console.keyMap = lib.mkDefault "us-acentos";
 
   environment.systemPackages = with pkgs; [
-    bitwarden-desktop
     btop
     curl
     git
@@ -69,10 +68,7 @@
 
   nixpkgs.config = {
     allowUnfree = true;
-    permittedInsecurePackages = [
-      "electron-39.8.10" # bitwarden-desktop's bundled Electron version
-      "pnpm-9.15.9" # decky-loader's frontend build (jovian.nix, legion only)
-    ];
+    permittedInsecurePackages = [ "pnpm-9.15.9" ];
   };
 
   programs.zsh.enable = true;
@@ -88,6 +84,14 @@
         addresses = true;
         enable = true;
       };
+    };
+
+    flatpak = {
+      enable = true;
+      packages = [
+        "com.bitwarden.desktop"
+        "net.retrodeck.retrodeck"
+      ];
     };
 
     fwupd.enable = true;

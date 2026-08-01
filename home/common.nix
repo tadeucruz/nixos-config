@@ -12,7 +12,7 @@
     homeDirectory = "/home/${username}";
     packages = with pkgs; [ ryzenadj ];
     sessionVariables = {
-      SSH_AUTH_SOCK = "$HOME/.bitwarden-ssh-agent.sock";
+      SSH_AUTH_SOCK = "$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock";
     };
     stateVersion = "26.05";
     inherit username;
