@@ -57,6 +57,7 @@
     settings = {
       encoder = "vulkan";
       vk_rc_mode = 2; # CBR
+      output_name = 1; # DP-1
     };
   };
 
