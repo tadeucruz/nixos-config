@@ -15,5 +15,12 @@
     };
   };
 
-  xdg.configFile."autostart/steam.desktop".source = "${pkgs.steam}/share/applications/steam.desktop";
+  xdg.configFile."autostart/steam.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Steam
+    Exec=steam -silent -pipewire
+    Icon=steam
+    Terminal=false
+  '';
 }
