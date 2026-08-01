@@ -14,4 +14,6 @@
       position = "top";
     };
   };
+
+  xdg.configFile."autostart/steam.desktop".source = "${pkgs.steam}/share/applications/steam.desktop";
 }

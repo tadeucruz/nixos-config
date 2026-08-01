@@ -61,8 +61,8 @@
       syntaxHighlighting.enable = true;
       shellAliases = {
         ll = "ls -alh";
-        rebuild = "sudo nixos-rebuild switch --flake .#$(hostname)";
-        update = "nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
+        rebuild = "cd $HOME/nixos-config && git pull && sudo nixos-rebuild switch --flake .#$(hostname)";
+        update = "cd $HOME/nixos-config && git pull && nix flake update && sudo nixos-rebuild switch --flake .#$(hostname)";
       };
     };
   };
