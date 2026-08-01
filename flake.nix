@@ -17,6 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
@@ -25,6 +27,7 @@
     {
       home-manager,
       jovian,
+      nix-flatpak,
       nixpkgs,
       nixpkgs-stable,
       self,
@@ -42,6 +45,7 @@
           modules = [
             ./hosts/${hostname}/configuration.nix
 
+            nix-flatpak.nixosModules.nix-flatpak
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
