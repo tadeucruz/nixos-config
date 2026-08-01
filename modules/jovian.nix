@@ -16,6 +16,4 @@
 
   # No display manager: Jovian's autoStart manages the session directly.
   services.desktopManager.plasma6.enable = true;
-
-  nixpkgs.config.permittedInsecurePackages = [ "pnpm-9.15.9" ];
 }

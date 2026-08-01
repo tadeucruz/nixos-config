@@ -19,10 +19,6 @@
     enable32Bit = true;
   };
 
-  # https://github.com/aarron-lee/LegionGoRemapper
-  jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
-  systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
-
   # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
   # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
   services.udev.packages = [ pkgs.inputplumber ];
