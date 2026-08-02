@@ -64,6 +64,7 @@
   nixpkgs.config = {
     allowUnfree = true;
     permittedInsecurePackages = [ "pnpm-9.15.9" ];
+    rocmSupport = true; # needed for btop's AMD GPU panel (links librocm_smi64.so)
   };
 
   programs = {
