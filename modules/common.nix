@@ -45,11 +45,6 @@
   networking.networkmanager.enable = true;
 
   nix = {
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 14d";
-    };
     optimise = {
       automatic = true;
       dates = [ "weekly" ];
@@ -71,7 +66,17 @@
     permittedInsecurePackages = [ "pnpm-9.15.9" ];
   };
 
-  programs.zsh.enable = true;
+  programs = {
+    nh = {
+      enable = true;
+      clean = {
+        enable = true;
+        extraArgs = "--keep-since 4d --keep 3";
+      };
+      flake = "/home/${username}/nixos-config";
+    };
+    zsh.enable = true;
+  };
 
   security.rtkit.enable = true;
 
