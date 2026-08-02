@@ -5,6 +5,10 @@
     protonplus
   ];
 
+  home.sessionVariables = {
+    PROTON_USE_NTSYNC = "1";
+  };
+
   programs.mangohud = {
     enable = true;
     enableSessionWide = true;

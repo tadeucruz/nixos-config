@@ -10,6 +10,8 @@
   boot = {
     consoleLogLevel = 3;
     initrd.verbose = false;
+    kernel.sysctl."vm.max_map_count" = 2147483642; # some games (Star Citizen, UE5 titles) crash without this
+    kernelModules = [ "ntsync" ]; # NT sync primitives in-kernel, speeds up Proton on CPU-bound games
     kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     kernelParams = [
       "quiet"
@@ -112,6 +114,11 @@
       };
       enable = true;
       pulse.enable = true;
+    };
+
+    scx = {
+      enable = true;
+      scheduler = "scx_lavd";
     };
 
     syncthing = {
