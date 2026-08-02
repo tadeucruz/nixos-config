@@ -33,6 +33,10 @@
     enable32Bit = true;
   };
 
+  # https://github.com/aarron-lee/LegionGoRemapper — legion_hid.py loads libhidapi via ctypes at runtime.
+  jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
+  systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
+
   networking.hostName = hostname;
 
   # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
