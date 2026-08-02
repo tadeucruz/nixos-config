@@ -69,9 +69,16 @@ in
   # Jovian's decky-loader module has no declarative "plugins" option — it just
   # scans jovian.decky-loader.stateDir (/var/lib/decky-loader/plugins by default,
   # owned by the system "decky" user, not $HOME). home.file was the wrong layer.
-  systemd.tmpfiles.rules = [
-    "L+ /var/lib/decky-loader/plugins/LegionGoRemapper - - - - ${legionGoRemapper}"
-  ];
+  #
+  # systemd.tmpfiles.rules can't place the symlink either: the loader process
+  # (runs as root) creates ./plugins itself as root under a decky-owned stateDir,
+  # and tmpfiles refuses that ownership transition as an "unsafe path transition"
+  # — it logs a warning and silently skips the rule instead of failing the switch.
+  # Doing it in the service's own preStart (also root) sidesteps that check entirely.
+  systemd.services.decky-loader.preStart = lib.mkAfter ''
+    mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
+    ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
+  '';
 
   networking.hostName = hostname;
 
