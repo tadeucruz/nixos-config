@@ -1,6 +1,7 @@
 # citadel — AMD desktop (CPU + GPU), SteamOS-like experience via Jovian.
 {
   lib,
+  pkgs,
   hostname,
   ...
 }:
@@ -15,6 +16,7 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
+    kernelPackages = pkgs.linuxPackages_testing; # mainline RC track, needed for kernel 7.2
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
