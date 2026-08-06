@@ -4,7 +4,7 @@ NixOS flakes config for 3 machines:
 
 | Host      | Hardware                                     | Role                                            |
 | --------- | --------------------------------------------- | ------------------------------------------------ |
-| `citadel` | AMD CPU + GPU                                | Gaming PC, full KDE desktop (like g15, no Jovian) |
+| `citadel` | AMD CPU + GPU                                | Gaming console-like, Steam/gamescope via Jovian + KDE fallback |
 | `g15`     | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU   | General-purpose laptop + gaming (KDE, PRIME)    |
 | `legion`  | Legion Go — APU AMD Z1 Extreme               | Handheld, Steam/gamescope via Jovian            |
 
@@ -16,10 +16,10 @@ All three run the default NixOS kernel (`linuxPackages_latest`, set in `modules/
 flake.nix              # inputs + 3 nixosConfigurations + Home Manager
 modules/
   common.nix           # nix/flakes, BR locale, user, audio, bluetooth, ssh, zram, fwupd
-  gaming.nix            # Steam + gamemode + ProtonGE + controllers (citadel + g15)
-  desktop.nix            # full KDE Plasma 6 desktop + printing + Syncthing + Bitwarden (citadel + g15)
+  gaming.nix            # Steam + gamemode + ProtonGE + controllers (citadel + g15 + legion)
+  desktop.nix            # full KDE Plasma 6 desktop + printing + Syncthing + Bitwarden (g15 only)
   btrfs-tuning.nix       # shared btrfs mount options + fstrim (citadel + legion)
-  jovian.nix              # SteamOS-like gamescope session + KDE fallback (legion only)
+  jovian.nix              # SteamOS-like gamescope session + KDE fallback (citadel + legion)
 hosts/
   citadel/  | g15/  | legion/
     configuration.nix          # per-host system config

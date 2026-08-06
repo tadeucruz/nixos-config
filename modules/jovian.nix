@@ -1,4 +1,4 @@
-# Applied to legion only.
+# Applied to citadel and legion.
 {
   config,
   lib,

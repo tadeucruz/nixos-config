@@ -62,7 +62,7 @@
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
 
       nixosConfigurations = {
-        citadel = mkHost nixpkgs "citadel" [ ];
+        citadel = mkHost nixpkgs "citadel" [ jovian.nixosModules.default ];
         g15 = mkHost nixpkgs-stable "g15" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };

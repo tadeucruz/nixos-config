@@ -2,14 +2,20 @@
 {
   imports = [
     ./common.nix
-    ./development.nix
     ./gaming.nix
   ];
 
-  # Proton on Wayland; force off Steam Deck identification since this is a real desktop.
   home.sessionVariables = {
-    PROTON_ENABLE_WAYLAND = "1";
-    DXVK_FRAME_RATE = "155";
+    DXVK_FRAME_RATE = "120";
     SteamDeck = "0";
+  };
+
+  xdg.desktopEntries.return-to-steam = {
+    name = "Return to Steam";
+    comment = "Switch back to Steam Big Picture session";
+    exec = "start-gamescope-session";
+    icon = "steam";
+    terminal = false;
+    categories = [ "Game" ];
   };
 }

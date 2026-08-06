@@ -1,9 +1,6 @@
-# citadel — AMD desktop (CPU + GPU). Gaming PC, normal desktop like g15.
+# citadel — AMD desktop (CPU + GPU), SteamOS-like experience via Jovian.
 {
-  config,
-  pkgs,
   lib,
-  username,
   hostname,
   ...
 }:
@@ -11,7 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/common.nix
-    ../../modules/desktop.nix
+    ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
   ];
@@ -37,27 +34,24 @@
     ];
   };
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      libva
-      libva-vdpau-driver
-      libvdpau-va-gl
-    ];
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+
+    # Kept from the desktop session for use while "Exit to Desktop"'d out of gamescope.
+    openrgb.enable = true;
   };
+
+  console.keyMap = "br-abnt2";
 
   networking.hostName = hostname;
 
-  services.sunshine = {
-    enable = true;
-    autoStart = true;
-    capSysAdmin = true; # required for KMS screen capture under Plasma Wayland
-    openFirewall = true;
-    settings = {
-      encoder = "vulkan";
-      vk_rc_mode = 2; # CBR
-      output_name = 1; # DP-1
+  services = {
+    xserver.xkb = lib.mkDefault {
+      layout = "br";
+      variant = "abnt2";
     };
   };
 

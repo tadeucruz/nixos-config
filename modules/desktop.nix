@@ -1,4 +1,4 @@
-# Full desktop environment (used on citadel and g15).
+# Full desktop environment (used on g15).
 { pkgs, lib, ... }:
 {
   services = {
