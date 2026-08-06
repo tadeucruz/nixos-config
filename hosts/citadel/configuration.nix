@@ -36,14 +36,9 @@
     ];
   };
 
-  hardware = {
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-
-    # Kept from the desktop session for use while "Exit to Desktop"'d out of gamescope.
-    openrgb.enable = true;
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
   };
 
   console.keyMap = "br-abnt2";
@@ -51,6 +46,9 @@
   networking.hostName = hostname;
 
   services = {
+    # Kept from the desktop session for use while "Exit to Desktop"'d out of gamescope.
+    hardware.openrgb.enable = true;
+
     xserver.xkb = lib.mkDefault {
       layout = "br";
       variant = "abnt2";
