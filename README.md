@@ -8,7 +8,7 @@ NixOS flakes config for 3 machines:
 | `g15`     | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU   | General-purpose laptop + gaming (KDE, PRIME)    |
 | `legion`  | Legion Go — APU AMD Z1 Extreme               | Handheld, Steam/gamescope via Jovian            |
 
-All three run the default NixOS kernel (`linuxPackages_latest`, set in `modules/common.nix`).
+g15 and legion run the default NixOS kernel (`linuxPackages_latest`, set in `modules/common.nix`); citadel overrides it with the CachyOS RC kernel for HDMI VRR (see Notes below).
 
 ## Layout
 
@@ -92,5 +92,5 @@ update    # update flake inputs (nixpkgs etc.) and rebuild
 - **Username:** set as `tadeucruz` in `flake.nix` (`username` variable).
 - **nixpkgs:** `citadel` and `legion` track `nixos-unstable`; `g15` tracks `nixos-26.05` (stable) since it's used infrequently.
 - **legion:** boots directly into Steam/gamescope via Jovian (`jovian.steam.autoStart`), with KDE Plasma 6 available as the "Exit to Desktop" fallback session.
-- **citadel:** normal KDE Plasma 6 desktop (same `modules/desktop.nix` + `modules/gaming.nix` as g15), no Jovian. root/`/home`/`/nix` btrfs subvolumes tuned with `compress=zstd`, `noatime`, `space_cache=v2`, `discard=async` (+ weekly `fstrim`); extra `/GAMES` btrfs data drive; `amdgpu.dcfeaturemask=0x400` kernel param enables HDMI 2.1 FRL (VRR itself isn't exposed for HDMI connectors on this driver yet — no `vrr_capable` property).
+- **citadel:** boots directly into Steam/gamescope via Jovian, same as legion, with KDE Plasma 6 as the "Exit to Desktop" fallback (`hardware.openrgb`, `services.printing`, and `br`/`abnt2` keyboard kept from its old desktop-only setup for that fallback session). root/`/home`/`/nix` btrfs subvolumes tuned with `compress=zstd`, `noatime`, `space_cache=v2`, `discard=async` (+ weekly `fstrim`); extra `/GAMES` btrfs data drive. Runs the CachyOS RC kernel (`nix-cachyos-kernel` input, citadel only) for its out-of-tree HDMI 2.1 VRR/FRL patchset — mainline amdgpu still doesn't expose `vrr_capable` on HDMI as of Linux 7.2 (targeting 7.3).
 - **legion:** same btrfs tuning as citadel; controller support via InputPlumber (`services.udev.packages = [ pkgs.inputplumber ]` for the `hid-lenovo-go` udev quirks, since Nix doesn't wire a package's bundled udev rules in automatically) plus decky-loader + LegionGoRemapper for the gamepad remap.

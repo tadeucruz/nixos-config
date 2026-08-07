@@ -16,7 +16,11 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    kernelPackages = pkgs.linuxPackages_testing; # mainline RC track, needed for kernel 7.2
+    # CachyOS RC kernel: carries the out-of-tree HDMI 2.1 VRR/FRL patchset that
+    # still hasn't landed in mainline amdgpu (confirmed missing on linuxPackages_testing
+    # 7.2.0-rc6 — no vrr_capable property on the HDMI connector at all; upstream is now
+    # targeting the Linux 7.3 merge window, not guaranteed). Risk accepted.
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
