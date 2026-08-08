@@ -18,6 +18,11 @@
     inherit username;
   };
 
+  # kbuildsycoca's incremental check misses store path hash changes on every rebuild, causing stale KDE plasmoid popups.
+  home.activation.rebuildKdeSycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${lib.getExe' pkgs.kdePackages.kservice "kbuildsycoca6"} --noincremental || true
+  '';
+
   programs = {
     firefox = {
       enable = true;
