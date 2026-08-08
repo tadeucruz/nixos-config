@@ -17,7 +17,7 @@ NixOS flakes repo for 3 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 - **citadel: CachyOS RC kernel (`nix-cachyos-kernel` input, citadel only).** Carries an out-of-tree HDMI 2.1 VRR/FRL patchset that still hasn't landed in mainline amdgpu — confirmed missing (`vrr_capable` absent on the HDMI connector) even on `linuxPackages_testing` 7.2.0-rc6; upstream is now targeting the Linux 7.3 merge window, not guaranteed. Uses the `release` branch (prebuilt + cached via the `attic.xuyh0120.win/lantian` substituter) to avoid local kernel compiles.
 - **legion: no CachyOS kernel.** Uses the default NixOS kernel (`linuxPackages_latest` from `modules/common.nix`). Controller support comes from InputPlumber (`services.udev.packages = [ pkgs.inputplumber ]` for the `hid-lenovo-go` quirks) plus decky-loader + LegionGoRemapper.
 - **Username:** `tadeucruz` (single variable in `flake.nix`, applies everywhere).
-- **nixpkgs channel:** `citadel` and `legion` track `nixos-unstable`; `g15` tracks `nixos-26.05` (stable, used infrequently).
+- **nixpkgs channel:** all three machines (`citadel`, `g15`, `legion`) track `nixos-unstable`. `nixpkgs-stable` input was removed.
 - **Home Manager:** integrated into the flake (`home-manager.nixosModules.home-manager`), not standalone.
 - **g15 PRIME bus IDs** in `hosts/g15/configuration.nix` are **placeholders** — must be replaced with real values from `lspci | grep -E 'VGA|3D'` on the machine.
 - **`hosts/g15/hardware-configuration.nix` is still a placeholder** — must be regenerated with `nixos-generate-config` on the physical machine. `hosts/citadel/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` are already the real, machine-generated ones.

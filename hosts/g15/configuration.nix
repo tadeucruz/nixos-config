@@ -38,7 +38,7 @@
       modesetting.enable = true;
       nvidiaSettings = true;
       open = true;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      package = config.boot.kernelPackages.nvidiaPackages.latest;
 
       powerManagement.enable = true;
       powerManagement.finegrained = true; # powers off dGPU when idle (saves battery)

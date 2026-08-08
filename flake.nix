@@ -4,7 +4,7 @@
   inputs = {
     awcc = {
       url = "github:tr1xem/AWCC";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
@@ -22,7 +22,6 @@
     nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
   outputs =
@@ -32,7 +31,6 @@
       nix-cachyos-kernel,
       nix-flatpak,
       nixpkgs,
-      nixpkgs-stable,
       self,
       ...
     }@inputs:
@@ -77,7 +75,7 @@
           jovian.nixosModules.default
           cachyosKernel
         ];
-        g15 = mkHost nixpkgs-stable "g15" [ ];
+        g15 = mkHost nixpkgs "g15" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };
     };
