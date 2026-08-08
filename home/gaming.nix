@@ -1,4 +1,4 @@
-# Shared Home Manager config for gaming (citadel + g15 + legion).
+# Shared Home Manager config for gaming (citadel + prothean + legion).
 { pkgs, ... }:
 {
   home.packages = with pkgs; [

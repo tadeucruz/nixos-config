@@ -1,4 +1,4 @@
-# g15 — Dell G15 5525: AMD Ryzen 6800H (iGPU Radeon 680M) + Nvidia dGPU. Laptop.
+# prothean (Dell G15 5525): AMD Ryzen 6800H (iGPU Radeon 680M) + Nvidia dGPU. Laptop.
 {
   config,
   pkgs,

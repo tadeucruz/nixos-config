@@ -1,4 +1,4 @@
-# Shared gaming stack (citadel + g15 + legion). Gamescope/session integration
+# Shared gaming stack (citadel + prothean + legion). Gamescope/session integration
 # is handled separately by Jovian on citadel and legion; this covers the
 # generic Steam features useful everywhere.
 { ... }:

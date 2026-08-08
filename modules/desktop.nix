@@ -1,4 +1,4 @@
-# Full desktop environment (used on g15).
+# Full desktop environment (used on prothean).
 { pkgs, lib, ... }:
 {
   services = {

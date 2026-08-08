@@ -1,4 +1,4 @@
-# Shared Home Manager config for development tools (citadel + g15).
+# Shared Home Manager config for development tools (citadel + prothean).
 { pkgs, ... }:
 {
   home.packages = with pkgs; [

@@ -1,5 +1,5 @@
 {
-  description = "NixOS config for 3 machines: citadel (AMD), g15 (AMD+Nvidia), legion (handheld)";
+  description = "NixOS config for 3 machines: citadel (AMD), prothean (AMD+Nvidia), legion (handheld)";
 
   inputs = {
     awcc = {
@@ -75,7 +75,7 @@
           jovian.nixosModules.default
           cachyosKernel
         ];
-        g15 = mkHost nixpkgs "g15" [ ];
+        prothean = mkHost nixpkgs "prothean" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };
     };
