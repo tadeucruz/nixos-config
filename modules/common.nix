@@ -56,10 +56,7 @@
         "nix-command"
         "flakes"
       ];
-      trusted-users = [
-        "root"
-        username
-      ];
+      trusted-users = [ "root" ];
     };
   };
 
@@ -105,7 +102,10 @@
 
     fwupd.enable = true;
 
-    openssh.enable = true;
+    openssh = {
+      enable = true;
+      settings.PasswordAuthentication = false;
+    };
 
     pipewire = {
       alsa = {
