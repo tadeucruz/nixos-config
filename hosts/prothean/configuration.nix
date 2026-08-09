@@ -60,6 +60,8 @@
   services = {
     awcc.enable = true;
 
+    logind.settings.Login.HandleLidSwitchExternalPower = "ignore"; # stays reachable over Tailscale when parked on AC (e.g. left at parents' house)
+
     xserver = {
       videoDrivers = [ "nvidia" ];
       xkb = {
