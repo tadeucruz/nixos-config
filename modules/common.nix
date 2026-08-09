@@ -126,6 +126,8 @@
       user = username;
       dataDir = "/home/${username}";
     };
+
+    tailscale.enable = true;
   };
 
   time.timeZone = "America/Sao_Paulo";
