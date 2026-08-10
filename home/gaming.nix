@@ -9,15 +9,15 @@
     PROTON_USE_NTSYNC = "1";
   };
 
-  # programs.mangohud = {
-  #   enable = true;
-  #   enableSessionWide = true;
-  #
-  #   settings = {
-  #     horizontal = true;
-  #     position = "top";
-  #   };
-  # };
+  programs.mangohud = {
+    enable = true;
+    enableSessionWide = true;
+
+    settings = {
+      horizontal = true;
+      position = "top";
+    };
+  };
 
   xdg.configFile."autostart/steam.desktop".text = ''
     [Desktop Entry]

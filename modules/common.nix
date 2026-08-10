@@ -130,6 +130,9 @@
     tailscale.enable = true;
   };
 
+  # Mask to prevent DrKonqi's unbounded crash-loop when it can't find a display (KDE bug 524048, unfixed): https://bugs.kde.org/show_bug.cgi?id=524048
+  systemd.user.sockets."drkonqi-coredump-launcher".enable = false;
+
   time.timeZone = "America/Sao_Paulo";
 
   users.users.${username} = {
