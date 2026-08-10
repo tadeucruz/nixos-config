@@ -21,6 +21,10 @@
     # 7.2.0-rc6 — no vrr_capable property on the HDMI connector at all; upstream is now
     # targeting the Linux 7.3 merge window, not guaranteed). Risk accepted.
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
+    # Reboot hangs after userspace shutdown completes (confirmed via journal on two
+    # separate reboots, both stuck right after "Sending SIGTERM to remaining processes").
+    # Classic AMD/amdgpu ACPI reset hang; forcing the PCI reset method avoids it.
+    kernelParams = [ "reboot=pci" ];
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
