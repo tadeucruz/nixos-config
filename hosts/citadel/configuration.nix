@@ -16,15 +16,11 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # Test: NOT pkgs.cachyosKernels.linuxPackages-cachyos-rc (that RC kernel's
-    # out-of-tree amdgpu DC patchset hangs on every shutdown/reboot, confirmed by
-    # bisecting it out — see README/CLAUDE.md). CachyOS's RC kernel only changes
-    # the *default value* of the existing amdgpu_dc_feature_mask module param
-    # (2 -> 0x402) to get HDMI FRL/VRR, rather than adding new code — so trying
-    # mainline's own linuxPackages_testing (7.2-rc6, same base CachyOS forks from)
-    # with that same flag, to see if VRR works without the RC kernel's patchset.
-    kernelPackages = pkgs.linuxPackages_testing;
-    kernelParams = [ "amdgpu.dc_feature_mask=0x402" ];
+    # CachyOS RC kernel: carries the out-of-tree HDMI 2.1 VRR/FRL patchset that
+    # still hasn't landed in mainline amdgpu (confirmed missing on linuxPackages_testing
+    # 7.2.0-rc6 — no vrr_capable property on the HDMI connector at all; upstream is now
+    # targeting the Linux 7.3 merge window, not guaranteed). Risk accepted.
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
