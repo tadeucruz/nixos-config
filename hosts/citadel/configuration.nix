@@ -20,6 +20,10 @@
     # pkgs.cachyosKernels.linuxPackages-cachyos-rc: that RC kernel's out-of-tree
     # amdgpu DC patchset (for HDMI 2.1 VRR/FRL) causes a hang on every
     # shutdown/reboot, confirmed by bisecting it out. See README/CLAUDE.md.
+    # Test: CachyOS's RC kernel only changes the *default value* of the existing
+    # amdgpu_dc_feature_mask module param (2 -> 0x402) to get HDMI FRL/VRR — the
+    # feature itself may already be in mainline, just gated off. Try it here first.
+    kernelParams = [ "amdgpu.dc_feature_mask=0x402" ];
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
