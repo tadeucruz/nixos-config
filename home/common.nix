@@ -67,7 +67,6 @@
       shellAliases = {
         ll = "ls -alh";
         rebuild = "cd $NH_FLAKE && git pull && nh os switch";
-        update = "cd $NH_FLAKE && git pull && nh os switch -u";
       };
     };
   };
