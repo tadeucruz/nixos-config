@@ -21,6 +21,12 @@
     # 7.2.0-rc6 — no vrr_capable property on the HDMI connector at all; upstream is now
     # targeting the Linux 7.3 merge window, not guaranteed). Risk accepted.
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
+    # Temporary: disable Plymouth splash to read the actual shutdown/reboot
+    # hang message on screen (debugging the mobo-logo freeze on power cycle).
+    consoleLogLevel = lib.mkForce 7;
+    initrd.verbose = lib.mkForce true;
+    kernelParams = lib.mkForce [ ];
+    plymouth.enable = lib.mkForce false;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
