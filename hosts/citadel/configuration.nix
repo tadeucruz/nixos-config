@@ -16,16 +16,10 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # Temporarily back on the default kernel (see modules/common.nix) instead of
-    # pkgs.cachyosKernels.linuxPackages-cachyos-rc: testing whether the CachyOS RC
-    # kernel itself is the cause of the shutdown/reboot hang (amdgpu.runpm=0 didn't
-    # fix it — reboot=pci didn't either — and this RC kernel carrying an out-of-tree
-    # amdgpu DC patchset is the one thing that changed right before the hang started).
-    # Temporary: disable Plymouth splash to read the actual shutdown/reboot
-    # hang message on screen (debugging the mobo-logo freeze on power cycle).
-    consoleLogLevel = lib.mkForce 7;
-    initrd.verbose = lib.mkForce true;
-    plymouth.enable = lib.mkForce false;
+    # On the default kernel (see modules/common.nix), NOT
+    # pkgs.cachyosKernels.linuxPackages-cachyos-rc: that RC kernel's out-of-tree
+    # amdgpu DC patchset (for HDMI 2.1 VRR/FRL) causes a hang on every
+    # shutdown/reboot, confirmed by bisecting it out. See README/CLAUDE.md.
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
