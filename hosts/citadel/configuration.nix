@@ -25,8 +25,11 @@
     # hang message on screen (debugging the mobo-logo freeze on power cycle).
     consoleLogLevel = lib.mkForce 7;
     initrd.verbose = lib.mkForce true;
-    kernelParams = lib.mkForce [ ];
     plymouth.enable = lib.mkForce false;
+    # Test fix: hang happens in device_shutdown() right after the network
+    # driver's .shutdown() runs — likely amdgpu stuck in BACO runtime PM
+    # during its own .shutdown() hook. Disable runtime PM to rule it out.
+    kernelParams = lib.mkForce [ "amdgpu.runpm=0" ];
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
