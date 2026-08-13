@@ -16,11 +16,10 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # CachyOS RC kernel: carries the out-of-tree HDMI 2.1 VRR/FRL patchset that
-    # still hasn't landed in mainline amdgpu (confirmed missing on linuxPackages_testing
-    # 7.2.0-rc6 — no vrr_capable property on the HDMI connector at all; upstream is now
-    # targeting the Linux 7.3 merge window, not guaranteed). Risk accepted.
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rc;
+    # Built locally from AMD's amd-staging-drm-next branch with the official HDMI 2.1
+    # VRR/ALLM patch series applied (posted upstream 2026-08-06, targeting Linux 7.4).
+    # See hosts/citadel/kernel-amd-staging-vrr.nix.
+    kernelPackages = import ./kernel-amd-staging-vrr.nix { inherit pkgs; };
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
