@@ -17,6 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
     nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -26,6 +28,7 @@
     {
       home-manager,
       jovian,
+      nix-cachyos-kernel,
       nix-flatpak,
       nixpkgs,
       self,
@@ -34,6 +37,14 @@
     let
       system = "x86_64-linux";
       username = "tadeucruz";
+
+      # "pinned" overlay = exact nixpkgs revision the kernel was cached against,
+      # required for binary cache hits (avoids compiling the kernel locally).
+      cachyosKernel = {
+        nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ];
+        nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
+        nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+      };
 
       mkHost =
         nixpkgsSource: hostname: extraModules:
@@ -60,7 +71,10 @@
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
 
       nixosConfigurations = {
-        citadel = mkHost nixpkgs "citadel" [ jovian.nixosModules.default ];
+        citadel = mkHost nixpkgs "citadel" [
+          jovian.nixosModules.default
+          cachyosKernel
+        ];
         prothean = mkHost nixpkgs "prothean" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };
