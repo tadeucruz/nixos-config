@@ -30,8 +30,11 @@ let
 
   amdStagingVrrKernel = pkgs.buildLinux {
     pname = "linux-amd-staging-vrr";
-    version = "7.2.0-amd-staging-vrr-20260812";
-    modDirVersion = "7.2.0-amd-staging-vrr-20260812";
+    # The tree's own Makefile (VERSION/PATCHLEVEL/SUBLEVEL) reports 7.1.0 even though
+    # it carries AMD display patches well ahead of that — modDirVersion must match it
+    # exactly (build.nix validates against `make kernelversion`).
+    version = "7.1.0-amd-staging-vrr-20260812";
+    modDirVersion = "7.1.0";
 
     # amd-staging-drm-next @ 2026-08-12
     src = pkgs.fetchgit {
