@@ -157,7 +157,7 @@ diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm
 +				 */
 +				if (!amdgpu_dm_connector->max_vfreq) {
 +					struct drm_display_mode *brr_mode =
-+						amdgpu_dm_get_highest_refresh_rate_mode(amdgpu_dm_connector, true);
++						get_highest_refresh_rate_mode(amdgpu_dm_connector, true);
 +
 +					if (brr_mode)
 +						amdgpu_dm_connector->max_vfreq =
