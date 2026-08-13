@@ -1,0 +1,191 @@
+Hand-ported, NOT a verbatim upstream patch.
+
+The official series (../amdgpu-hdmi21-vrr-allm/0001-0004) targets AMD's
+amd-staging-drm-next branch, which has already split amdgpu_dm.c into separate
+amdgpu_dm_connector.c / amdgpu_dm_freesync.c files. That split hasn't landed in
+mainline (linux_testing), so those hunks don't apply here. This patch carries the
+same logic — HDMI FRL accepted as a FreeSync signal source, VRR capability falling
+back to the HF-VSDB when the AMD VSDB doesn't provide a range, VTEM info-packet
+transmission on FRL, and ALLM signaling via the HF-VSIF — transplanted into the
+equivalent functions still living in amdgpu_dm.c on mainline (parse_hdmi_amd_vsdb's
+caller, amdgpu_dm_update_freesync_caps, update_freesync_state_on_stream,
+create_stream_for_sink). One upstream hunk was dropped: a debug-log-only addition
+to amdgpu_dm_get_freesync_config_for_crtc, whose mainline equivalent
+(update_stream_irq_parameters) doesn't have the connector state / vrefresh
+values in scope that the log line needs. No functional behavior was omitted.
+
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+@@ -7745,8 +7745,22 @@
+ 	update_stream_signal(stream, sink);
+ 
+ 	if (stream->signal == SIGNAL_TYPE_HDMI_TYPE_A ||
+-	    stream->signal == SIGNAL_TYPE_HDMI_FRL)
+-		mod_build_hf_vsif_infopacket(stream, &stream->vsp_infopacket, false, false);
++	    stream->signal == SIGNAL_TYPE_HDMI_FRL) {
++		/*
++		 * Enable HDMI ALLM (Auto Low-Latency Mode) when the sink
++		 * advertises ALLM in the SCDS and the content type is Game.
++		 * Setting content-type = Game is how userspace requests the
++		 * Sink's low-latency mode (HDMI GCTS HF1-56).
++		 */
++		bool allm = connector->display_info.hdmi.allm &&
++			stream->content_type == DISPLAY_CONTENT_TYPE_GAME;
++
++		drm_dbg_driver(dev,
++			       "ALLM: set mode: sink_allm=%d content_type=%d -> ALLM_Mode=%d\n",
++			    connector->display_info.hdmi.allm, stream->content_type, allm);
++
++		mod_build_hf_vsif_infopacket(stream, &stream->vsp_infopacket, allm, allm);
++	}
+ 
+ 	if (stream->signal == SIGNAL_TYPE_DISPLAY_PORT ||
+ 	    stream->signal == SIGNAL_TYPE_DISPLAY_PORT_MST ||
+@@ -9983,6 +9997,9 @@
+ 		&vrr_infopacket,
+ 		pack_sdp_v1_3);
+ 
++	if (new_stream->sink->sink_signal == SIGNAL_TYPE_HDMI_FRL)
++		mod_build_infopacket_vtem(new_stream, &vrr_params, 0, &vrr_infopacket);
++
+ 	new_crtc_state->freesync_vrr_info_changed |=
+ 		(memcmp(&new_crtc_state->vrr_infopacket,
+ 			&vrr_infopacket,
+@@ -9994,6 +10011,37 @@
+ 	new_stream->vrr_infopacket = vrr_infopacket;
+ 	new_stream->allow_freesync = mod_freesync_get_freesync_enabled(&vrr_params);
+ 
++	/*
++	 * HDMI ALLM: transmit the HF-VSIF with ALLM_Mode=1 when the sink
++	 * advertises ALLM in the SCDS and either the content type is Game
++	 * (HF1-56) or Gaming-VRR is active (VRR_EN=1, HF1-58 step 8.3.1).
++	 * HDMI 2.1 7.6.6.
++	 */
++	if (new_stream->signal == SIGNAL_TYPE_HDMI_TYPE_A ||
++	    new_stream->signal == SIGNAL_TYPE_HDMI_FRL) {
++		struct dc_info_packet vsp_infopacket = {0};
++		bool sink_allm = aconn && aconn->base.display_info.hdmi.allm;
++		bool allm = sink_allm &&
++			(new_stream->content_type == DISPLAY_CONTENT_TYPE_GAME ||
++			 vrr_params.state == VRR_STATE_ACTIVE_VARIABLE ||
++			 vrr_params.state == VRR_STATE_ACTIVE_FIXED);
++		bool allm_changed;
++
++		mod_build_hf_vsif_infopacket(new_stream, &vsp_infopacket, allm, allm);
++
++		allm_changed = memcmp(&new_stream->vsp_infopacket, &vsp_infopacket,
++				      sizeof(vsp_infopacket)) != 0;
++		new_crtc_state->freesync_vrr_info_changed |= allm_changed;
++		new_stream->vsp_infopacket = vsp_infopacket;
++
++		if (allm_changed)
++			drm_dbg_driver(adev_to_drm(adev),
++				       "ALLM: flip on crtc=%u: sink_allm=%d content_type=%d vrr_state=%d -> ALLM_Mode=%d\n",
++				    new_crtc_state->base.crtc->base.id,
++				    sink_allm,
++				    new_stream->content_type, vrr_params.state, allm);
++	}
++
+ 	if (new_crtc_state->freesync_vrr_info_changed)
+ 		drm_dbg_kms(adev_to_drm(adev), "VRR packet update: crtc=%u enabled=%d state=%d",
+ 			      new_crtc_state->base.crtc->base.id,
+@@ -13925,6 +13973,15 @@
+ 
+ 	if (!adev->dm.freesync_module || !dc_supports_vrr(sink->ctx->dce_version))
+ 		goto update;
++
++	drm_dbg_driver(adev_to_drm(adev),
++		       "VRR: enter signal=%d hdmi_vrr=%d mrange[%d-%d] hdmi.vrr_cap[sup=%d min=%d max=%d]\n",
++		       sink->sink_signal, connector->display_info.hdmi.vrr_cap.supported,
++		       connector->display_info.monitor_range.min_vfreq,
++		       connector->display_info.monitor_range.max_vfreq,
++		       connector->display_info.hdmi.vrr_cap.supported,
++		       connector->display_info.hdmi.vrr_cap.vrr_min,
++		       connector->display_info.hdmi.vrr_cap.vrr_max);
+ 
+ 	edid = drm_edid_raw(drm_edid); // FIXME: Get rid of drm_edid_raw()
+ 
+@@ -13951,7 +14008,9 @@
+ 			amdgpu_dm_connector->as_type = ADAPTIVE_SYNC_TYPE_EDP;
+ 		}
+ 
+-	} else if (drm_edid && sink->sink_signal == SIGNAL_TYPE_HDMI_TYPE_A) {
++	} else if (drm_edid &&
++		  (sink->sink_signal == SIGNAL_TYPE_HDMI_TYPE_A ||
++		   sink->sink_signal == SIGNAL_TYPE_HDMI_FRL)) {
+ 		i = parse_hdmi_amd_vsdb(amdgpu_dm_connector, edid, &vsdb_info);
+ 		if (i >= 0) {
+ 			amdgpu_dm_connector->vsdb_info = vsdb_info;
+@@ -13967,6 +14026,59 @@
+ 				connector->display_info.monitor_range.max_vfreq = vsdb_info.max_refresh_rate_hz;
+ 			}
+ 		}
++
++		drm_dbg_driver(adev_to_drm(adev),
++			       "VRR: amd_vsdb i=%d fs_sup=%d min=%d max=%d fs_capable=%d\n",
++			       i, vsdb_info.freesync_supported,
++			       vsdb_info.min_refresh_rate_hz,
++			       vsdb_info.max_refresh_rate_hz, freesync_capable);
++
++		/*
++		 * If AMD VSDB didn't provide a valid FreeSync range, fall back to
++		 * the HDMI 2.1 VRR capability parsed from the HF-VSDB.
++		 */
++		if (!freesync_capable && connector->display_info.hdmi.vrr_cap.supported) {
++			struct drm_hdmi_vrr_cap *vrr_cap =
++				&connector->display_info.hdmi.vrr_cap;
++
++			drm_dbg_driver(adev_to_drm(adev),
++				       "VRR: HF-VSDB fallback: hdmi_vrr=1 vrr_cap[sup=%d min=%d max=%d] mrange_max=%d\n",
++				       vrr_cap->supported, vrr_cap->vrr_min, vrr_cap->vrr_max,
++				       connector->display_info.monitor_range.max_vfreq);
++
++			if (vrr_cap->supported && vrr_cap->vrr_min > 0) {
++				amdgpu_dm_connector->min_vfreq = vrr_cap->vrr_min;
++				amdgpu_dm_connector->max_vfreq = vrr_cap->vrr_max ?
++					vrr_cap->vrr_max :
++					connector->display_info.monitor_range.max_vfreq;
++
++				/*
++				 * VRRMAX = 0 in the HF-VSDB means "up to the Base
++				 * Refresh Rate". If the EDID also did not provide a
++				 * monitor range max, fall back to the Base Refresh
++				 * Rate (the highest refresh rate of the preferred
++				 * timing) so a valid VRR range is still reported to
++				 * userspace.
++				 */
++				if (!amdgpu_dm_connector->max_vfreq) {
++					struct drm_display_mode *brr_mode =
++						amdgpu_dm_get_highest_refresh_rate_mode(amdgpu_dm_connector, true);
++
++					if (brr_mode)
++						amdgpu_dm_connector->max_vfreq =
++							drm_mode_vrefresh(brr_mode);
++				}
++
++				if (amdgpu_dm_connector->max_vfreq -
++				    amdgpu_dm_connector->min_vfreq > 10)
++					freesync_capable = true;
++
++				connector->display_info.monitor_range.min_vfreq =
++					amdgpu_dm_connector->min_vfreq;
++				connector->display_info.monitor_range.max_vfreq =
++					amdgpu_dm_connector->max_vfreq;
++			}
++		}
+ 	}
+ 
+ 	if (amdgpu_dm_connector->dc_link)
+@@ -14007,6 +14119,11 @@
+ update:
+ 	if (dm_con_state)
+ 		dm_con_state->freesync_capable = freesync_capable;
++
++	drm_dbg_driver(adev_to_drm(adev),
++		       "VRR: caps result: freesync_capable=%d min_vfreq=%d max_vfreq=%d\n",
++		       freesync_capable, amdgpu_dm_connector->min_vfreq,
++		       amdgpu_dm_connector->max_vfreq);
+ 
+ 	if (connector->state && amdgpu_dm_connector->dc_link && !freesync_capable &&
+ 	    amdgpu_dm_connector->dc_link->replay_settings.config.replay_supported) {

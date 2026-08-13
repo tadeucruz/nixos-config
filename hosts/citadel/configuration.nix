@@ -16,10 +16,10 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # Built locally from AMD's amd-staging-drm-next branch with the official HDMI 2.1
-    # VRR/ALLM patch series applied (posted upstream 2026-08-06, targeting Linux 7.4).
-    # See hosts/citadel/kernel-amd-staging-vrr.nix.
-    kernelPackages = import ./kernel-amd-staging-vrr.nix { inherit pkgs; };
+    # NixOS's linuxPackages_testing with the official HDMI 2.1 VRR/ALLM patch series
+    # applied (posted upstream 2026-08-06, targeting Linux 7.4). See
+    # hosts/citadel/kernel-vrr.nix.
+    kernelPackages = import ./kernel-vrr.nix { inherit pkgs; };
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
