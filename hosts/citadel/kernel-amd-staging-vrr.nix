@@ -41,6 +41,13 @@ let
     };
 
     kernelPatches = vrrPatches;
+
+    # The tree's own Makefile reports 7.1 (VERSION/PATCHLEVEL) even though it carries
+    # AMD display patches well ahead of that — nixpkgs' common-config.nix picks kernel
+    # hardening options by version-gating on our `version` string (e.g.
+    # KMALLOC_PARTITION_CACHES, gated on >=7.2), and those Kconfig symbols don't exist
+    # in this source. Downgrades those mismatches from hard build failures to warnings.
+    ignoreConfigErrors = true;
   };
 in
 pkgs.linuxPackagesFor amdStagingVrrKernel
