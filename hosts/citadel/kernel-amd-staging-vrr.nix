@@ -37,7 +37,7 @@ let
     src = pkgs.fetchgit {
       url = "https://gitlab.freedesktop.org/agd5f/linux.git";
       rev = "21c50d41af7c46e138b542dba2dcf6d2a978ae99";
-      hash = "sha256-dE/+I7l34xlsgHjwT25mv7kVLbkOd857HcCoOkyOPZw=";
+      hash = "sha256-w09lxf6VIMN1140OZBNuP+O7bQsHzVUn5gYSinXUKX0=";
     };
 
     kernelPatches = vrrPatches;
