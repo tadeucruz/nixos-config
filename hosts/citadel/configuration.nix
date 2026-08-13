@@ -1,5 +1,6 @@
 # citadel — AMD desktop (CPU + GPU), SteamOS-like experience via Jovian.
 {
+  config,
   lib,
   pkgs,
   hostname,
@@ -24,9 +25,22 @@
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
     loader = {
       efi.canTouchEfiVariables = true;
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 5;
+      };
     };
   };
+
+  # Keep only the last 5 generations — many old ones piling up (kernel rebuilds
+  # especially) made GC slow, but full "-d" (only current, no rollback) was too much.
+  # `nix.gc.options` alone can't do "keep N", so trim generations first, then GC.
+  nix.gc.automatic = true;
+  nix.gc.dates = "weekly";
+  systemd.services.nix-gc.script = lib.mkForce ''
+    ${lib.getExe' config.nix.package "nix-env"} -p /nix/var/nix/profiles/system --delete-generations +5
+    exec ${lib.getExe' config.nix.package "nix-collect-garbage"}
+  '';
 
   fileSystems."/GAMES" = {
     device = "/dev/disk/by-uuid/be622b96-26c5-4ff2-b740-7bab4dd6fa9d";
