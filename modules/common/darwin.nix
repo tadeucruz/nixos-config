@@ -35,10 +35,6 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    nh
-  ];
-
   system.defaults = {
     dock = {
       autohide = true;

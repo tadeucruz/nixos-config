@@ -1,11 +1,18 @@
 # Shared Home Manager config across all machines (cross-platform).
 {
+  pkgs,
   username,
   ...
 }:
 {
   home = {
     enableNixpkgsReleaseCheck = false;
+    packages = with pkgs; [
+      btop
+      curl
+      vim
+      wget
+    ];
     stateVersion = "26.05";
     inherit username;
   };

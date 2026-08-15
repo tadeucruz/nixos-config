@@ -1,8 +1,6 @@
 # Shared config applied to ALL machines (cross-platform).
 { ... }:
 {
-  imports = [ ../system-packages.nix ];
-
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
