@@ -17,10 +17,7 @@
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # linuxPackages_testing + OpenGamingCollective's VRR/handheld patch (see
-    # hosts/citadel/kernel-ogc-vrr.nix). Still RC-track — the reboot/shutdown hang
-    # applies here (accepted tradeoff, see CLAUDE.md).
-    kernelPackages = import ./kernel-ogc-vrr.nix { inherit pkgs; };
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot = {

@@ -51,9 +51,7 @@ in
       "uhid"
       "uinput"
     ];
-    # Stable linuxPackages_latest + OpenGamingCollective's Lenovo WMI driver patch
-    # (battery charge limiting, CPU/GPU tunables). See hosts/legion/kernel-ogc-lenovo.nix.
-    kernelPackages = import ./kernel-ogc-lenovo.nix { inherit pkgs; };
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-deckify;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;

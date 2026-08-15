@@ -20,6 +20,7 @@
   boot = {
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     kernelModules = [ "acpi_call" ];
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
