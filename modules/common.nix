@@ -116,11 +116,6 @@
       pulse.enable = true;
     };
 
-    scx = {
-      enable = true;
-      scheduler = "scx_lavd";
-    };
-
     syncthing = {
       enable = true;
       user = username;
