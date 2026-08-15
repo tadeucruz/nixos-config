@@ -3,8 +3,6 @@
 {
   imports = [ ./all.nix ];
 
-  nix.settings.trusted-users = [ "root" username ];
-
   homebrew = {
     enable = true;
     onActivation.cleanup = "zap";
@@ -36,19 +34,9 @@
   };
 
   system.defaults = {
-    dock = {
-      autohide = true;
-      mru-spaces = false;
-    };
-
     trackpad = {
       Clicking = true;
       TrackpadRightClick = true;
-    };
-
-    finder = {
-      AppleShowAllExtensions = true;
-      ShowPathbar = true;
     };
   };
 }

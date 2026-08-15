@@ -73,6 +73,25 @@
           ]
           ++ extraModules;
         };
+
+      mkDarwin =
+        hostname:
+        nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          specialArgs = { inherit inputs username hostname; };
+          modules = [
+            ./hosts/${hostname}/configuration.nix
+
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "backup";
+              home-manager.extraSpecialArgs = { inherit inputs username hostname; };
+              home-manager.users.${username} = import ./home/hosts/${hostname}.nix;
+            }
+          ];
+        };
     in
     {
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
@@ -83,27 +102,8 @@
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
       };
 
-      darwinConfigurations.normandy = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        specialArgs = {
-          inherit inputs username;
-          hostname = "normandy";
-        };
-        modules = [
-          ./hosts/normandy/configuration.nix
-
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = {
-              inherit inputs username;
-              hostname = "normandy";
-            };
-            home-manager.users.${username} = import ./home/hosts/normandy.nix;
-          }
-        ];
+      darwinConfigurations = {
+        normandy = mkDarwin "normandy";
       };
     };
 }
