@@ -1,0 +1,24 @@
+name: Update flake.lock
+
+on:
+  schedule:
+    # 08:00 America/Sao_Paulo (UTC-3, no DST) = 11:00 UTC
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: DeterminateSystems/update-flake-lock@main
+        with:
+          pr-title: "flake: update flake.lock"
+          commit-msg: "flake: update flake.lock"
