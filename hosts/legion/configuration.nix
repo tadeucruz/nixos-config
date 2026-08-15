@@ -39,7 +39,7 @@ in
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/common.nix
+    ../../modules/common/linux.nix
     ../../modules/gaming.nix
     ../../modules/jovian.nix
     ../../modules/btrfs-tuning.nix

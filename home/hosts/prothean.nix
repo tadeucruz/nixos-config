@@ -1,9 +1,10 @@
 { ... }:
 {
   imports = [
-    ./common.nix
-    ./development.nix
-    ./gaming.nix
+    ../common/all.nix
+    ../common/linux.nix
+    ../development.nix
+    ../gaming.nix
   ];
 
   # Proton on Wayland; force off Steam Deck identification since this is a real desktop.

@@ -11,7 +11,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/common.nix
+    ../../modules/common/linux.nix
     ../../modules/desktop.nix
     ../../modules/gaming.nix
     inputs.awcc.nixosModules.default

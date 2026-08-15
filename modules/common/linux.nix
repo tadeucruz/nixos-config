@@ -1,12 +1,13 @@
-# Shared config applied to ALL machines.
+# Shared NixOS (Linux) config applied to citadel, prothean, and legion.
 {
-  config,
   pkgs,
   lib,
   username,
   ...
 }:
 {
+  imports = [ ./all.nix ];
+
   boot = {
     consoleLogLevel = 3;
     initrd.verbose = false;
@@ -21,14 +22,6 @@
   };
 
   console.keyMap = lib.mkDefault "us-acentos";
-
-  environment.systemPackages = with pkgs; [
-    btop
-    curl
-    git
-    vim
-    wget
-  ];
 
   hardware.bluetooth = {
     enable = true;
@@ -51,20 +44,10 @@
       automatic = true;
       dates = [ "weekly" ];
     };
-    settings = {
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      trusted-users = [ "root" ];
-    };
+    settings.trusted-users = [ "root" ];
   };
 
-  nixpkgs.config = {
-    allowUnfree = true;
-    permittedInsecurePackages = [ "pnpm-9.15.9" ];
-    rocmSupport = true; # needed for btop's AMD GPU panel (links librocm_smi64.so)
-  };
+  nixpkgs.config.rocmSupport = true; # needed for btop's AMD GPU panel (links librocm_smi64.so)
 
   programs = {
     nh = {
@@ -127,8 +110,6 @@
 
   # Mask to prevent DrKonqi's unbounded crash-loop when it can't find a display (KDE bug 524048, unfixed): https://bugs.kde.org/show_bug.cgi?id=524048
   systemd.user.sockets."drkonqi-coredump-launcher".enable = false;
-
-  time.timeZone = "America/Sao_Paulo";
 
   users.users.${username} = {
     description = "Tadeu Cruz";

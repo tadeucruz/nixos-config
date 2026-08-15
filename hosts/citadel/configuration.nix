@@ -9,7 +9,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/common.nix
+    ../../modules/common/linux.nix
     ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix

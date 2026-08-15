@@ -1,14 +1,10 @@
 { ... }:
 {
   imports = [
-    ./common.nix
-    ./gaming.nix
+    ../common/all.nix
+    ../common/linux.nix
+    ../gaming.nix
   ];
-
-  home.sessionVariables = {
-    DXVK_FRAME_RATE = "120";
-    SteamDeck = "0";
-  };
 
   xdg.desktopEntries.return-to-steam = {
     name = "Return to Steam";
