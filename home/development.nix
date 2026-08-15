@@ -1,4 +1,4 @@
-# Shared Home Manager config for development tools (citadel + prothean).
+# Shared Home Manager config for development tools (prothean + normandy).
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
@@ -6,6 +6,7 @@
     go
     godot_4
     jdk
+    opencode
     vscode
   ];
 }

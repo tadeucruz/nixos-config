@@ -10,6 +10,7 @@
     packages = with pkgs; [
       btop
       curl
+      herdr
       vim
       wget
     ];
