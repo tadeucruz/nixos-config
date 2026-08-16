@@ -7,7 +7,7 @@
     enable = true;
     enableZshIntegration = true;
     onActivation.cleanup = "zap";
-    brews = [ "displayplacer" ];
+    brews = [ "displayplacer" "cocoapods" ];
     casks = [ "cryptomator" "android-studio" ];
     masApps = {
       Xcode = 497799835;
