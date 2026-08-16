@@ -8,7 +8,10 @@
     enableZshIntegration = true;
     onActivation.cleanup = "zap";
     brews = [ "displayplacer" ];
-    casks = [ "iterm2" "cryptomator" ];
+    casks = [ "cryptomator" "android-studio" ];
+    masApps = {
+      Xcode = 497799835;
+    };
   };
 
   services.tailscale.enable = true;
@@ -45,7 +48,7 @@
       largesize = 128;
       persistent-apps = [
         "/System/Cryptexes/App/System/Applications/Safari.app"
-        "/Applications/iTerm.app"
+        "/System/Applications/Utilities/Terminal.app"
         "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
         "/System/Applications/Mail.app"
         "/System/Applications/Photos.app"
@@ -76,6 +79,13 @@
     )"
     if [ -n "$builtin_id" ] && ! launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer list 2>/dev/null | grep -q "res:1800x1169.*<-- current mode"; then
       launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer "id:$builtin_id res:1800x1169 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" || true
+    fi
+
+    # Accept the Xcode license and point xcode-select at the full Xcode install.
+    # Runs after `brew bundle` (which installs Xcode via `mas`).
+    if [ -d /Applications/Xcode.app ]; then
+      /usr/bin/xcode-select -s /Applications/Xcode.app/Contents/Developer
+      /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -license accept >/dev/null 2>&1 || true
     fi
   '';
 }
