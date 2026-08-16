@@ -68,12 +68,7 @@
     };
   };
 
-  # macOS does not apply trackpad defaults until they are activated; without
-  # this the switch writes the plists but tap-to-click stays off until
-  # logout/login. Must run in the user's session (activation runs as root).
   system.activationScripts.postActivation.text = ''
-    launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-
     # Keep the built-in display on "More Space" (1800x1169) when it is
     # connected. Its persistent id changes between docks/reboots, so detect it
     # dynamically and skip silently when the lid is closed (external-only).
