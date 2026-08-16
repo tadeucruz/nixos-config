@@ -5,6 +5,7 @@
     ../../modules/common/darwin.nix
     ../../modules/normandy.nix
     ../../homebrew/common.nix
+    ../../homebrew/normandy.nix
     ../../homebrew/development-mac.nix
   ];
 

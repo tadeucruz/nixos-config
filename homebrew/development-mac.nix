@@ -1,11 +1,10 @@
-# Dev tooling and personal apps installed via Homebrew (normandy only).
+# Mobile dev toolchain installed via Homebrew (normandy only).
 { ... }:
 {
   homebrew = {
-    brews = [ "displayplacer" "cocoapods" ];
-    casks = [ "cryptomator" "android-studio" "flutter" ];
+    brews = [ "cocoapods" ];
+    casks = [ "android-studio" "flutter" ];
     masApps = {
-      WhatsApp = 310633997;
       Xcode = 497799835;
     };
   };
