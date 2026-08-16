@@ -60,7 +60,7 @@
 
       settings = {
         add_newline = true;
-        format = "╭─$username$hostname$directory$git_branch$git_status$golang$java$dart$cmd_duration$jobs$line_break╰─$character";
+        format = "╭─$username$hostname$directory$git_branch$git_status$golang$nodejs$java$dart$cmd_duration$jobs$line_break╰─$character";
 
         os = { disabled = true; };
 
@@ -92,6 +92,7 @@
         git_status = { style = "bold red"; };
 
         golang = { symbol = " "; };
+        nodejs = { symbol = " "; };
         java = { symbol = " "; };
         dart = { symbol = " "; };
 
