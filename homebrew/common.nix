@@ -5,6 +5,5 @@
     enable = true;
     enableZshIntegration = true;
     onActivation.cleanup = "zap";
-    taps = [ "homebrew/core" "homebrew/cask" ];
   };
 }
