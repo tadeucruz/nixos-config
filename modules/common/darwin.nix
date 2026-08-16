@@ -8,7 +8,7 @@
     enableZshIntegration = true;
     onActivation.cleanup = "zap";
     brews = [ "displayplacer" ];
-    casks = [ "ghostty" ];
+    casks = [ "iterm2" ];
   };
 
   services.tailscale.enable = true;
@@ -45,7 +45,7 @@
       largesize = 128;
       persistent-apps = [
         "/System/Cryptexes/App/System/Applications/Safari.app"
-        "/Applications/Ghostty.app"
+        "/Applications/iTerm.app"
         "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
         "/System/Applications/Mail.app"
         "/System/Applications/Photos.app"
