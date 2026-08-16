@@ -20,6 +20,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **Username:** `tadeucruz` (single variable in `flake.nix`, applies everywhere).
 - **nixpkgs channel:** all four machines track `nixos-unstable`. `nixpkgs-stable` input was removed.
 - **Home Manager:** integrated into the flake (`home-manager.nixosModules.home-manager` for NixOS, `home-manager.darwinModules.home-manager` for darwin), not standalone.
+- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/neovim.nix`, imported alongside `development.nix`). Config comes from the official `LazyVim/starter` template, kept in `home/neovim/` and deployed read-only via `xdg.configFile.nvim.source`. Only `lua/plugins/extras.lua` was customized, enabling just the `lang.java` and `lang.go` LazyVim extras. Two things had to account for `~/.config/nvim` being a read-only nix store symlink: `lua/config/lazy.lua` redirects lazy.nvim's `lockfile` to `stdpath("data")` (writable) instead of the default `stdpath("config")` path; and LSP servers (`jdtls`, `gopls`) are left to Mason (installs into `~/.local/share/nvim/mason`, also writable) rather than forced through nix — jdtls's launch mechanism is tightly coupled to Mason's install layout inside LazyVim's java extra, so overriding it isn't reliable. `gcc`/`ripgrep`/`fd`/`unzip` are installed via nix since LazyVim's core (treesitter, telescope, Mason downloads) needs them regardless of language; `go`/`jdk` already come from `development.nix`.
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — must be replaced with real values from `lspci | grep -E 'VGA|3D'` on the machine.
 - **`hosts/prothean/hardware-configuration.nix` is still a placeholder** — must be regenerated with `nixos-generate-config` on the physical machine. `hosts/citadel/hardware-configuration.nix` and `hosts/legion/hardware-configuration.nix` are already the real, machine-generated ones. normandy (macOS) has no hardware-configuration.nix.
 
@@ -49,6 +50,8 @@ home/
   common/linux.nix               # Linux-only: KDE sycoca, bitwarden SSH agent, rebuild alias
   common/darwin.nix              # macOS-only: nh (programs.nh, with GC) + rebuild alias
   development.nix                # dev tooling (vscode, claude-code, opencode, go, godot_4, jdk) — prothean + normandy
+  neovim.nix                     # LazyVim (java + go extras), meant to eventually replace vscode — prothean + normandy
+  neovim/                        # actual nvim config (init.lua, lua/config, lua/plugins) copied to ~/.config/nvim
   gaming.nix                     # mangohud, protonplus — citadel + prothean + legion
 ```
 
