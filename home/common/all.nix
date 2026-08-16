@@ -60,9 +60,9 @@
 
       settings = {
         add_newline = true;
-        format = "╭─$os$username$hostname$directory$git_branch$git_status$go$java$dart$cmd_duration$jobs$line_break╰─$character";
+        format = "╭─$username$hostname$directory$git_branch$git_status$golang$java$dart$cmd_duration$jobs$line_break╰─$character";
 
-        os = { disabled = false; style = "bold blue"; };
+        os = { disabled = true; };
 
         username = {
           show_always = true;
@@ -91,7 +91,7 @@
         };
         git_status = { style = "bold red"; };
 
-        go = { symbol = " "; };
+        golang = { symbol = " "; };
         java = { symbol = " "; };
         dart = { symbol = " "; };
 
