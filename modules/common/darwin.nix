@@ -10,6 +10,7 @@
     brews = [ "displayplacer" "cocoapods" ];
     casks = [ "cryptomator" "android-studio" "flutter" ];
     masApps = {
+      WhatsApp = 310633997;
       Xcode = 497799835;
     };
   };
@@ -58,6 +59,7 @@
         "/System/Applications/Notes.app"
         "/System/Applications/TV.app"
         "/System/Applications/Music.app"
+        "/Applications/WhatsApp.app"
         "/System/Applications/System Settings.app"
       ];
     };
