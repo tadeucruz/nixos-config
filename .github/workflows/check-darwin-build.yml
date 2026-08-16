@@ -1,0 +1,29 @@
+name: Check darwin build
+
+on:
+  pull_request:
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/normandy/**"
+      - "modules/**"
+      - "home/**"
+  push:
+    branches: [main]
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/normandy/**"
+      - "modules/**"
+      - "home/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - run: nix build .#darwinConfigurations.normandy.system --no-link --print-build-logs
