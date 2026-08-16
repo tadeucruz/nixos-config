@@ -15,7 +15,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 
 - **Jovian on citadel and legion.** gamescope+Steam session (`jovian.steam.autoStart`) with KDE Plasma 6 as the fallback desktop (`modules/jovian.nix`). No display manager — Jovian's `autoStart` manages the session directly. Both also import `modules/gaming.nix` for the generic Steam/controller bits. citadel additionally keeps `hardware.openrgb`, `services.printing`, and the `intl` keyboard variant (carried over from its old desktop-only setup) for when it's "Exit to Desktop"'d out of gamescope.
 - **prothean: no Jovian, full KDE desktop.** Uses `modules/desktop.nix` + `modules/gaming.nix` (normal desktop session, SDDM login manager). Has PRIME offload + AWCC fan control (Nvidia dGPU + Dell-specific).
-- **normandy: nix-darwin, not NixOS.** System config via `darwinConfigurations.normandy` (`hosts/normandy/configuration.nix` + `modules/common/darwin.nix`). GUI apps via Homebrew casks (`homebrew.onActivation.cleanup = "zap"` → removing a cask from config uninstalls it): bitwarden, betterdisplay. `displayplacer` is a Homebrew **formula** declared in `homebrew.brews`; a `postActivation` script re-applies the built-in display's "More Space" scaling (1800x1169) on every switch. Tailscale and Syncthing via nix-darwin services (`services.tailscale` / a `launchd.user.agents.syncthing`). Firefox is installed from **nixpkgs** (not cask) so the shared `programs.firefox` policies/extensions apply. Trackpad `system.defaults` (tap-to-click, dark mode) are written on switch but only take effect after logout/login (the old `activateSettings -u` `postActivation` hack was removed 2026-08-16 in favor of just logging out).
+- **normandy: nix-darwin, not NixOS.** System config via `darwinConfigurations.normandy` (`hosts/normandy/configuration.nix` + `modules/common/darwin.nix`). GUI apps via Homebrew casks (`homebrew.onActivation.cleanup = "zap"` → removing a cask from config uninstalls it): bitwarden, betterdisplay. `displayplacer` is a Homebrew **formula** declared in `homebrew.brews`; a `postActivation` script re-applies the built-in display's "More Space" scaling (1800x1169) on every switch, logging failures to `/tmp/darwin-activation.log` instead of swallowing them. Touch ID for sudo is enabled (`security.pam.services.sudo_local.touchIdAuth`), and a Nerd Font (`fonts.packages`) is declared explicitly for the starship glyphs. Tailscale and Syncthing via nix-darwin services (`services.tailscale` / a `launchd.user.agents.syncthing`). Firefox is installed from **nixpkgs** (not cask) so the shared `programs.firefox` policies/extensions apply. Trackpad `system.defaults` (tap-to-click, dark mode) are written on switch but only take effect after logout/login (the old `activateSettings -u` `postActivation` hack was removed 2026-08-16 in favor of just logging out). A `.github/workflows/check-darwin-build.yml` job (`macos-14` runner) builds `darwinConfigurations.normandy.system` on PRs/pushes touching darwin-relevant paths, since the lockfile-update workflow itself only runs on `ubuntu-latest` and never validates the darwin build.
 - **Kernel: CachyOS on the three NixOS hosts**, via the `nix-cachyos-kernel` flake input (`flake.nix`'s `cachyosKernel` module — pinned overlay + `attic.xuyh0120.win/lantian` binary cache, no local kernel compiling). citadel and prothean use `linuxPackages-cachyos-latest`; legion uses `linuxPackages-cachyos-deckify` (handheld-tuned variant). Dropped the custom OGC-patched kernels (`OpenGamingCollective/linux`) on 2026-08-15 after unexplained hard freezes on legion. legion's Lenovo WMI battery/TDP driver stack (`lenovo_wmi_*`) is present and working on CachyOS too (verified 2026-08-15, not OGC-exclusive). citadel's HDMI VRR is unclear: upstream `CachyOS/linux-cachyos` does carry a VRR/ALLM patch (Lawstorant's `vrr-fixing` branch), but the running build (`v7.1.6-cachyos`, via the third-party `nix-cachyos-kernel` packaging) shows no `vrr_capable` sysfs property on the connected HDMI output — possibly this packaging lags CachyOS's own patch set. Needs re-checking after a `nix-cachyos-kernel` bump.
 - **Username:** `tadeucruz` (single variable in `flake.nix`, applies everywhere).
 - **nixpkgs channel:** all four machines track `nixos-unstable`. `nixpkgs-stable` input was removed.
@@ -30,7 +30,7 @@ flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigura
 modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
   common/linux.nix               # NixOS shared: kernel, hardware, services, user, zram
-  common/darwin.nix              # nix-darwin shared: homebrew casks, tailscale, syncthing, defaults
+  common/darwin.nix              # nix-darwin shared: homebrew casks, touch ID sudo, fonts, tailscale, syncthing, defaults
   gaming.nix                     # Steam + gamemode + controllers (citadel + prothean + legion)
   jovian.nix                     # gamescope+Steam session + KDE fallback (citadel + legion)
   desktop.nix                    # full KDE Plasma 6 desktop (prothean only)
@@ -41,8 +41,8 @@ hosts/
 home/
   hosts/<host>.nix               # per-host user overrides (imports home/common + shared modules)
   common/all.nix                 # cross-platform dotfiles: git, zsh, starship, firefox + packages (btop, curl, vim, wget, herdr)
-  common/linux.nix               # Linux-only: ryzenadj, KDE sycoca, bitwarden SSH agent, rebuild alias
-  common/darwin.nix              # macOS-only: nh + rebuild alias
+  common/linux.nix               # Linux-only: KDE sycoca, bitwarden SSH agent, rebuild alias
+  common/darwin.nix              # macOS-only: nh (programs.nh, with GC) + rebuild alias
   development.nix                # dev tooling (vscode, claude-code, opencode, go, godot_4, jdk) — prothean + normandy
   gaming.nix                     # mangohud, protonplus — citadel + prothean + legion
 ```
@@ -52,5 +52,5 @@ home/
 - All file content (comments, READMEs, inline notes) must be written in **English**.
 - Conversation with the user happens in Portuguese.
 - Keep modules flat — avoid deep nesting or extra abstraction layers unless clearly needed.
-- Cross-platform user packages belong in `home/common/all.nix`; OS-specific in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's the `home/` layer's job (only `programs.nh` stays system-level because it wires the `nh clean` GC service).
+- Cross-platform user packages belong in `home/common/all.nix`; OS-specific in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's the `home/` layer's job. On NixOS, `programs.nh` stays system-level because it wires the `nh clean` GC service; on darwin (no system-level `programs.nh` module) the equivalent lives in `home/common/darwin.nix` via home-manager's `programs.nh`.
 - `system.stateVersion` is `"26.05"` on the NixOS hosts; normandy uses `system.stateVersion = 7` (nix-darwin).
