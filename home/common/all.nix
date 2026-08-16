@@ -49,6 +49,7 @@
       enable = true;
       settings.user.name = "Tadeu Cruz";
       settings.user.email = "tadeucruz@gmail.com";
+      settings.pull.rebase = "true";
     };
 
     home-manager.enable = true;
