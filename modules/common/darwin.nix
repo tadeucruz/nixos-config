@@ -44,7 +44,7 @@
       magnification = true;
       largesize = 128;
       persistent-apps = [
-        "/Applications/Safari.app"
+        "/System/Cryptexes/App/System/Applications/Safari.app"
         "/System/Applications/Utilities/Terminal.app"
         "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
         "/System/Applications/Mail.app"
