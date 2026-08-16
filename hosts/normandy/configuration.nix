@@ -3,7 +3,7 @@
 {
   imports = [
     ../../modules/common/darwin.nix
-    ../../modules/development-mac.nix
+    ../../modules/normandy.nix
     ../../homebrew/common.nix
     ../../homebrew/development-mac.nix
   ];
