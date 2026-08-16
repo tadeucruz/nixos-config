@@ -23,6 +23,8 @@
 
   console.keyMap = lib.mkDefault "us-acentos";
 
+  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
