@@ -32,14 +32,5 @@
       launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer "id:$builtin_id res:1800x1169 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
         || echo "postActivation: displayplacer failed to set built-in display mode" >> /tmp/darwin-activation.log
     fi
-
-    # Accept the Xcode license and point xcode-select at the full Xcode install.
-    # Runs after `brew bundle` (which installs Xcode via `mas`).
-    if [ -d /Applications/Xcode.app ]; then
-      /usr/bin/xcode-select -s /Applications/Xcode.app/Contents/Developer \
-        || echo "postActivation: xcode-select failed" >> /tmp/darwin-activation.log
-      /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -license accept >/dev/null 2>&1 \
-        || echo "postActivation: xcodebuild -license accept failed" >> /tmp/darwin-activation.log
-    fi
   '';
 }
