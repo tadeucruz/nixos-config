@@ -8,7 +8,7 @@
     enableZshIntegration = true;
     onActivation.cleanup = "zap";
     brews = [ "displayplacer" ];
-    casks = [ "iterm2" ];
+    casks = [ "iterm2" "cryptomator" ];
   };
 
   services.tailscale.enable = true;
