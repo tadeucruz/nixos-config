@@ -5,6 +5,7 @@
 
   homebrew = {
     enable = true;
+    enableZshIntegration = true;
     onActivation.cleanup = "zap";
     brews = [ "displayplacer" ];
     casks = [ ];
