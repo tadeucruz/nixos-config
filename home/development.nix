@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     claude-code
+    flutter
     go
     godot_4
     jdk
