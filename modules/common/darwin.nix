@@ -43,6 +43,8 @@
     };
     # Keeps the System Settings trackpad UI in sync with the Clicking above.
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
+    # Dark appearance system-wide.
+    NSGlobalDomain.AppleInterfaceStyle = "Dark";
 
     dock = {
       magnification = true;
