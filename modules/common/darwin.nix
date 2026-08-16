@@ -39,6 +39,24 @@
     };
     # Keeps the System Settings trackpad UI in sync with the Clicking above.
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
+
+    dock = {
+      magnification = true;
+      largesize = 128;
+      persistent-apps = [
+        "/Applications/Safari.app"
+        "/System/Applications/Utilities/Terminal.app"
+        "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
+        "/System/Applications/Mail.app"
+        "/System/Applications/Photos.app"
+        "/System/Applications/Calendar.app"
+        "/System/Applications/Reminders.app"
+        "/System/Applications/Notes.app"
+        "/System/Applications/TV.app"
+        "/System/Applications/Music.app"
+        "/System/Applications/System Settings.app"
+      ];
+    };
   };
 
   # macOS does not apply trackpad defaults until they are activated; without
