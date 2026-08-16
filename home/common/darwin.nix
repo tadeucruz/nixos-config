@@ -10,6 +10,8 @@
       nh
       bitwarden-desktop
       betterdisplay
+      obsidian
+      rectangle
     ];
   };
 
