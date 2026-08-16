@@ -2,7 +2,10 @@
 { pkgs, username, hostname, ... }:
 {
   home = {
-    sessionVariables.NH_DARWIN_FLAKE = "/Users/${username}/nixos-config";
+    sessionVariables = {
+      NH_DARWIN_FLAKE = "/Users/${username}/nixos-config";
+      SSH_AUTH_SOCK = "/Users/${username}/.bitwarden-ssh-agent.sock";
+    };
     packages = with pkgs; [
       nh
       bitwarden-desktop
