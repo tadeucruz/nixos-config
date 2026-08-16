@@ -18,9 +18,17 @@ Once installed: `nh os switch` (alias `rebuild`).
 
 ## macOS (nix-darwin)
 
+Fresh machine bootstrap:
+
 ```sh
 # 1. Install Nix: https://nixos.org/download/
-nix run nix-darwin -- switch --flake github:tadeucruz/nixos-config#normandy
+# 2. Install Homebrew (required by the homebrew module)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# 3. Rename the /etc files macOS created; nix-darwin manages these
+sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
+sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
+# 4. Switch (sudo is required for activation; -H keeps $HOME sane)
+sudo -H nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake github:tadeucruz/nixos-config#normandy
 
 # then clone for local edits
 git clone https://github.com/tadeucruz/nixos-config.git ~/nixos-config
