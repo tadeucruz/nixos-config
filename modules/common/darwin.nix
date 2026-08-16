@@ -66,10 +66,16 @@
   system.activationScripts.postActivation.text = ''
     launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
 
-    # Keep the built-in display on "More Space" (1800x1169). displayplacer must
-    # also run in the user's session; skip when already set to avoid flicker.
-    if ! launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer list 2>/dev/null | grep -q "res:1800x1169.*<-- current mode"; then
-      launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer "id:37D8832A-2D66-02CA-B9F7-8F30A301B230 res:1800x1169 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0"
+    # Keep the built-in display on "More Space" (1800x1169) when it is
+    # connected. Its persistent id changes between docks/reboots, so detect it
+    # dynamically and skip silently when the lid is closed (external-only).
+    # displayplacer must run in the user's session.
+    builtin_id="$(
+      launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer list 2>/dev/null |
+        awk '/^[[:space:]]*$/{id=""} /^Persistent screen id:/{id=$NF} /^Type:/ && $0 !~ /external/ && id != ""{print id; exit}'
+    )"
+    if [ -n "$builtin_id" ] && ! launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer list 2>/dev/null | grep -q "res:1800x1169.*<-- current mode"; then
+      launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- /opt/homebrew/bin/displayplacer "id:$builtin_id res:1800x1169 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" || true
     fi
   '';
 }
