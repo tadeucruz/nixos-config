@@ -60,6 +60,7 @@
 
       settings = {
         add_newline = true;
+        command_timeout = 2000;
         format = "╭─$username$hostname$directory$git_branch$git_status$golang$nodejs$java$dart$cmd_duration$jobs$line_break╰─$character";
 
         os = { disabled = true; };
