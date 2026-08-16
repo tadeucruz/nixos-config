@@ -8,6 +8,7 @@ on:
       - "hosts/normandy/**"
       - "modules/**"
       - "home/**"
+      - "homebrew/**"
   push:
     branches: [main]
     paths:
@@ -16,6 +17,7 @@ on:
       - "hosts/normandy/**"
       - "modules/**"
       - "home/**"
+      - "homebrew/**"
   workflow_dispatch:
 
 jobs:
