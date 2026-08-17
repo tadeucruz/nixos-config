@@ -4,7 +4,7 @@
 {
   homebrew = {
     brews = [ "displayplacer" ];
-    casks = [ "cryptomator" ];
+    casks = [ "cryptomator" "zoom" ];
     masApps = {
       WhatsApp = 310633997;
     };
