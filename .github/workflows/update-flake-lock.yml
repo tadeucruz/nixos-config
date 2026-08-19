@@ -22,3 +22,7 @@ jobs:
         with:
           pr-title: "flake: update flake.lock"
           commit-msg: "flake: update flake.lock"
+          # PAT so the PR is attributed to a user instead of github-actions[bot];
+          # otherwise GitHub won't run the check workflows on the PR (the reason
+          # the checks used to sit "waiting for approval").
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
