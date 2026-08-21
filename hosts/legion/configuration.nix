@@ -95,7 +95,7 @@ in
   # PowerStation resolves hwdata via xdg data dirs (prefix "hwdata"); without it
   # GPU discovery fails with "Config base path not found".
   systemd.services.powerstation.environment.XDG_DATA_DIRS =
-    lib.mkAfter "${pkgs.hwdata}/share";
+    lib.mkForce "${pkgs.hwdata}/share:/run/current-system/sw/share";
 
   system.stateVersion = "26.05";
 }
