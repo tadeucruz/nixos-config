@@ -42,7 +42,7 @@ let
 
     src = pkgs.fetchurl {
       url = "https://github.com/mengmeet/PowerControl/releases/download/v3.15.1/PowerControl.tar.gz";
-      sha256 = "0zf5nj67r2m0s9f3iimjrvxhkdvk2sbcrfl6a8vkzn6agip7svl5";
+      sha256 = "sha256-P91xmeSZbUbQqgnHJwf6l+8JcdIeZBkZlPfDsfG3iI4=";
     };
 
     dontConfigure = true;
