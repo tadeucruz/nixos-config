@@ -36,19 +36,6 @@ in
     };
   };
 
-  # Keep only the last 5 generations — many old ones piling up (kernel rebuilds
-  # especially) made GC slow, but full "-d" (only current, no rollback) was too much.
-  # `nix.gc.options` alone can't do "keep N", so trim generations first, then GC.
-  # programs.nh.clean (from modules/common/linux.nix) does the same job, so it's
-  # disabled here to avoid running two GC services.
-  programs.nh.clean.enable = lib.mkForce false;
-  nix.gc.automatic = true;
-  nix.gc.dates = "weekly";
-  systemd.services.nix-gc.script = lib.mkForce ''
-    ${lib.getExe' config.nix.package "nix-env"} -p /nix/var/nix/profiles/system --delete-generations +5
-    exec ${lib.getExe' config.nix.package "nix-collect-garbage"}
-  '';
-
   fileSystems."/GAMES" = {
     device = "/dev/disk/by-uuid/be622b96-26c5-4ff2-b740-7bab4dd6fa9d";
     fsType = "btrfs";
