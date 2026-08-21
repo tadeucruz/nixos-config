@@ -82,5 +82,20 @@ in
     };
   };
 
+  # Turn off all RGB lighting at boot (ASRock motherboard via OpenRGB). The
+  # devices default to their factory rainbow loop; apply mode "off" once the
+  # udev rules from hardware.openrgb are live.
+  systemd.services.openrgb-off = {
+    description = "Turn off all OpenRGB devices";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${lib.getExe pkgs.openrgb} -m off --noautoconnect";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+  };
+
   system.stateVersion = "26.05";
 }
