@@ -45,6 +45,9 @@ let
       sha256 = "sha256-P91xmeSZbUbQqgnHJwf6l+8JcdIeZBkZlPfDsfG3iI4=";
     };
 
+    # PowerControl's py_modules/config.py does `import yaml`, and the plugin
+    # appends its own py_modules/site-packages to sys.path at runtime — so we
+    # vendor PyYAML in there.
     dontConfigure = true;
     dontBuild = true;
 
@@ -52,6 +55,9 @@ let
       runHook preInstall
       mkdir -p $out
       tar xzf "$src" -C $out --strip-components=1
+      mkdir -p $out/py_modules/site-packages
+      cp -r ${pkgs.python3Packages.pyyaml}/lib/python*/site-packages/yaml $out/py_modules/site-packages/
+      cp -r ${pkgs.python3Packages.pyyaml}/lib/python*/site-packages/yaml* $out/py_modules/site-packages/ 2>/dev/null || true
       runHook postInstall
     '';
 
