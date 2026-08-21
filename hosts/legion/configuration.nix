@@ -35,38 +35,6 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
-
-  powerControl = pkgs.stdenvNoCC.mkDerivation {
-    pname = "PowerControl";
-    version = builtins.replaceStrings [ "." ] [ "-" ] "3.15.1";
-
-    src = pkgs.fetchurl {
-      url = "https://github.com/mengmeet/PowerControl/releases/download/v3.15.1/PowerControl.tar.gz";
-      sha256 = "sha256-P91xmeSZbUbQqgnHJwf6l+8JcdIeZBkZlPfDsfG3iI4=";
-    };
-
-    # PowerControl's py_modules/config.py does `import yaml`, and the plugin
-    # appends its own py_modules/site-packages to sys.path at runtime — so we
-    # vendor PyYAML in there.
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out
-      tar xzf "$src" -C $out --strip-components=1
-      mkdir -p $out/py_modules/site-packages
-      cp -r ${pkgs.python3Packages.pyyaml}/lib/python*/site-packages/yaml $out/py_modules/site-packages/
-      cp -r ${pkgs.python3Packages.pyyaml}/lib/python*/site-packages/yaml* $out/py_modules/site-packages/ 2>/dev/null || true
-      runHook postInstall
-    '';
-
-    meta = {
-      description = "Decky Loader power control plugin (TDP, GPU, boost per-game)";
-      homepage = "https://github.com/mengmeet/PowerControl";
-      platforms = [ "x86_64-linux" ];
-    };
-  };
 in
 {
   imports = [
@@ -111,7 +79,6 @@ in
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
-    ln -sfn ${powerControl} ${config.jovian.decky-loader.stateDir}/plugins/PowerControl
   '';
 
   networking.hostName = hostname;
@@ -120,10 +87,22 @@ in
   # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
   services.udev.packages = [ pkgs.inputplumber ];
 
-  # PowerStation: TDP/perf daemon (DBus). The SteamOS-Manager exposes no working
-  # TDP control on the Legion Go (no power1_cap, EC-only), so this is the real
-  # way to set TDP (5-35W), GPU clocks and governor from the QAM/Decky.
-  services.powerstation.enable = true;
+  # PowerStation: TDP/perf daemon (DBus, org.shadowblip.PowerStation). The
+  # SteamOS-Manager exposes no working TDP control on the Legion Go (no
+  # power1_cap, EC-only) — this is the real way to set TDP (5-35W), GPU
+  # clocks and governor. No frontend wired up yet; talk to it directly via
+  # busctl, or over DBus at org.shadowblip.GPU.Card.TDP on
+  # /org/shadowblip/Performance/GPU/card1.
+  #
+  # Enabled via programs.opengamepadui (upstream module, same author as
+  # PowerStation/InputPlumber) rather than services.powerstation.enable
+  # directly — gamescopeSession stays off, so this only turns on the
+  # inputplumber/powerstation services, no session/display-manager change.
+  programs.opengamepadui = {
+    enable = true;
+    inputplumber.enable = true;
+    powerstation.enable = true;
+  };
 
   # PowerStation resolves hwdata via xdg data dirs (prefix "hwdata"); without it
   # GPU discovery fails with "Config base path not found".
