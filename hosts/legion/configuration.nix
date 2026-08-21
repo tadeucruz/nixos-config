@@ -83,31 +83,21 @@ in
 
   networking.hostName = hostname;
 
-  # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
-  # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
-  services.udev.packages = [ pkgs.inputplumber ];
-
-  # PowerStation: TDP/perf daemon (DBus, org.shadowblip.PowerStation). The
-  # SteamOS-Manager exposes no working TDP control on the Legion Go (no
-  # power1_cap, EC-only) — this is the real way to set TDP (5-35W), GPU
-  # clocks and governor. No frontend wired up yet; talk to it directly via
-  # busctl, or over DBus at org.shadowblip.GPU.Card.TDP on
-  # /org/shadowblip/Performance/GPU/card1.
+  # Handheld Daemon (hhd): controller input + TDP (Adjustor, bundled since v4)
+  # via Lenovo's native WMI methods — the correct hardware-level path for the
+  # Legion Go's TDP, vs. PowerStation's generic GPU power-cap approach.
   #
-  # Enabled via programs.opengamepadui (upstream module, same author as
-  # PowerStation/InputPlumber) rather than services.powerstation.enable
-  # directly — gamescopeSession stays off, so this only turns on the
-  # inputplumber/powerstation services, no session/display-manager change.
-  programs.opengamepadui = {
+  # hhd's controller plugin and InputPlumber fight over the same hidraw/
+  # keyboard device (documented conflict, e.g. CachyOS's handheld edition).
+  # Unlike an imperative distro, there's nothing here to mask/remove: we just
+  # never reference pkgs.inputplumber or services.inputplumber anywhere, so
+  # there's no D-Bus activation file in the closure for it to respawn from.
+  services.handheld-daemon = {
     enable = true;
-    inputplumber.enable = true;
-    powerstation.enable = true;
+    adjustor.enable = true;
+    ui.enable = true;
+    user = username;
   };
-
-  # PowerStation resolves hwdata via xdg data dirs (prefix "hwdata"); without it
-  # GPU discovery fails with "Config base path not found".
-  systemd.services.powerstation.environment.XDG_DATA_DIRS =
-    lib.mkForce "${pkgs.hwdata}/share:/run/current-system/sw/share";
 
   system.stateVersion = "26.05";
 }
