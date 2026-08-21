@@ -6,6 +6,15 @@
   hostname,
   ...
 }:
+let
+  # gamescope-session starts gamescope without --hdr-enabled, so HDR content is
+  # tonemapped to SDR and washed out on an HDR display. This shim (prepended to
+  # PATH via the Jovian pre-start hook) injects the flag before the real
+  # cap_sys_nice wrapper.
+  gamescope-hdr-shim = pkgs.writeShellScriptBin "gamescope-hdr" ''
+    exec /run/wrappers/bin/gamescope --hdr-enabled "$@"
+  '';
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -56,6 +65,10 @@
   };
 
   console.keyMap = "br-abnt2";
+
+  environment.etc."jovian/gamescope-session/pre-start".text = ''
+    export PATH=${gamescope-hdr-shim}/bin:$PATH
+  '';
 
   networking.hostName = hostname;
 
