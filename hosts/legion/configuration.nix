@@ -87,5 +87,10 @@ in
   # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
   services.udev.packages = [ pkgs.inputplumber ];
 
+  # PowerStation: TDP/perf daemon (DBus). The SteamOS-Manager exposes no working
+  # TDP control on the Legion Go (no power1_cap, EC-only), so this is the real
+  # way to set TDP (5-35W), GPU clocks and governor from the QAM/Decky.
+  services.powerstation.enable = true;
+
   system.stateVersion = "26.05";
 }
