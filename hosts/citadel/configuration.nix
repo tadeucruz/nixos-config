@@ -39,6 +39,9 @@ in
   # Keep only the last 5 generations — many old ones piling up (kernel rebuilds
   # especially) made GC slow, but full "-d" (only current, no rollback) was too much.
   # `nix.gc.options` alone can't do "keep N", so trim generations first, then GC.
+  # programs.nh.clean (from modules/common/linux.nix) does the same job, so it's
+  # disabled here to avoid running two GC services.
+  programs.nh.clean.enable = lib.mkForce false;
   nix.gc.automatic = true;
   nix.gc.dates = "weekly";
   systemd.services.nix-gc.script = lib.mkForce ''
