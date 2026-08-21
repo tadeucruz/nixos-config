@@ -62,6 +62,10 @@ in
 
   networking.hostName = hostname;
 
+  # Desktop gaming, always on AC power: force max CPU boost (amd_pstate EPP
+  # follows and becomes "performance"). Keeps lowest latency/consistency.
+  powerManagement.cpuFreqGovernor = "performance";
+
   services = {
     # Kept from the desktop session for use while "Exit to Desktop"'d out of gamescope.
     hardware.openrgb.enable = true;
