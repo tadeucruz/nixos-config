@@ -50,6 +50,7 @@ let
 
     installPhase = ''
       runHook preInstall
+      mkdir -p $out
       tar xzf "$src" -C $out --strip-components=1
       runHook postInstall
     '';
