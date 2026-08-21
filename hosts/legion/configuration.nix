@@ -92,5 +92,10 @@ in
   # way to set TDP (5-35W), GPU clocks and governor from the QAM/Decky.
   services.powerstation.enable = true;
 
+  # PowerStation resolves hwdata via xdg data dirs (prefix "hwdata"); without it
+  # GPU discovery fails with "Config base path not found".
+  systemd.services.powerstation.environment.XDG_DATA_DIRS =
+    lib.mkAfter "${pkgs.hwdata}/share";
+
   system.stateVersion = "26.05";
 }
