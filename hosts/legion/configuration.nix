@@ -35,6 +35,31 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  powerControl = pkgs.stdenvNoCC.mkDerivation {
+    pname = "PowerControl";
+    version = builtins.replaceStrings [ "." ] [ "-" ] "3.15.1";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/mengmeet/PowerControl/releases/download/v3.15.1/PowerControl.tar.gz";
+      sha256 = "0zf5nj67r2m0s9f3iimjrvxhkdvk2sbcrfl6a8vkzn6agip7svl5";
+    };
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      runHook preInstall
+      tar xzf "$src" -C $out --strip-components=1
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Decky Loader power control plugin (TDP, GPU, boost per-game)";
+      homepage = "https://github.com/mengmeet/PowerControl";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
 in
 {
   imports = [
@@ -79,6 +104,7 @@ in
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
+    ln -sfn ${powerControl} ${config.jovian.decky-loader.stateDir}/plugins/PowerControl
   '';
 
   networking.hostName = hostname;
