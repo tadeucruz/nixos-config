@@ -93,15 +93,6 @@ in
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  # Jovian's decky-loader module has no declarative "plugins" option — it just
-  # scans jovian.decky-loader.stateDir (/var/lib/decky-loader/plugins by default,
-  # owned by the system "decky" user, not $HOME). home.file was the wrong layer.
-  #
-  # systemd.tmpfiles.rules can't place the symlink either: the loader process
-  # (runs as root) creates ./plugins itself as root under a decky-owned stateDir,
-  # and tmpfiles refuses that ownership transition as an "unsafe path transition"
-  # — it logs a warning and silently skips the rule instead of failing the switch.
-  # Doing it in the service's own preStart (also root) sidesteps that check entirely.
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
@@ -110,14 +101,5 @@ in
 
   networking.hostName = hostname;
 
-  # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
-  # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
-  services.udev.packages = [ pkgs.inputplumber ];
-
-  # TDP: SimpleDeckyTDP (Decky plugin, above) uses Lenovo's WMI
-  # firmware-attributes sysfs on the Legion Go — same mechanism as
-  # jovian.steamos's platform-profile handling, not ryzenadj/PowerStation —
-  # so it doesn't touch hidraw/controller devices and doesn't conflict with
-  # InputPlumber.
   system.stateVersion = "26.05";
 }
