@@ -35,32 +35,6 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
-
-  simpleDeckyTDP = pkgs.stdenvNoCC.mkDerivation rec {
-    pname = "SimpleDeckyTDP";
-    version = "1.0.5";
-
-    src = pkgs.fetchzip {
-      url = "https://github.com/aarron-lee/SimpleDeckyTDP/releases/download/v${version}/SimpleDeckyTDP.zip";
-      hash = "sha256-0D02/F8XDCJi/hq+hlPp/d38n4kKPY68ODMCHdOpHAM=";
-    };
-
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out
-      cp -r . $out/
-      runHook postInstall
-    '';
-
-    meta = {
-      description = "Decky Loader TDP/GPU plugin — uses Lenovo's WMI firmware-attributes on Legion Go, not ryzenadj";
-      homepage = "https://github.com/aarron-lee/SimpleDeckyTDP";
-      platforms = [ "x86_64-linux" ];
-    };
-  };
 in
 {
   imports = [
@@ -93,22 +67,24 @@ in
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  # SimpleDeckyTDP hardcodes $HOME/homebrew/plugins/SimpleDeckyTDP in a few
-  # places (i18n dir, ryzenadj fallback, self-update) instead of using
-  # DECKY_PLUGIN_DIR; without it i18n.LANGS stays None and any translation
-  # call throws. /home/${username}/homebrew is already root-owned (created by
-  # some root-run plugin), so systemd.tmpfiles.rules refuses the ownership
-  # transition and silently skips it — do it in preStart (root) instead.
+  # Jovian's decky-loader module has no declarative "plugins" option — it just
+  # scans jovian.decky-loader.stateDir (/var/lib/decky-loader/plugins by default,
+  # owned by the system "decky" user, not $HOME). home.file was the wrong layer.
+  #
+  # systemd.tmpfiles.rules can't place the symlink either: the loader process
+  # (runs as root) creates ./plugins itself as root under a decky-owned stateDir,
+  # and tmpfiles refuses that ownership transition as an "unsafe path transition"
+  # — it logs a warning and silently skips the rule instead of failing the switch.
+  # Doing it in the service's own preStart (also root) sidesteps that check entirely.
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
-    ln -sfn ${simpleDeckyTDP} ${config.jovian.decky-loader.stateDir}/plugins/SimpleDeckyTDP
-    mkdir -p /home/${username}/homebrew/plugins
-    ln -sfn ${simpleDeckyTDP} /home/${username}/homebrew/plugins/SimpleDeckyTDP
   '';
 
   networking.hostName = hostname;
 
+  # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
+  # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
   services.udev.packages = [ pkgs.inputplumber ];
 
   system.stateVersion = "26.05";
