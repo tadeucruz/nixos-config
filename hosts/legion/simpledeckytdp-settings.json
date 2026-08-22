@@ -56,62 +56,6 @@
                     "powerGovernor": "powersave"
                 }
             }
-        },
-        "377160-ac-power": {
-            "tdp": 30,
-            "cpuBoost": true,
-            "smt": true,
-            "gpuMode": "BALANCE",
-            "minGpuFrequency": 800,
-            "maxGpuFrequency": 2700,
-            "fixedGpuFrequency": 1750,
-            "powerControls": {
-                "intel_cpufreq": {
-                    "powerGovernor": "powersave"
-                },
-                "intel_pstate": {
-                    "epp": "balance_power",
-                    "powerGovernor": "powersave"
-                },
-                "amd-pstate-epp": {
-                    "epp": "balance_power",
-                    "powerGovernor": "powersave"
-                },
-                "amd-pstate": {
-                    "powerGovernor": "powersave"
-                },
-                "acpi-cpufreq": {
-                    "powerGovernor": "powersave"
-                }
-            }
-        },
-        "377160": {
-            "tdp": 15,
-            "cpuBoost": true,
-            "smt": true,
-            "gpuMode": "BALANCE",
-            "minGpuFrequency": 800,
-            "maxGpuFrequency": 2700,
-            "fixedGpuFrequency": 1750,
-            "powerControls": {
-                "intel_cpufreq": {
-                    "powerGovernor": "powersave"
-                },
-                "intel_pstate": {
-                    "epp": "balance_power",
-                    "powerGovernor": "powersave"
-                },
-                "amd-pstate-epp": {
-                    "epp": "balance_power",
-                    "powerGovernor": "powersave"
-                },
-                "amd-pstate": {
-                    "powerGovernor": "powersave"
-                },
-                "acpi-cpufreq": {
-                    "powerGovernor": "powersave"
-                }
-            }
         }
     },
     "advanced": {
