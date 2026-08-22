@@ -13,5 +13,7 @@
     ${lib.getExe' pkgs.kdePackages.kservice "kbuildsycoca6"} --noincremental || true
   '';
 
-  programs.zsh.shellAliases.rebuild = "cd $NH_FLAKE && git pull && nh os switch";
+  # systemd-inhibit keeps the machine awake during long builds (e.g. citadel's
+  # OGC kernel) — honored by both logind and KDE powerdevil.
+  programs.zsh.shellAliases.rebuild = "cd $NH_FLAKE && git pull && systemd-inhibit --what=sleep --why='Nix build' nh os switch";
 }
