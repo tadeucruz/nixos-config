@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Bump the OpenGamingCollective kernel pin in modules/ogc-kernel.nix.
+# Bump the OpenGamingCollective kernel pin in modules/ogc-kernel.nix (citadel only).
 #
-# The OGC release tag IS the kernel (vanilla tree + their patches applied), so a
-# bump is just: new archive hash + new ogcRelease + new modDirVersion (derived
-# from the tag's kernel base). Used manually and by .github/workflows/check-ogc-update.yml.
+# The pin is vanilla <base> tarball + OGC's monolithic.patch. A bump is: new
+# ogcRelease, new ogcModDir, and two new pure-content hashes (base tarball +
+# patch). Used manually and by .github/workflows/check-ogc-update.yml.
 #
 #   ./scripts/update-ogc-kernel.sh --check              # exit 0 ok, 2 update available, 1 error
 #   ./scripts/update-ogc-kernel.sh --apply [tag]        # rewrite the pin (defaults to latest tag)
@@ -27,16 +27,6 @@ latest_release() {
   curl -fsSL "$API_URL" | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])'
 }
 
-archive_url() {
-  echo "https://github.com/${REPO}/archive/refs/tags/$1.tar.gz"
-}
-
-# fetchzip hashes the unpacked, root-stripped tree; nix-prefetch-url --unpack
-# computes exactly that and stores the tree in the nix store.
-fetchzip_hash() {
-  nix-prefetch-url --unpack "$(archive_url "$1")"
-}
-
 # OGC tags are v<kernel-base>-ogc<N>, e.g. v7.2-ogc4, v7.1.8-ogc1.
 base_of() {
   local tag="$1"
@@ -44,7 +34,7 @@ base_of() {
   echo "${BASH_REMATCH[1]}"
 }
 
-# modDirVersion must match the tree's Makefile exactly. The base is the full
+# modDirVersion must match the base tree's Makefile exactly. The base is the full
 # kernel version (7.2 or 7.1.8); pad it to 3 components (7.2 -> 7.2.0).
 mod_dir_version_of() {
   local base="$1" parts
@@ -53,16 +43,36 @@ mod_dir_version_of() {
   echo "${parts[0]}.${parts[1]}.${parts[2]}"
 }
 
+base_tarball_url() {
+  local base="$1"
+  echo "https://cdn.kernel.org/pub/linux/kernel/v${base%%.*}.x/linux-${base}.tar.xz"
+}
+
+patch_url() {
+  local tag="$1"
+  echo "https://github.com/${REPO}/releases/download/${tag}/monolithic.patch"
+}
+
+# nix-prefetch-url without --unpack gives the pure file hash (version-independent,
+# unlike fetchzip's unpacked-tree hash which differs across nix versions).
+fetch_hash() {
+  nix-prefetch-url "$1"
+}
+
+sri() {
+  nix hash convert --hash-algo sha256 --to sri "$1"
+}
+
 rewrite_pin() {
-  local tag="$1" sri="$2" mod_dir_version="$3"
-  python3 - "$KERNEL_FILE" "$tag" "$sri" "$mod_dir_version" <<'EOF'
+  local tag="$1" mod_dir_version="$2" base_hash="$3" patch_hash="$4"
+  python3 - "$KERNEL_FILE" "$tag" "$mod_dir_version" "$base_hash" "$patch_hash" <<'EOF'
 import re, sys
-path, tag, sri, mod_dir_version = sys.argv[1:5]
+path, tag, mod_dir_version, base_hash, patch_hash = sys.argv[1:6]
 src = open(path).read()
 src = re.sub(r'ogcRelease = "[^"]*";', f'ogcRelease = "{tag}";', src)
-src = re.sub(r'(url = "https://github.com/OpenGamingCollective/linux/archive[^\n]*\n\s*)hash = "[^"]*";',
-             rf'\1hash = "{sri}";', src)
-src = re.sub(r'modDirVersion = "[^"]*";', f'modDirVersion = "{mod_dir_version}";', src)
+src = re.sub(r'ogcModDir = "[^"]*";', f'ogcModDir = "{mod_dir_version}";', src)
+src = re.sub(r'ogcBaseHash = "[^"]*";', f'ogcBaseHash = "{base_hash}";', src)
+src = re.sub(r'ogcPatchHash = "[^"]*";', f'ogcPatchHash = "{patch_hash}";', src)
 open(path, "w").write(src)
 EOF
 }
@@ -81,15 +91,18 @@ check() {
 
 apply() {
   local tag="${1:-$(latest_release)}"
-  local current hash sri mod_dir_version
+  local current base mod_dir_version base_hash patch_hash
   current="$(current_release)"
   [[ "$tag" != "$current" ]] || die "already at ${tag}"
   echo "updating ${current} -> ${tag}"
-  mod_dir_version="$(mod_dir_version_of "$(base_of "$tag")")"
-  hash="$(fetchzip_hash "$tag")"
-  sri="$(nix hash convert --hash-algo sha256 --to sri "$hash")"
-  rewrite_pin "$tag" "$sri" "$mod_dir_version"
-  echo "done: ${KERNEL_FILE} now pins ${tag} (modDirVersion ${mod_dir_version}, hash ${sri})"
+  base="$(base_of "$tag")"
+  mod_dir_version="$(mod_dir_version_of "$base")"
+  echo "fetching base tarball hash ($(base_tarball_url "$base"))..."
+  base_hash="$(sri "$(fetch_hash "$(base_tarball_url "$base")")")"
+  echo "fetching patch hash ($(patch_url "$tag"))..."
+  patch_hash="$(sri "$(fetch_hash "$(patch_url "$tag")")")"
+  rewrite_pin "$tag" "$mod_dir_version" "$base_hash" "$patch_hash"
+  echo "done: ${KERNEL_FILE} now pins ${tag} (base ${base}, modDirVersion ${mod_dir_version})"
 }
 
 case "${1:-}" in
