@@ -33,9 +33,5 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            extra-substituters = https://attic.xuyh0120.win/lantian
-            extra-trusted-public-keys = lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=
 
       - run: nix build .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel --no-link --print-build-logs
