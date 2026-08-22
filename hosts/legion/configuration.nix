@@ -101,5 +101,16 @@ in
 
   networking.hostName = hostname;
 
+  services.udev.packages = [ pkgs.inputplumber ];
+
+  # SimpleDeckyTDP hardcodes $HOME/homebrew/plugins/SimpleDeckyTDP in a few
+  # places (i18n dir, ryzenadj fallback, self-update) instead of using
+  # DECKY_PLUGIN_DIR; without it i18n.LANGS stays None and any translation
+  # call throws.
+  systemd.tmpfiles.rules = [
+    "d /home/${username}/homebrew/plugins 0755 ${username} users -"
+    "L+ /home/${username}/homebrew/plugins/SimpleDeckyTDP - - - - ${simpleDeckyTDP}"
+  ];
+
   system.stateVersion = "26.05";
 }
