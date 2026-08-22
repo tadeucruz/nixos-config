@@ -63,6 +63,13 @@ in
     enable32Bit = true;
   };
 
+  # SteamOS-Manager (jovian.steam.enable) doesn't work on the Legion Go — its
+  # daemon fights for the same power/TDP interface SimpleDeckyTDP will use, so
+  # disable both the root and user daemons. inputplumber/scx/orca stay (Jovian
+  # needs them regardless).
+  systemd.services.steamos-manager.enable = false;
+  systemd.user.services.steamos-manager.enable = false;
+
   # https://github.com/aarron-lee/LegionGoRemapper — legion_hid.py loads libhidapi via ctypes at runtime.
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
