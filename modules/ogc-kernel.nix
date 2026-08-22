@@ -9,7 +9,7 @@
 # Deliberately decoupled from nixpkgs's linux_latest: nixpkgs updates freely, the
 # kernel only moves when a new OGC release is picked up. Bump via
 # scripts/update-ogc-kernel.sh (CI: .github/workflows/check-ogc-update.yml).
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   ogcRelease = "v7.2-ogc4";
@@ -25,7 +25,9 @@ let
   # Verified for v7.2-ogc4: 7.2.0.
   ogcKernel = pkgs.buildLinux {
     pname = "linux-ogc";
-    version = ogcRelease;
+    # Strip the tag's "v" prefix so version stays parseable by versionAtLeast/
+    # kernelAtLeast checks (e.g. nixpkgs's SCX assertion requires >= 6.12).
+    version = lib.removePrefix "v" ogcRelease;
     modDirVersion = "7.2.0";
     src = ogcSrc;
     # nixpkgs's generic kernel patches (bridge STP helper, request_key helper).

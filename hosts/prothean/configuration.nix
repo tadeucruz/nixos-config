@@ -20,7 +20,7 @@
   boot = {
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     kernelModules = [ "acpi_call" ];
-    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs; };
+    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
