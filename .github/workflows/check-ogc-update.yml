@@ -1,0 +1,44 @@
+name: Check OGC kernel update
+
+on:
+  schedule:
+    # 09:00 America/Sao_Paulo (UTC-3, no DST) = 12:00 UTC
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ogc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - id: check
+        name: Check for a newer OGC release
+        run: |
+          if ./scripts/update-ogc-kernel.sh --check; then
+            echo "up-to-date" >&2
+          else
+            echo "bumping pinned OGC release" >&2
+          fi
+        continue-on-error: true
+
+      - name: Apply the bump
+        if: steps.check.outcome == 'failure'
+        run: ./scripts/update-ogc-kernel.sh --apply
+
+      - uses: peter-evans/create-pull-request@v6
+        if: steps.check.outcome == 'failure'
+        with:
+          branch: ogc-kernel-update
+          commit-message: "kernel: bump OGC pin"
+          title: "kernel: bump OGC release"
+          body: |
+            A new [OpenGamingCollective/linux](https://github.com/OpenGamingCollective/linux)
+            release was detected. The `modules/ogc-kernel.nix` pin was bumped;
+            the `check-nixos-build` job validates the kernel actually builds.

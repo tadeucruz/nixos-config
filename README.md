@@ -2,6 +2,8 @@
 
 Flake for 4 machines — NixOS (`citadel`, `prothean`, `legion`) and nix-darwin (`normandy`).
 
+All three NixOS hosts run the [OpenGamingCollective](https://github.com/OpenGamingCollective/linux) kernel (`modules/ogc-kernel.nix`, currently `v7.2-ogc4` on a stable 7.2.0 base) — the release tag is the kernel tree with their patches applied, fetched from GitHub and built locally. It adds AMD HDMI 2.1 VRR/ALLM (the reason citadel wants it; vanilla 7.2 lacks it) plus gaming-handheld drivers; the Lenovo Legion Go drivers are upstream in vanilla 7.2. Bumps are handled by `scripts/update-ogc-kernel.sh` + the `.github/workflows/check-ogc-update.yml` job, decoupled from nixpkgs's own kernel.
+
 ## Linux (NixOS)
 
 ```sh
