@@ -33,7 +33,6 @@
           "uBlock0@raymondhill.net" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
             installation_mode = "force_installed";
-            updates_disabled = true;
           };
         };
       };
@@ -63,7 +62,9 @@
         command_timeout = 2000;
         format = "╭─$username$hostname$directory$git_branch$git_status$golang$nodejs$java$dart$cmd_duration$jobs$line_break╰─$character";
 
-        os = { disabled = true; };
+        os = {
+          disabled = true;
+        };
 
         username = {
           show_always = true;
@@ -90,18 +91,30 @@
           symbol = " ";
           style = "bold purple";
         };
-        git_status = { style = "bold red"; };
+        git_status = {
+          style = "bold red";
+        };
 
-        golang = { symbol = " "; };
-        nodejs = { symbol = " "; };
-        java = { symbol = " "; };
-        dart = { symbol = " "; };
+        golang = {
+          symbol = " ";
+        };
+        nodejs = {
+          symbol = " ";
+        };
+        java = {
+          symbol = " ";
+        };
+        dart = {
+          symbol = " ";
+        };
 
         cmd_duration = {
           min_time = 2000;
           format = "took [$duration](bold yellow) ";
         };
-        jobs = { symbol = "✦ "; };
+        jobs = {
+          symbol = "✦ ";
+        };
 
         character = {
           success_symbol = "[❯](bold green)";
