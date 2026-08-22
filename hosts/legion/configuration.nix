@@ -88,7 +88,7 @@ in
     ];
     # OpenGamingCollective v7.2-ogc4 (7.2.0 base). Lenovo WMI/controller drivers
     # are upstream in vanilla 7.2 — OGC's patch no longer carries them.
-    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs; };
+    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;

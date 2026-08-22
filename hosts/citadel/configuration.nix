@@ -27,7 +27,7 @@ in
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
     # OpenGamingCollective v7.2-ogc4: AMD HDMI 2.1 VRR/ALLM (not in vanilla 7.2).
-    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs; };
+    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot = {
