@@ -46,7 +46,6 @@
       automatic = true;
       dates = [ "weekly" ];
     };
-    settings.trusted-users = [ "root" ];
   };
 
   nixpkgs.config.rocmSupport = true; # needed for btop's AMD GPU panel (links librocm_smi64.so)

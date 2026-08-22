@@ -32,7 +32,7 @@
   systemd.services.steam-cef-debug = lib.mkIf config.jovian.decky-loader.enable {
     description = "Create Steam CEF debugging file";
     serviceConfig = {
-      ExecStart = "/bin/sh -c 'mkdir -p ~/.steam/steam && [ ! -f ~/.steam/steam/.cef-enable-remote-debugging ] && touch ~/.steam/steam/.cef-enable-remote-debugging || true'";
+      ExecStart = "${pkgs.bash}/bin/sh -c 'mkdir -p ~/.steam/steam && [ ! -f ~/.steam/steam/.cef-enable-remote-debugging ] && touch ~/.steam/steam/.cef-enable-remote-debugging || true'";
       Type = "oneshot";
       User = config.jovian.steam.user;
     };
