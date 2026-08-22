@@ -35,6 +35,41 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  simpleDeckyTDP = pkgs.stdenvNoCC.mkDerivation rec {
+    pname = "simpledeckytdp";
+    version = "1.0.5";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/aarron-lee/SimpleDeckyTDP/releases/download/v${version}/SimpleDeckyTDP.zip";
+      hash = "sha256-6/HGgUe2MA7hfC1+oAqc/prBx4r3jTZNnTBqxkoswFc=";
+    };
+
+    nativeBuildInputs = [ pkgs.unzip ];
+
+    dontConfigure = true;
+    dontBuild = true;
+    dontUnpack = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      unzip "$src" -d "$out"
+      rm -f $out/SimpleDeckyTDP/ota_update.sh
+
+      # i18n.py hardcodes the SteamOS layout ($DECKY_USER_HOME/homebrew/plugins/...),
+      # which doesn't match Jovian's stateDir. decky-loader already sets
+      # DECKY_PLUGIN_DIR to the plugin's real location — use it instead.
+      sed -i "s|{decky_plugin.DECKY_USER_HOME}/homebrew/plugins/SimpleDeckyTDP/i18n|{decky_plugin.DECKY_PLUGIN_DIR}/i18n|" $out/SimpleDeckyTDP/py_modules/i18n.py
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Decky TDP plugin for PC handhelds (uses Legion Go kernel WMI)";
+      homepage = "https://github.com/aarron-lee/SimpleDeckyTDP";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
 in
 {
   imports = [
@@ -79,6 +114,7 @@ in
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
+    ln -sfn ${simpleDeckyTDP}/SimpleDeckyTDP ${config.jovian.decky-loader.stateDir}/plugins/SimpleDeckyTDP
   '';
 
   networking.hostName = hostname;
