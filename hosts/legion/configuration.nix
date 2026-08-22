@@ -115,6 +115,12 @@ in
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
     ln -sfn ${simpleDeckyTDP}/SimpleDeckyTDP ${config.jovian.decky-loader.stateDir}/plugins/SimpleDeckyTDP
+
+    # git is the source of truth for SimpleDeckyTDP's settings (15W battery / 30W on AC).
+    # Overwrite on every boot so interface tweaks never persist past a reboot.
+    mkdir -p ${config.jovian.decky-loader.stateDir}/settings/SimpleDeckyTDP
+    cp ${./simpledeckytdp-settings.json} ${config.jovian.decky-loader.stateDir}/settings/SimpleDeckyTDP/settings.json
+    chown decky:decky ${config.jovian.decky-loader.stateDir}/settings/SimpleDeckyTDP/settings.json
   '';
 
   networking.hostName = hostname;

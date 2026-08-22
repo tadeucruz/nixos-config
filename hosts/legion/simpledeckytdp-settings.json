@@ -1,0 +1,137 @@
+{
+    "supportsRyzenadjCoall": false,
+    "tdpProfiles": {
+        "default": {
+            "tdp": 15,
+            "cpuBoost": true,
+            "smt": true,
+            "gpuMode": "BALANCE",
+            "powerControls": {
+                "intel_cpufreq": {
+                    "powerGovernor": "powersave"
+                },
+                "intel_pstate": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate-epp": {
+                    "epp": "power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate": {
+                    "powerGovernor": "powersave"
+                },
+                "acpi-cpufreq": {
+                    "powerGovernor": "powersave"
+                }
+            },
+            "minGpuFrequency": 800,
+            "maxGpuFrequency": 2700,
+            "fixedGpuFrequency": 1750
+        },
+        "default-ac-power": {
+            "tdp": 30,
+            "cpuBoost": true,
+            "smt": true,
+            "gpuMode": "BALANCE",
+            "minGpuFrequency": 800,
+            "maxGpuFrequency": 2700,
+            "fixedGpuFrequency": 1750,
+            "powerControls": {
+                "intel_cpufreq": {
+                    "powerGovernor": "powersave"
+                },
+                "intel_pstate": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate-epp": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate": {
+                    "powerGovernor": "powersave"
+                },
+                "acpi-cpufreq": {
+                    "powerGovernor": "powersave"
+                }
+            }
+        },
+        "377160-ac-power": {
+            "tdp": 30,
+            "cpuBoost": true,
+            "smt": true,
+            "gpuMode": "BALANCE",
+            "minGpuFrequency": 800,
+            "maxGpuFrequency": 2700,
+            "fixedGpuFrequency": 1750,
+            "powerControls": {
+                "intel_cpufreq": {
+                    "powerGovernor": "powersave"
+                },
+                "intel_pstate": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate-epp": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate": {
+                    "powerGovernor": "powersave"
+                },
+                "acpi-cpufreq": {
+                    "powerGovernor": "powersave"
+                }
+            }
+        },
+        "377160": {
+            "tdp": 15,
+            "cpuBoost": true,
+            "smt": true,
+            "gpuMode": "BALANCE",
+            "minGpuFrequency": 800,
+            "maxGpuFrequency": 2700,
+            "fixedGpuFrequency": 1750,
+            "powerControls": {
+                "intel_cpufreq": {
+                    "powerGovernor": "powersave"
+                },
+                "intel_pstate": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate-epp": {
+                    "epp": "balance_power",
+                    "powerGovernor": "powersave"
+                },
+                "amd-pstate": {
+                    "powerGovernor": "powersave"
+                },
+                "acpi-cpufreq": {
+                    "powerGovernor": "powersave"
+                }
+            }
+        }
+    },
+    "advanced": {
+        "enableTdpControl": true,
+        "enableGpuControl": true,
+        "enablePowercontrol": false,
+        "enableSimpleEppLabels": true,
+        "enableAutomaticEppManagement": false,
+        "acPowerProfiles": true,
+        "maxTdpOnAcPower": true,
+        "enableBackgroundPolling": true,
+        "forceDisableTdpOnResume": false,
+        "forceDisableSuspendActions": false,
+        "maxTdpOnResume": true,
+        "enableApuSlowLimit": false,
+        "maxTdpOnGameProfileChange": 0,
+        "lenovoCustomTdpMode": true,
+        "enableMaxTdpOverride": false
+    },
+    "enableTdpProfiles": true,
+    "minTdp": 12,
+    "maxTdp": 30
+}
