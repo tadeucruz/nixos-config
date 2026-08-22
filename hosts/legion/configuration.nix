@@ -89,9 +89,12 @@ in
   #
   # hhd's controller plugin and InputPlumber fight over the same hidraw/
   # keyboard device (documented conflict, e.g. CachyOS's handheld edition).
-  # Unlike an imperative distro, there's nothing here to mask/remove: we just
-  # never reference pkgs.inputplumber or services.inputplumber anywhere, so
-  # there's no D-Bus activation file in the closure for it to respawn from.
+  # Jovian's own jovian.steam module hardcodes
+  # `services.inputplumber.enable = true` (plain assignment, not mkDefault) —
+  # "Required by steamos-manager" — so it comes back even though we never
+  # reference pkgs.inputplumber ourselves. mkForce it off.
+  services.inputplumber.enable = lib.mkForce false;
+
   services.handheld-daemon = {
     enable = true;
     adjustor.enable = true;
