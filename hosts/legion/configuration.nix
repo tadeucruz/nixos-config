@@ -35,6 +35,32 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  simpleDeckyTDP = pkgs.stdenvNoCC.mkDerivation rec {
+    pname = "SimpleDeckyTDP";
+    version = "1.0.5";
+
+    src = pkgs.fetchzip {
+      url = "https://github.com/aarron-lee/SimpleDeckyTDP/releases/download/v${version}/SimpleDeckyTDP.zip";
+      hash = "sha256-0D02/F8XDCJi/hq+hlPp/d38n4kKPY68ODMCHdOpHAM=";
+    };
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Decky Loader TDP/GPU plugin — uses Lenovo's WMI firmware-attributes on Legion Go, not ryzenadj";
+      homepage = "https://github.com/aarron-lee/SimpleDeckyTDP";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
 in
 {
   imports = [
@@ -79,28 +105,19 @@ in
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
+    ln -sfn ${simpleDeckyTDP} ${config.jovian.decky-loader.stateDir}/plugins/SimpleDeckyTDP
   '';
 
   networking.hostName = hostname;
 
-  # Handheld Daemon (hhd): controller input + TDP (Adjustor, bundled since v4)
-  # via Lenovo's native WMI methods — the correct hardware-level path for the
-  # Legion Go's TDP, vs. PowerStation's generic GPU power-cap approach.
-  #
-  # hhd's controller plugin and InputPlumber fight over the same hidraw/
-  # keyboard device (documented conflict, e.g. CachyOS's handheld edition).
-  # Jovian's own jovian.steam module hardcodes
-  # `services.inputplumber.enable = true` (plain assignment, not mkDefault) —
-  # "Required by steamos-manager" — so it comes back even though we never
-  # reference pkgs.inputplumber ourselves. mkForce it off.
-  services.inputplumber.enable = lib.mkForce false;
+  # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
+  # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
+  services.udev.packages = [ pkgs.inputplumber ];
 
-  services.handheld-daemon = {
-    enable = true;
-    adjustor.enable = true;
-    ui.enable = true;
-    user = username;
-  };
-
+  # TDP: SimpleDeckyTDP (Decky plugin, above) uses Lenovo's WMI
+  # firmware-attributes sysfs on the Legion Go — same mechanism as
+  # jovian.steamos's platform-profile handling, not ryzenadj/PowerStation —
+  # so it doesn't touch hidraw/controller devices and doesn't conflict with
+  # InputPlumber.
   system.stateVersion = "26.05";
 }
