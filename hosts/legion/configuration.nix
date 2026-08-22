@@ -93,24 +93,23 @@ in
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
+  # SimpleDeckyTDP hardcodes $HOME/homebrew/plugins/SimpleDeckyTDP in a few
+  # places (i18n dir, ryzenadj fallback, self-update) instead of using
+  # DECKY_PLUGIN_DIR; without it i18n.LANGS stays None and any translation
+  # call throws. /home/${username}/homebrew is already root-owned (created by
+  # some root-run plugin), so systemd.tmpfiles.rules refuses the ownership
+  # transition and silently skips it — do it in preStart (root) instead.
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
     ln -sfn ${simpleDeckyTDP} ${config.jovian.decky-loader.stateDir}/plugins/SimpleDeckyTDP
+    mkdir -p /home/${username}/homebrew/plugins
+    ln -sfn ${simpleDeckyTDP} /home/${username}/homebrew/plugins/SimpleDeckyTDP
   '';
 
   networking.hostName = hostname;
 
   services.udev.packages = [ pkgs.inputplumber ];
-
-  # SimpleDeckyTDP hardcodes $HOME/homebrew/plugins/SimpleDeckyTDP in a few
-  # places (i18n dir, ryzenadj fallback, self-update) instead of using
-  # DECKY_PLUGIN_DIR; without it i18n.LANGS stays None and any translation
-  # call throws.
-  systemd.tmpfiles.rules = [
-    "d /home/${username}/homebrew/plugins 0755 ${username} users -"
-    "L+ /home/${username}/homebrew/plugins/SimpleDeckyTDP - - - - ${simpleDeckyTDP}"
-  ];
 
   system.stateVersion = "26.05";
 }
