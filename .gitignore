@@ -1,0 +1,3 @@
+# symlink created by `nix build`/`nix-build` at the repo root — build artifact
+/result
+/result-*
