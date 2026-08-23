@@ -8,8 +8,7 @@
 # The vanilla base hash equals nixpkgs's own linux_7_2 pin; the patch applies
 # cleanly against linux-7.2.0 (verified with git apply --check). What the patch
 # buys citadel: AMD HDMI 2.1 VRR/ALLM (absent from vanilla 7.2) plus
-# hardware-ID-gated handheld drivers (harmless here). No game scheduler — scx
-# schedulers are userspace and run on vanilla 7.2's sched_ext anyway.
+# hardware-ID-gated handheld drivers (harmless here). No game scheduler included.
 #
 # Decoupled from nixpkgs's linux_latest: nixpkgs updates freely, the kernel only
 # moves when a new OGC release is picked up. Bump via scripts/update-ogc-kernel.sh
@@ -36,8 +35,7 @@ let
 
   ogcKernel = pkgs.buildLinux {
     pname = "linux-ogc";
-    # Strip the tag's "v" prefix so version stays parseable by kernelAtLeast
-    # (nixpkgs's SCX assertion requires >= 6.12).
+    # Strip the tag's "v" prefix so version stays parseable by kernelAtLeast.
     version = lib.removePrefix "v" ogcRelease;
     modDirVersion = ogcModDir;
     src = ogcBaseSrc;
