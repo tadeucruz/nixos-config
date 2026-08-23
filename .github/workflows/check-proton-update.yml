@@ -1,0 +1,59 @@
+name: Check Proton update
+
+on:
+  schedule:
+    # 09:00 America/Sao_Paulo (UTC-3, no DST) = 12:00 UTC
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  proton:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - id: check
+        name: Check for newer Proton releases
+        run: |
+          updated=""
+          for tool in ge cachyos; do
+            if ./scripts/update-proton.sh "$tool" --check; then
+              echo "$tool up-to-date" >&2
+            else
+              echo "bumping pinned $tool" >&2
+              updated="$updated $tool"
+            fi
+          done
+          if [[ -n "$updated" ]]; then
+            echo "updated=${updated}" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "updated=none" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: Apply the bumps
+        if: steps.check.outcome == 'failure'
+        run: |
+          for tool in ge cachyos; do
+            if ! ./scripts/update-proton.sh "$tool" --check >/dev/null 2>&1; then
+              ./scripts/update-proton.sh "$tool" --apply
+            fi
+          done
+
+      - uses: peter-evans/create-pull-request@v6
+        if: steps.check.outcome == 'failure'
+        with:
+          branch: proton-update
+          commit-message: "gaming: bump pinned Proton"
+          title: "gaming: bump Proton releases"
+          body: |
+            A new release of [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom)
+            or [Proton-CachyOS](https://github.com/CachyOS/proton-cachyos) was
+            detected. The `modules/proton-ge.nix` / `modules/proton-cachyos.nix`
+            pins were bumped; the `check-nixos-build` job validates the builds.
