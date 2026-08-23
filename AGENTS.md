@@ -57,7 +57,7 @@ home/
   development.nix                # dev tooling (vscode, claude-code, opencode, go, godot_4, jdk) — prothean + normandy
   neovim.nix                     # LazyVim (java + go extras), meant to eventually replace vscode — prothean + normandy
   neovim/                        # actual nvim config (init.lua, lua/config, lua/plugins) copied to ~/.config/nvim
-  gaming.nix                     # mangohud, protonplus — citadel + prothean + legion
+  gaming.nix                     # mangohud, steam extraCompatPackages (proton-ge-bin) — citadel + prothean + legion
 ```
 
 ## Conventions

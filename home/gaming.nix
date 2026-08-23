@@ -1,10 +1,6 @@
 # Shared Home Manager config for gaming (citadel + prothean + legion).
-{ pkgs, ... }:
+{ ... }:
 {
-  home.packages = with pkgs; [
-    protonplus
-  ];
-
   home.sessionVariables = {
     PROTON_USE_NTSYNC = "1";
   };
