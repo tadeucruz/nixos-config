@@ -11,51 +11,59 @@
   # Can be overridden to alter the display name in steam.
   steamDisplayName ? "GE-Proton",
 }:
-stdenvNoCC.mkDerivation (finalAttrs: {
-  pname = "proton-ge";
-  version = "GE-Proton11-5";
+stdenvNoCC.mkDerivation (
+  finalAttrs:
+  let
+    # Real upstream release tag (kept out of `version` so the store path stays
+    # `proton-ge-latest`; the hash still changes on bump).
+    release = "GE-Proton11-5";
+  in
+  {
+    pname = "proton-ge";
+    version = "latest";
 
-  src = fetchurl {
-    url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${finalAttrs.version}/${finalAttrs.version}-x86_64.tar.gz";
-    hash = "sha256-3kPEsl88BH20m5bETYR1mVLFoBMypogFoJ5p+V3DinU=";
-  };
+    src = fetchurl {
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${release}/${release}-x86_64.tar.gz";
+      hash = "sha256-3kPEsl88BH20m5bETYR1mVLFoBMypogFoJ5p+V3DinU=";
+    };
 
-  dontConfigure = true;
-  dontBuild = true;
+    dontConfigure = true;
+    dontBuild = true;
 
-  outputs = [
-    "out"
-    "steamcompattool"
-  ];
+    outputs = [
+      "out"
+      "steamcompattool"
+    ];
 
-  installPhase = ''
-    runHook preInstall
+    installPhase = ''
+      runHook preInstall
 
-    # Make it impossible to add to an environment. You should use the appropriate NixOS option.
-    echo "${finalAttrs.pname} should not be installed into environments. Please use programs.steam.extraCompatPackages instead." > $out
+      # Make it impossible to add to an environment. You should use the appropriate NixOS option.
+      echo "${finalAttrs.pname} should not be installed into environments. Please use programs.steam.extraCompatPackages instead." > $out
 
-    mkdir $steamcompattool
-    # Upstream ships GE-Proton11-x tarballs with a top-level
-    # GE-Proton11-x-x86_64/ directory since the arch-split releases.
-    tar -xf $src -C $steamcompattool --strip-components=1
+      mkdir $steamcompattool
+      # Upstream ships GE-Proton11-x tarballs with a top-level
+      # GE-Proton11-x-x86_64/ directory since the arch-split releases.
+      tar -xf $src -C $steamcompattool --strip-components=1
 
-    runHook postInstall
-  '';
-
-  preFixup = ''
-    substituteInPlace "$steamcompattool/compatibilitytool.vdf" \
-      --replace-fail "${finalAttrs.version}-x86_64" "${steamDisplayName}"
-  '';
-
-  meta = {
-    description = ''
-      Compatibility tool for Steam Play based on Wine and additional components.
-
-      (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
+      runHook postInstall
     '';
-    homepage = "https://github.com/GloriousEggroll/proton-ge-custom";
-    license = lib.licenses.bsd3;
-    platforms = [ "x86_64-linux" ];
-    sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
-  };
-})
+
+    preFixup = ''
+      substituteInPlace "$steamcompattool/compatibilitytool.vdf" \
+        --replace-fail "${release}-x86_64" "${steamDisplayName}"
+    '';
+
+    meta = {
+      description = ''
+        Compatibility tool for Steam Play based on Wine and additional components.
+
+        (This is intended for use in the `programs.steam.extraCompatPackages` option only.)
+      '';
+      homepage = "https://github.com/GloriousEggroll/proton-ge-custom";
+      license = lib.licenses.bsd3;
+      platforms = [ "x86_64-linux" ];
+      sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
+    };
+  }
+)

@@ -34,8 +34,8 @@ tool_repo() {
   esac
 }
 
-current_version() {
-  sed -n 's/^  version = "\(.*\)";$/\1/p' "$(tool_file "$1")"
+current_release() {
+  sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")"
 }
 
 latest_tag() {
@@ -68,13 +68,13 @@ sri() {
 }
 
 rewrite_pin() {
-  local tool="$1" version="$2" hash="$3" file
+  local tool="$1" release="$2" hash="$3" file
   file="$(tool_file "$tool")"
-  python3 - "$file" "$version" "$hash" <<'EOF'
+  python3 - "$file" "$release" "$hash" <<'EOF'
 import re, sys
-path, version, hash = sys.argv[1:4]
+path, release, hash = sys.argv[1:4]
 src = open(path).read()
-src = re.sub(r'version = "[^"]*";', f'version = "{version}";', src)
+src = re.sub(r'release = "[^"]*";', f'release = "{release}";', src)
 src = re.sub(r'hash = "sha256-[^"]*";', f'hash = "{hash}";', src)
 open(path, "w").write(src)
 EOF
@@ -82,7 +82,7 @@ EOF
 
 check() {
   local tool="$1" current latest
-  current="$(current_version "$tool")"
+  current="$(current_release "$tool")"
   latest="$(latest_tag "$tool")"
   if [[ "$(version_of_tag "$tool" "$latest")" == "$current" ]]; then
     echo "up to date (${current})"
@@ -93,15 +93,15 @@ check() {
 }
 
 apply() {
-  local tool="$1" tag="${2:-$(latest_tag "$1")}" current version hash
-  current="$(current_version "$tool")"
-  version="$(version_of_tag "$tool" "$tag")"
-  [[ "$version" != "$current" ]] || die "already at ${version}"
-  echo "updating ${current} -> ${version}"
-  echo "fetching hash ($(asset_url "$tool" "$version" "$tag"))..."
-  hash="$(sri "$(nix-prefetch-url "$(asset_url "$tool" "$version" "$tag")")")"
-  rewrite_pin "$tool" "$version" "$hash"
-  echo "done: $(tool_file "$tool") now pins ${version}"
+  local tool="$1" tag="${2:-$(latest_tag "$1")}" current release hash
+  current="$(current_release "$tool")"
+  release="$(version_of_tag "$tool" "$tag")"
+  [[ "$release" != "$current" ]] || die "already at ${release}"
+  echo "updating ${current} -> ${release}"
+  echo "fetching hash ($(asset_url "$tool" "$release" "$tag"))..."
+  hash="$(sri "$(nix-prefetch-url "$(asset_url "$tool" "$release" "$tag")")")"
+  rewrite_pin "$tool" "$release" "$hash"
+  echo "done: $(tool_file "$tool") now pins ${release}"
 }
 
 if [[ $# -lt 2 ]]; then
