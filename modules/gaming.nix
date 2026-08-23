@@ -15,6 +15,9 @@
       enable = true;
       localNetworkGameTransfers.openFirewall = true;
       remotePlay.openFirewall = true;
+      # GE-Proton managed by nixpkgs (pinned to the nixos-unstable snapshot);
+      # wired into the Steam wrapper via STEAM_EXTRA_COMPAT_TOOLS_PATHS.
+      extraCompatPackages = [ pkgs.proton-ge-bin ];
     };
   };
 
