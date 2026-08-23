@@ -13,6 +13,23 @@ let
   proton-cachyos = import ./proton-cachyos.nix {
     inherit (pkgs) lib stdenvNoCC fetchurl;
   };
+
+  # scx_lavd 1.1.3 (current nixpkgs) has a known regression: repeated
+  # runnable-task stalls that freeze the game for 30-44s (verified on citadel:
+  # Cyberpunk's GameThread failed to run for 30s+, watchdog kills the scheduler).
+  # Upstream sched-ext/scx#3750 — resolved by downgrading to 1.1.2. Pin the rust
+  # schedulers to 1.1.2 (hashes from the nixpkgs that shipped it) until a fixed
+  # release lands in nixpkgs.
+  scx-rustscheds-112 = pkgs.scx.rustscheds.overrideAttrs (old: {
+    version = "1.1.2";
+    src = pkgs.fetchFromGitHub {
+      owner = "sched-ext";
+      repo = "scx";
+      tag = "v1.1.2";
+      hash = "sha256-igrmrfimVOEJnFxMr9ghN6lAHwEBSFLLVrB2MQ72PXI=";
+    };
+    cargoHash = "sha256-CTEVdvw6aG/fFas2Fk3x9o4Sp2k3lHO/OLwUM8t9UjE=";
+  });
 in
 {
   hardware = {
@@ -41,11 +58,12 @@ in
   # because steamos-manager is the supposed owner — but it never actually starts
   # it (verified: sched_ext stayed disabled during a game on legion). Make the
   # boot service authoritative everywhere via mkOverride 0 (beats mkForce).
-  # package/scheduler use mkDefault so Jovian's plain definitions (priority 100)
-  # win on citadel/legion without a "unique option defined twice" conflict.
+  # scheduler uses mkDefault so Jovian's plain definition (priority 100) wins on
+  # citadel/legion without a "unique option defined twice" conflict. package uses
+  # mkForce to beat Jovian's plain package (the pinned 1.1.2).
   services.scx = {
     enable = true;
-    package = lib.mkDefault pkgs.scx.rustscheds;
+    package = lib.mkForce scx-rustscheds-112;
     scheduler = lib.mkDefault "scx_lavd";
   };
 
