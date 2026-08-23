@@ -22,6 +22,16 @@
     steamos.useSteamOSConfig = true;
   };
 
+  # steam-launcher execs a hardcoded steam store path baked into
+  # gamescope-session, so the STEAM_EXTRA_COMPAT_TOOLS_PATHS that
+  # programs.steam.extraCompatPackages adds to the nixos steam wrapper's FHS
+  # profile never reaches the Steam client here. steam-launcher.service does
+  # EnvironmentFile=%t/gamescope-environment, and that file is a dump of the
+  # gamescope session env after sourcing /etc/xdg/gamescope-session/environment
+  # (jovian.steam.environment) — so inject the variable there too.
+  jovian.steam.environment.STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+    lib.makeSearchPathOutput "steamcompattool" "" config.programs.steam.extraCompatPackages;
+
   services = {
     desktopManager.plasma6.enable = true;
 
