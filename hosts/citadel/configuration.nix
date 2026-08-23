@@ -55,6 +55,8 @@ in
     enable32Bit = true;
   };
 
+  environment.systemPackages = [ pkgs.ethtool ];
+
   console.keyMap = "br-abnt2";
 
   environment.etc."jovian/gamescope-session/pre-start".text = ''
@@ -89,6 +91,19 @@ in
       ExecStart = "${lib.getExe pkgs.openrgb} -m off --noautoconnect";
       Restart = "on-failure";
       RestartSec = 3;
+    };
+  };
+
+  # Wake-on-LAN for the Realtek RTL8125 (enp10s0). The r8169 driver persists
+  # the setting across shutdown, so enabling it once at boot is enough.
+  systemd.services.enable-wol = {
+    description = "Enable Wake-on-LAN on enp10s0";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-pre.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${lib.getExe pkgs.ethtool} -s enp10s0 wol g";
+      RemainAfterExit = true;
     };
   };
 
