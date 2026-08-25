@@ -16,12 +16,12 @@
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2-ogc4";
+  ogcRelease = "v7.2-ogc6";
   ogcBase = "7.2"; # kernel base (major.minor) the OGC release was generated against
   ogcModDir = "7.2.0"; # Makefile version of the base tree
 
   ogcBaseHash = "sha256-+f7z0UwN9TgZAm9L50RZg1wqCw3L9bW72eoZ8IKUArM=";
-  ogcPatchHash = "sha256-HFjMBRubCRy+6QYQxir1BvK9MkYjMuvC++TI4z63Mr8=";
+  ogcPatchHash = "sha256-BZ06Jz3xbG0bYq+BLfSFUfEhkUzJC+JPHZa+WepKvcM=";
 
   ogcBaseSrc = pkgs.fetchurl {
     url = "https://cdn.kernel.org/pub/linux/kernel/v${lib.versions.major ogcBase}.x/linux-${ogcBase}.tar.xz";
