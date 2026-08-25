@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Bump the OpenGamingCollective kernel pin in modules/ogc-kernel.nix (citadel only).
 #
-# The pin is vanilla <base> tarball + OGC's monolithic.patch. A bump is: new
-# ogcRelease, new ogcModDir, and two new pure-content hashes (base tarball +
-# patch). Used manually and by .github/workflows/check-ogc-update.yml.
+# The pin is nixpkgs's linux_7_2 + OGC's monolithic.patch. A bump is: new
+# ogcRelease and a new patch hash (the vanilla base comes from nixpkgs, so no
+# base tarball hash/modDirVersion to compute). Used manually and by
+# .github/workflows/check-ogc-update.yml.
 #
 #   ./scripts/update-ogc-kernel.sh --check              # exit 0 ok, 2 update available, 1 error
 #   ./scripts/update-ogc-kernel.sh --apply [tag]        # rewrite the pin (defaults to latest tag)
@@ -13,6 +14,7 @@ REPO="OpenGamingCollective/linux"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KERNEL_FILE="$ROOT/modules/ogc-kernel.nix"
 API_URL="https://api.github.com/repos/${REPO}/releases/latest"
+PINNED_BASE="7.2" # nixpkgs's linux_7_2; bump manually if OGC switches bases
 
 die() {
   echo "error: $*" >&2
@@ -34,20 +36,6 @@ base_of() {
   echo "${BASH_REMATCH[1]}"
 }
 
-# modDirVersion must match the base tree's Makefile exactly. The base is the full
-# kernel version (7.2 or 7.1.8); pad it to 3 components (7.2 -> 7.2.0).
-mod_dir_version_of() {
-  local base="$1" parts
-  IFS='.' read -ra parts <<<"$base"
-  while ((${#parts[@]} < 3)); do parts+=("0"); done
-  echo "${parts[0]}.${parts[1]}.${parts[2]}"
-}
-
-base_tarball_url() {
-  local base="$1"
-  echo "https://cdn.kernel.org/pub/linux/kernel/v${base%%.*}.x/linux-${base}.tar.xz"
-}
-
 patch_url() {
   local tag="$1"
   echo "https://github.com/${REPO}/releases/download/${tag}/monolithic.patch"
@@ -64,14 +52,12 @@ sri() {
 }
 
 rewrite_pin() {
-  local tag="$1" mod_dir_version="$2" base_hash="$3" patch_hash="$4"
-  python3 - "$KERNEL_FILE" "$tag" "$mod_dir_version" "$base_hash" "$patch_hash" <<'EOF'
+  local tag="$1" patch_hash="$2"
+  python3 - "$KERNEL_FILE" "$tag" "$patch_hash" <<'EOF'
 import re, sys
-path, tag, mod_dir_version, base_hash, patch_hash = sys.argv[1:6]
+path, tag, patch_hash = sys.argv[1:4]
 src = open(path).read()
 src = re.sub(r'ogcRelease = "[^"]*";', f'ogcRelease = "{tag}";', src)
-src = re.sub(r'ogcModDir = "[^"]*";', f'ogcModDir = "{mod_dir_version}";', src)
-src = re.sub(r'ogcBaseHash = "[^"]*";', f'ogcBaseHash = "{base_hash}";', src)
 src = re.sub(r'ogcPatchHash = "[^"]*";', f'ogcPatchHash = "{patch_hash}";', src)
 open(path, "w").write(src)
 EOF
@@ -91,18 +77,18 @@ check() {
 
 apply() {
   local tag="${1:-$(latest_release)}"
-  local current base mod_dir_version base_hash patch_hash
+  local current base patch_hash
   current="$(current_release)"
   [[ "$tag" != "$current" ]] || die "already at ${tag}"
   echo "updating ${current} -> ${tag}"
   base="$(base_of "$tag")"
-  mod_dir_version="$(mod_dir_version_of "$base")"
-  echo "fetching base tarball hash ($(base_tarball_url "$base"))..."
-  base_hash="$(sri "$(fetch_hash "$(base_tarball_url "$base")")")"
+  if [[ "$base" != "$PINNED_BASE" ]]; then
+    die "OGC ${tag} is based on ${base}, but modules/ogc-kernel.nix pins nixpkgs's linux_${PINNED_BASE//./_}. Switch the base package manually."
+  fi
   echo "fetching patch hash ($(patch_url "$tag"))..."
   patch_hash="$(sri "$(fetch_hash "$(patch_url "$tag")")")"
-  rewrite_pin "$tag" "$mod_dir_version" "$base_hash" "$patch_hash"
-  echo "done: ${KERNEL_FILE} now pins ${tag} (base ${base}, modDirVersion ${mod_dir_version})"
+  rewrite_pin "$tag" "$patch_hash"
+  echo "done: ${KERNEL_FILE} now pins ${tag} (base ${base} from nixpkgs linux_${base//./_})"
 }
 
 case "${1:-}" in
