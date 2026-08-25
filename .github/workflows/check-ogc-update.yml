@@ -22,18 +22,19 @@ jobs:
         name: Check for a newer OGC release
         run: |
           if ./scripts/update-ogc-kernel.sh --check; then
+            echo "updated=false" >> "$GITHUB_OUTPUT"
             echo "up-to-date" >&2
           else
+            echo "updated=true" >> "$GITHUB_OUTPUT"
             echo "bumping pinned OGC release" >&2
           fi
-        continue-on-error: true
 
       - name: Apply the bump
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outputs.updated == 'true'
         run: ./scripts/update-ogc-kernel.sh --apply
 
       - uses: peter-evans/create-pull-request@v6
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outputs.updated == 'true'
         with:
           branch: ogc-kernel-update
           commit-message: "kernel: bump OGC pin"
