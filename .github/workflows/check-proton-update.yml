@@ -31,14 +31,13 @@ jobs:
             fi
           done
           if [[ -n "$updated" ]]; then
-            echo "updated=${updated}" >> "$GITHUB_OUTPUT"
-            exit 1
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "updated=none" >> "$GITHUB_OUTPUT"
-        continue-on-error: true
 
       - name: Apply the bumps
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outputs.updated == 'true'
         run: |
           for tool in ge cachyos; do
             if ! ./scripts/update-proton.sh "$tool" --check >/dev/null 2>&1; then
@@ -47,7 +46,7 @@ jobs:
           done
 
       - uses: peter-evans/create-pull-request@v6
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outputs.updated == 'true'
         with:
           branch: proton-update
           commit-message: "gaming: bump pinned Proton"
