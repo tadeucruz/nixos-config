@@ -124,6 +124,11 @@ in
 
   networking.hostName = hostname;
 
+  # MT7921e (Legion Go's WiFi) drops/stalls association with power save on —
+  # observed 2026-08-26: repeated "association took too long" until it connects.
+  # wifi.powersave = 2 disables it (NetworkManager config).
+  networking.networkmanager.wifi.powersave = false;
+
   # Nix doesn't wire a package's bundled udev rules in automatically like RPM/pacman
   # do; without this the hid-lenovo-go quirks never apply and InputPlumber sees no controller.
   services.udev.packages = [ pkgs.inputplumber ];
