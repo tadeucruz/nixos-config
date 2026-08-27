@@ -72,6 +72,17 @@ in
   # InputPlumber (Bazzite 44 stack). TDP works via Steam QAM/SteamOS-Manager.
   services.inputplumber.enable = true;
 
+  # scx_lavd (sched-ext scheduler via scx_rustscheds). Jovian sets
+  # services.scx (package = scx.rustscheds, scheduler = "scx_lavd") but forces
+  # systemd.services.scx.wantedBy = [] (mkForce) so steamos-manager owns it.
+  # Steamos-manager doesn't start it on Legion Go, so override wantedBy to start on boot.
+  services.scx = {
+    enable = true;
+    package = lib.mkDefault pkgs.scx.rustscheds;
+    scheduler = lib.mkDefault "scx_lavd";
+  };
+  systemd.services.scx.wantedBy = lib.mkOverride 0 [ "multi-user.target" ];
+
   # udev rules so InputPlumber sees the Legion Go controllers.
   services.udev.packages = [ pkgs.inputplumber ];
 
