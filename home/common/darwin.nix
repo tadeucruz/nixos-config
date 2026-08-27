@@ -17,12 +17,28 @@
   programs = {
     nh = {
       enable = true;
-      clean = {
-        enable = true;
-        extraArgs = "--keep-since 4d --keep 3";
-      };
       darwinFlake = "/Users/${username}/nixos-config";
     };
-    zsh.shellAliases.rebuild = "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname}";
+    zsh.shellAliases.rebuild = "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && nh clean all --keep-since 4d --keep 3";
+  };
+
+  # programs.nh.clean wires a systemd timer, which macOS doesn't run →
+  # same job as a launchd agent instead.
+  launchd.agents.nh-clean = {
+    serviceConfig = {
+      ProgramArguments = [
+        "${pkgs.nh}/bin/nh"
+        "clean"
+        "--keep-since"
+        "4d"
+        "--keep"
+        "3"
+      ];
+      StartCalendarInterval = {
+        Weekday = 1; # Monday, mirroring systemd timer's "weekly" on Linux
+        Hour = 4;
+        Minute = 30;
+      };
+    };
   };
 }
