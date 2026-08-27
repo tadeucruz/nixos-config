@@ -22,7 +22,7 @@
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2-ogc6";
+  ogcRelease = "v7.2-ogc7";
 
   ogcPatch = pkgs.fetchurl {
     url = "https://github.com/OpenGamingCollective/linux/releases/download/${ogcRelease}/monolithic.patch";
