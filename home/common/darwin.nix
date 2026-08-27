@@ -25,20 +25,24 @@
   # programs.nh.clean wires a systemd timer, which macOS doesn't run →
   # same job as a launchd agent instead.
   launchd.agents.nh-clean = {
-    serviceConfig = {
+    enable = true;
+    config = {
       ProgramArguments = [
         "${pkgs.nh}/bin/nh"
         "clean"
+        "all"
         "--keep-since"
         "4d"
         "--keep"
         "3"
       ];
-      StartCalendarInterval = {
-        Weekday = 1; # Monday, mirroring systemd timer's "weekly" on Linux
-        Hour = 4;
-        Minute = 30;
-      };
+      StartCalendarInterval = [
+        {
+          Weekday = 1; # Monday, mirroring systemd timer's "weekly" on Linux
+          Hour = 4;
+          Minute = 30;
+        }
+      ];
     };
   };
 }
