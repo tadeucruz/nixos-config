@@ -17,12 +17,8 @@
   ];
 
   boot = {
-    # uhid/uinput are needed by Handheld Daemon's controller emulation.
-    # hid-lenovo-go is blacklisted: HHD reads the Legion Go controllers raw via
-    # hidraw/evdev, and the kernel driver fights its emulation (controllers
-    # plug/unplug in gamescope). Same approach as anatase/CachyOS.
-    blacklistedKernelModules = [ "hid-lenovo-go" ];
     kernelModules = [
+      "hid_lenovo_go"
       "uhid"
       "uinput"
     ];
@@ -44,35 +40,16 @@
   # wifi.powersave = 2 disables it (NetworkManager config).
   networking.networkmanager.wifi.powersave = false;
 
-  # Handheld Daemon replaces InputPlumber + Decky on the Legion Go. It covers
-  # everything the Decky plugins did: controller emulation (incl. joystick-as-
-  # mouse in KDE), back buttons/remap, RGB, and TDP + fan curves (adjustor).
-  #
-  # Migration from InputPlumber+Decky → HHD. Rollback point: commit 21f38dd
-  # ("legion: disable wifi power save") if anything regresses.
-  services.handheld-daemon = {
-    enable = true;
-    user = username;
-    ui.enable = true;
-    adjustor = {
-      enable = true;
-      # TDP on the Legion Go goes through acpi_call (Lenovo WMI methods).
-      loadAcpiCallModule = true;
-    };
-  };
+  # Testing InputPlumber again (Bazzite 44 moved to it). HHD was the previous
+  # path; commit a20ef09 was the migration. power-profiles-daemon and decky stay
+  # disabled either way (ppd fights TDP, decky plugins now redundant/optional).
+  services.inputplumber.enable = true;
 
-  # HHD and InputPlumber fight over the raw controllers — HHD can't see the
-  # devices. The jovian steam module enables inputplumber without mkDefault, so
-  # mkForce is required to win.
-  services.inputplumber.enable = lib.mkForce false;
+  # InputPlumber needs its udev rules so it sees the Legion Go controllers.
+  services.udev.packages = [ pkgs.inputplumber ];
 
-  # power-profiles-daemon fights adjustor over the power profile, silently
-  # breaking TDP (documented HHD caveat). Disabled for the HHD path.
   services.power-profiles-daemon.enable = lib.mkForce false;
 
-  # Decky was only kept for TDP (SimpleDeckyTDP), RGB and button remap
-  # (LegionGoRemapper) — all provided by HHD now. Disabled only here; citadel
-  # still uses decky-loader via modules/jovian.nix.
   jovian.decky-loader.enable = lib.mkForce false;
 
   system.stateVersion = "26.05";
