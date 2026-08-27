@@ -65,6 +65,6 @@ home/
 - All file content (comments, READMEs, inline notes) in **English**.
 - Conversation with the user in Portuguese.
 - Keep modules flat — avoid deep nesting or extra abstraction unless clearly needed.
-- Cross-platform user packages in `home/common/all.nix`; OS-specific in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin.
+- Cross-platform user packages in `home/common/all.nix`; OS-specific in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin. **Note:** `programs.nh.clean` uses a systemd timer, which macOS ignores → darwin replaces it with a `launchd.agents.nh-clean` job (same args).
 - `system.stateVersion` is `"26.05"` on NixOS; normandy uses `7` (nix-darwin).
 - Any `homebrew.*` option goes under `homebrew/`, never `modules/` or `home/`. Split like `modules/`: `common.nix` baseline + per-purpose files.
