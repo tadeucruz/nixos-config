@@ -7,6 +7,35 @@
   hostname,
   ...
 }:
+
+let
+  legionGoRemapper = pkgs.stdenvNoCC.mkDerivation rec {
+    pname = "legion-go-remapper";
+    version = "0.3.0";
+
+    src = pkgs.fetchzip {
+      url = "https://github.com/aarron-lee/LegionGoRemapper/releases/download/v${version}/LegionGoRemapper.tar.gz";
+      hash = "sha256-JqUXzU/kiHg8AZtBPTkcBvXtNYDnOdXOy4mHkIC30Wg=";
+    };
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r . $out/
+      rm -f $out/ota_update.sh
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Decky Loader plugin for Legion Go button remapping";
+      homepage = "https://github.com/aarron-lee/LegionGoRemapper";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -40,17 +69,21 @@
   # wifi.powersave = 2 disables it (NetworkManager config).
   networking.networkmanager.wifi.powersave = false;
 
-  # Testing InputPlumber again (Bazzite 44 moved to it). HHD was the previous
-  # path; commit a20ef09 was the migration. power-profiles-daemon and decky stay
-  # disabled either way (ppd fights TDP, decky plugins now redundant/optional).
+  # InputPlumber (Bazzite 44 stack). TDP works via Steam QAM/SteamOS-Manager.
   services.inputplumber.enable = true;
 
-  # InputPlumber needs its udev rules so it sees the Legion Go controllers.
+  # udev rules so InputPlumber sees the Legion Go controllers.
   services.udev.packages = [ pkgs.inputplumber ];
 
-  services.power-profiles-daemon.enable = lib.mkForce false;
+  # LegionGoRemapper decky plugin (button remap); legion_hid.py needs libhidapi.
+  jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
+  systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  jovian.decky-loader.enable = lib.mkForce false;
+  # decky-loader has no declarative plugins option, so symlink it in preStart.
+  systemd.services.decky-loader.preStart = lib.mkAfter ''
+    mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
+    ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper
+  '';
 
   system.stateVersion = "26.05";
 }
