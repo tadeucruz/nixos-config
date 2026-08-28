@@ -15,6 +15,7 @@
     "/System/Applications/Notes.app"
     "/System/Applications/TV.app"
     "/System/Applications/Music.app"
+    "/System/Applications/Podcasts.app"
     "/Applications/WhatsApp.app"
     "/System/Applications/System Settings.app"
   ];
