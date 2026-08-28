@@ -1,0 +1,36 @@
+name: Check configurations
+
+on:
+  pull_request:
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/**"
+      - "modules/**"
+      - "home/**"
+      - "homebrew/**"
+  push:
+    branches: [main]
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "hosts/**"
+      - "modules/**"
+      - "home/**"
+      - "homebrew/**"
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Evaluate NixOS and nix-darwin configurations
+        run: |
+          nix eval .#nixosConfigurations.citadel.config.system.build.toplevel.drvPath
+          nix eval .#nixosConfigurations.prothean.config.system.build.toplevel.drvPath
+          nix eval .#nixosConfigurations.legion.config.system.build.toplevel.drvPath
+          nix eval .#darwinConfigurations.normandy.system.drvPath

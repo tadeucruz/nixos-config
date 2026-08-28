@@ -56,4 +56,4 @@ jobs:
             A new release of [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom)
             or [Proton-CachyOS](https://github.com/CachyOS/proton-cachyos) was
             detected. The `modules/proton-ge.nix` / `modules/proton-cachyos.nix`
-            pins were bumped; the `check-nixos-build` job validates the builds.
+            pins were bumped; the `eval` job in `check.yml` validates the configuration.
