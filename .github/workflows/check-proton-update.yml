@@ -2,8 +2,8 @@ name: Check Proton update
 
 on:
   schedule:
-    # 09:00 America/Sao_Paulo (UTC-3, no DST) = 12:00 UTC
-    - cron: "0 12 * * *"
+    # 09:37 America/Sao_Paulo (UTC-3, no DST) = 12:37 UTC (off-peak minute)
+    - cron: "37 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -48,6 +48,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         if: steps.check.outputs.updated == 'true'
         with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           branch: proton-update
           commit-message: "gaming: bump pinned Proton"
           title: "gaming: bump Proton releases"

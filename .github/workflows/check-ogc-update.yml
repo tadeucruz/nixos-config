@@ -2,8 +2,8 @@ name: Check OGC kernel update
 
 on:
   schedule:
-    # 09:00 America/Sao_Paulo (UTC-3, no DST) = 12:00 UTC
-    - cron: "0 12 * * *"
+    # 09:14 America/Sao_Paulo (UTC-3, no DST) = 12:14 UTC (off-peak minute)
+    - cron: "14 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -36,6 +36,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         if: steps.check.outputs.updated == 'true'
         with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           branch: ogc-kernel-update
           commit-message: "kernel: bump OGC pin"
           title: "kernel: bump OGC release"
