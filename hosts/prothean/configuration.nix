@@ -71,5 +71,11 @@
     };
   };
 
+  # awcc calls pkexec to execute ACPI calls (/proc/acpi/call); ensure pkexec wrapper is in PATH
+  systemd.services.awccd.path = [
+    "/run/wrappers"
+    pkgs.polkit
+  ];
+
   system.stateVersion = "26.05";
 }
