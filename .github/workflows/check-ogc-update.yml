@@ -43,4 +43,4 @@ jobs:
           body: |
             A new [OpenGamingCollective/linux](https://github.com/OpenGamingCollective/linux)
             release was detected. The `modules/ogc-kernel.nix` pin was bumped;
-            the `check-nixos-build` job validates the kernel actually builds.
+            the `eval` job in `check.yml` validates the configuration.
