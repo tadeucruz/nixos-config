@@ -11,6 +11,7 @@
       btop
       curl
       herdr
+      ripgrep
       vim
       wget
     ];
@@ -42,6 +43,12 @@
         default = "ddg";
         privateDefault = "ddg";
       };
+    };
+
+    fzf = {
+      enable = true;
+      enableZshIntegration = true;
+      enableBashIntegration = false;
     };
 
     git = {
