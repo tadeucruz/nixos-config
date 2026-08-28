@@ -7,10 +7,7 @@
       SSH_AUTH_SOCK = "/Users/${username}/.bitwarden-ssh-agent.sock";
     };
     packages = with pkgs; [
-      bitwarden-desktop
-      betterdisplay
       obsidian
-      rectangle
     ];
   };
 
