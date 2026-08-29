@@ -26,7 +26,8 @@ in
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    # OpenGamingCollective v7.2-ogc4: AMD HDMI 2.1 VRR/ALLM (not in vanilla 7.2).
+    # OpenGamingCollective kernel: linux_latest + OGC monolithic.patch
+    # (AMD HDMI 2.1 VRR/ALLM, not in vanilla).
     kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
     kernelParams = [ "transparent_hugepage=always" ];
     loader = {
