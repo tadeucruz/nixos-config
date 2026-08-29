@@ -1,7 +1,7 @@
 { username, ... }:
 {
   home = {
-    enableNixpkgsReleaseCheck = yes;
+    enableNixpkgsReleaseCheck = true;
     stateVersion = "26.05";
     inherit username;
   };

@@ -32,7 +32,7 @@
       Clicking = true;
       TrackpadRightClick = true;
     };
-    
+
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
     NSGlobalDomain.AppleInterfaceStyleSwitchesAutomatically = false;
