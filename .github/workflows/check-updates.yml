@@ -22,18 +22,27 @@ jobs:
         name: Apply pending bumps
         run: |
           # scripts/update.sh apply result: 0 = nothing changed, 2 = applied,
-          # anything else = error. The tools applied are printed on stdout.
+          # anything else = error. The markdown summary (PR body) is printed on
+          # stdout; human messages go to stderr.
           set +e
           out="$(./scripts/update.sh apply)"
           rc=$?
           set -e
-          echo "$out" >&2
           case $rc in
             0) echo "updated=false" >> "$GITHUB_OUTPUT" ;;
             2)
-              applied="${out#applied:}"
               echo "updated=true" >> "$GITHUB_OUTPUT"
-              echo "APPLIED_TOOLS=$applied" >> "$GITHUB_ENV"
+              {
+                echo "Automated bump of the pinned upstream dependencies."
+                echo
+                echo "### Changes"
+                echo
+                echo "$out"
+                echo
+                echo "### Validation"
+                echo
+                echo "The \`eval\` job in \`check.yml\` validates the configuration."
+              } > pr-body.md
               ;;
             *) echo "error applying updates (exit $rc)" >&2; exit 1 ;;
           esac
@@ -45,17 +54,4 @@ jobs:
           branch: dependency-updates
           commit-message: "chore: bump dependencies"
           title: "chore: bump dependencies"
-          body: |
-            Automated bump of the pinned upstream dependencies:
-
-            ${{ env.APPLIED_TOOLS }}
-
-            - **GE-Proton** / **Proton-CachyOS** (`modules/proton-ge.nix` /
-              `modules/proton-cachyos.nix`): latest upstream releases.
-            - **OGC kernel** (`modules/ogc-kernel.nix`): latest
-              [OpenGamingCollective/linux](https://github.com/OpenGamingCollective/linux)
-              release. If the base changed from 7.2, the build must be validated
-              manually before merging.
-            - **flake.lock**: `nix flake update`.
-
-            The `eval` job in `check.yml` validates the configuration.
+          body-path: pr-body.md
