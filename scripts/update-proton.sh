@@ -39,8 +39,15 @@ current_release() {
 }
 
 latest_tag() {
-  curl -fsSL "https://api.github.com/repos/$(tool_repo "$1")/releases/latest" |
-    python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])'
+  # Resolve the web redirect instead of hitting api.github.com — unauthenticated
+  # API calls get rate-limited (HTTP 403) on CI runners, which previously made
+  # the pipeline collapse into garbage URLs ("" <tag> "").
+  local redir
+  redir="$(curl -fsS --http1.1 -o /dev/null -w '%{redirect_url}' \
+    "https://github.com/$(tool_repo "$1")/releases/latest")" || die "could not resolve latest release"
+  local tag="${redir##*/}"
+  [[ "$redir" == */releases/tag/* && -n "$tag" ]] || die "unexpected latest-release redirect: $redir"
+  echo "$tag"
 }
 
 # The version stored in the modules is the upstream tag without CachyOS's
@@ -94,6 +101,7 @@ check() {
 
 apply() {
   local tool="$1" tag="${2:-$(latest_tag "$1")}" current release hash
+  [[ -n "$tag" ]] || die "empty tag; won't build a download URL from it"
   current="$(current_release "$tool")"
   release="$(version_of_tag "$tool" "$tag")"
   [[ "$release" != "$current" ]] || die "already at ${release}"
