@@ -9,6 +9,7 @@ on:
       - "modules/**"
       - "home/**"
       - "homebrew/**"
+      - "Makefile"
   push:
     branches: [main]
     paths:
@@ -18,6 +19,7 @@ on:
       - "modules/**"
       - "home/**"
       - "homebrew/**"
+      - "Makefile"
   workflow_dispatch:
 
 jobs:
@@ -28,10 +30,8 @@ jobs:
 
       - uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Evaluate NixOS and nix-darwin configurations
-        run: |
-          nix eval .#nixosConfigurations.citadel.config.system.build.toplevel.drvPath
-          nix eval .#nixosConfigurations.prothean.config.system.build.toplevel.drvPath
-          nix eval .#nixosConfigurations.legion.config.system.build.toplevel.drvPath
-          nix eval .#nixosConfigurations.omega.config.system.build.toplevel.drvPath
-          nix eval .#darwinConfigurations.normandy.system.drvPath
+      # Same entrypoint developers run locally (`make check`): nixfmt --check
+      # plus evaluation of every NixOS and nix-darwin configuration. Keeping the
+      # host list in the Makefile avoids it drifting from CI.
+      - name: Check formatting and evaluate configurations
+        run: make check

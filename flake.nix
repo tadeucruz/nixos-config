@@ -44,6 +44,14 @@
       system = "x86_64-linux";
       username = "tadeucruz";
 
+      # Systems we run tooling (nixfmt) on: the NixOS hosts and the MacBook.
+      # Only `formatter` is generated per-system; the configurations themselves
+      # stay pinned to their own system.
+      forAllSystems = nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+
       mkHost =
         nixpkgsSource: hostname: extraModules:
         nixpkgsSource.lib.nixosSystem {
@@ -107,7 +115,7 @@
         };
     in
     {
-      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
+      formatter = forAllSystems (s: nixpkgs.legacyPackages.${s}.nixfmt);
 
       nixosConfigurations = {
         citadel = mkHost nixpkgs "citadel" [ jovian.nixosModules.default ];

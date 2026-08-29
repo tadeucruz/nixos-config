@@ -4,6 +4,22 @@ Flake for 4 machines — NixOS (`citadel`, `prothean`, `legion`) and nix-darwin 
 
 legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`, 7.2.0). citadel runs [OpenGamingCollective](https://github.com/OpenGamingCollective/linux)'s `v7.2-ogc9` (`modules/ogc-kernel.nix`): the same `linux_latest` base + their `monolithic.patch` via `fetchurl` — it adds AMD HDMI 2.1 VRR/ALLM, which vanilla lacks. Bumps go through `scripts/update.sh ogc` + the `.github/workflows/check-updates.yml` job, decoupled from nixpkgs's own kernel; the bump is skipped with a warning while the OGC release's base differs from `linux_latest` (applied automatically once nixpkgs catches up).
 
+## Validating changes
+
+`make` is the pre-commit gate — it checks formatting and evaluates every configuration, which is what CI runs too. Evaluation is cross-platform, so any machine (including the MacBook) can validate all five hosts:
+
+```sh
+make                  # nixfmt --check + eval of every host
+make eval-citadel     # evaluate a single host
+make build-omega      # real build (needs a builder for that system)
+make fmt              # reformat every tracked .nix file
+make help             # list all targets
+```
+
+An unchanged `.drv` hash between two revisions means the change was a no-op — useful to prove a refactor didn't alter any system.
+
+Note: flakes copy the git tree to the store **excluding untracked files**, so a brand-new module is invisible to `nix eval` until it is at least `git add -N`'d. `make` fails early with a clear message when that happens.
+
 ## Linux (NixOS)
 
 ```sh

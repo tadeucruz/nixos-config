@@ -30,7 +30,8 @@
   # gamescope session env after sourcing /etc/xdg/gamescope-session/environment
   # (jovian.steam.environment) — so inject the variable there too.
   jovian.steam.environment.STEAM_EXTRA_COMPAT_TOOLS_PATHS =
-    lib.makeSearchPathOutput "steamcompattool" "" config.programs.steam.extraCompatPackages;
+    lib.makeSearchPathOutput "steamcompattool" ""
+      config.programs.steam.extraCompatPackages;
 
   services = {
     desktopManager.plasma6.enable = true;

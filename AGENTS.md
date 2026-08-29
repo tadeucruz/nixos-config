@@ -42,10 +42,16 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout.
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
+- **`Makefile` is the single validation entrypoint**, run both locally and by `check.yml` (`make check` = `fmt-check` + `eval` of all five hosts), so the host list never drifts between the two. Evaluating `.drvPath` proves the module tree evaluates without building; comparing the hash across revisions proves a refactor was a no-op. Gotchas baked into it:
+  - **`eval-%`/`build-%` must NOT be in `.PHONY`** — GNU make 3.81 (shipped by macOS) skips pattern-rule lookup for phony targets, silently turning `make eval-citadel` into "Nothing to be done".
+  - The `attr` helper needs `$(strip …)`: backslash-newline continuations expand to a leading space that corrupts the flake attribute path.
+  - **`git-check`**: flakes copy the git tree to the store *excluding untracked files*, so a new module is invisible to `nix eval` until `git add -N`. The target fails early with instructions (bypass with `ALLOW_UNTRACKED=1`).
+  - `flake.nix` exposes `formatter` via `forAllSystems` (`x86_64-linux` + `aarch64-darwin`) — it used to be `formatter.${system}` only, so `nix fmt` was broken on normandy and formatting drift accumulated in 6 files.
 
 ## File layout
 
 ```
+Makefile                         # local validation entrypoint (also used by check.yml)
 flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigurations + 1 darwinConfiguration
 modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
