@@ -55,3 +55,10 @@ jobs:
           commit-message: "chore: bump dependencies"
           title: "chore: bump dependencies"
           body-path: pr-body.md
+          # Only the pin files belong in the PR; pr-body.md is a working-tree
+          # scratch file and would otherwise be committed too.
+          add-paths: |
+            modules/proton-ge.nix
+            modules/proton-cachyos.nix
+            modules/ogc-kernel.nix
+            flake.lock
