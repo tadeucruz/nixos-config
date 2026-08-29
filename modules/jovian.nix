@@ -14,7 +14,6 @@
 
     steam = {
       autoStart = true;
-      desktopSession = "plasma";
       enable = true;
       user = username;
     };
@@ -22,13 +21,14 @@
     steamos.useSteamOSConfig = true;
   };
 
+  jovian.steam.desktopSession = config.desktop.sessionName;
+
   jovian.steam.environment.STEAM_EXTRA_COMPAT_TOOLS_PATHS =
     lib.makeSearchPathOutput "steamcompattool" ""
       config.programs.steam.extraCompatPackages;
 
   services = {
-    desktopManager.plasma6.enable = true;
-
+    displayManager.plasma-login-manager.enable = lib.mkForce false;
     xserver.enable = false;
   };
 

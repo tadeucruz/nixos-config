@@ -17,7 +17,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **Jovian on citadel and legion** (`modules/jovian.nix`): gamescope+Steam (`jovian.steam.autoStart`) with KDE Plasma 6 fallback, no display manager. Both also import `modules/gaming.nix`.
   - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
   - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
-- **prothean: no Jovian, full KDE desktop** (`modules/desktop.nix` + `modules/gaming.nix`, SDDM). PRIME offload + AWCC fan control.
+- **prothean: no Jovian, full KDE desktop** (`modules/desktop/kde.nix` + `modules/gaming.nix`, SDDM). PRIME offload + AWCC fan control.
 - **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,zsh,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
   - **Samba + btrfs** (`modules/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
   - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
@@ -61,7 +61,8 @@ modules/
   normandy.nix                   # normandy-only: dock persistent-apps, displayplacer/Xcode postActivation (personal, not dev)
   gaming.nix                     # Steam + gamemode + controllers (citadel + prothean + legion)
   jovian.nix                     # gamescope+Steam session + KDE fallback (citadel + legion)
-  desktop.nix                    # full KDE Plasma 6 desktop (prothean only)
+  desktop/
+    kde.nix                      # all KDE: plasma6 + SDDM (mkDefault, jovian mkForce) + DrKonqi mask + sycoca hook + jovian session
   btrfs-tuning.nix               # shared btrfs mount options + fstrim (citadel + legion)
   server/
     base.nix                     # headless server subset of common/linux.nix (no desktop bits)
@@ -98,8 +99,10 @@ home/
     base.nix                     # cross-platform base settings (stateVersion, username)
     packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
     unstable.nix                 # packages only in nixos-unstable (herdr) — desktop hosts only
-    linux.nix                    # Linux-only: KDE sycoca, bitwarden SSH agent
+    linux.nix                    # Linux-only: bitwarden SSH agent
     darwin.nix                   # macOS-only: nh (programs.nh, with GC)
+  desktop/
+    kde.nix                      # KDE home bits (sycoca hook) — wired via modules/desktop/kde.nix
   programs/                      # one file per configured program (programs.* options)
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
