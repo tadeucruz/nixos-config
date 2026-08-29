@@ -5,7 +5,10 @@
   ...
 }:
 {
-  imports = [ ../../modules/common/all.nix ];
+  imports = [
+    ../../modules/common/all.nix
+    services/sonarr.nix
+  ];
 
   boot = {
     consoleLogLevel = 3;
