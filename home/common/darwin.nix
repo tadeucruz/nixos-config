@@ -1,7 +1,6 @@
 {
   pkgs,
   username,
-  hostname,
   ...
 }:
 {
@@ -15,12 +14,9 @@
     ];
   };
 
-  programs = {
-    nh = {
-      enable = true;
-      darwinFlake = "/Users/${username}/nixos-config";
-    };
-    zsh.shellAliases.rebuild = "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && nh clean all --keep-since 4d --keep 3";
+  programs.nh = {
+    enable = true;
+    darwinFlake = "/Users/${username}/nixos-config";
   };
 
   launchd.agents.nh-clean = {

@@ -98,13 +98,13 @@ home/
     base.nix                     # cross-platform base settings (stateVersion, username)
     packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
     unstable.nix                 # packages only in nixos-unstable (herdr) — desktop hosts only
-    linux.nix                    # Linux-only: KDE sycoca, bitwarden SSH agent, rebuild alias
-    darwin.nix                   # macOS-only: nh (programs.nh, with GC) + rebuild alias
+    linux.nix                    # Linux-only: KDE sycoca, bitwarden SSH agent
+    darwin.nix                   # macOS-only: nh (programs.nh, with GC)
   programs/                      # one file per configured program (programs.* options)
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
     fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
-    zsh.nix                      # cross-platform zsh config
+    zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
