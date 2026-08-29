@@ -7,6 +7,9 @@
 {
   imports = [
     ../../modules/common/all.nix
+    ../services/avahi.nix
+    ../services/openssh.nix
+    ../services/tailscale.nix
     ../services/sonarr.nix
   ];
 
@@ -52,25 +55,6 @@
       flake = "/home/${username}/nixos-config";
     };
     zsh.enable = true;
-  };
-
-  services = {
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-      publish = {
-        addresses = true;
-        enable = true;
-      };
-    };
-
-    openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-    };
-
-    tailscale.enable = true;
   };
 
   users.users.${username} = {

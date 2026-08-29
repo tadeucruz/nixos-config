@@ -5,7 +5,16 @@
   ...
 }:
 {
-  imports = [ ./all.nix ];
+  imports = [
+    ./all.nix
+    ../services/avahi.nix
+    ../services/flatpak.nix
+    ../services/fwupd.nix
+    ../services/openssh.nix
+    ../services/pipewire.nix
+    ../services/syncthing.nix
+    ../services/tailscale.nix
+  ];
 
   boot = {
     consoleLogLevel = 3;
@@ -69,51 +78,6 @@
   };
 
   security.rtkit.enable = true;
-
-  services = {
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-      publish = {
-        addresses = true;
-        enable = true;
-      };
-    };
-
-    flatpak = {
-      enable = true;
-      packages = [
-        "com.bitwarden.desktop"
-        "md.obsidian.Obsidian"
-        "net.retrodeck.retrodeck"
-      ];
-    };
-
-    fwupd.enable = true;
-
-    openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-    };
-
-    pipewire = {
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-      enable = true;
-      pulse.enable = true;
-    };
-
-    syncthing = {
-      enable = true;
-      user = username;
-      dataDir = "/home/${username}";
-    };
-
-    tailscale.enable = true;
-  };
 
   # Mask to prevent DrKonqi's unbounded crash-loop when it can't find a display (KDE bug 524048, unfixed): https://bugs.kde.org/show_bug.cgi?id=524048
   systemd.user.sockets."drkonqi-coredump-launcher".enable = false;

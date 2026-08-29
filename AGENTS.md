@@ -55,7 +55,7 @@ Makefile                         # local validation entrypoint (also used by che
 flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigurations + 1 darwinConfiguration
 modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
-  common/linux.nix               # NixOS shared: kernel, hardware, services, user, zram
+  common/linux.nix               # NixOS shared: kernel, hardware, user, zram (services live in modules/services/)
   common/darwin.nix              # nix-darwin shared baseline (any Mac): touch ID sudo, fonts, tailscale, syncthing, defaults
   normandy.nix                   # normandy-only: dock persistent-apps, displayplacer/Xcode postActivation (personal, not dev)
   gaming.nix                     # Steam + gamemode + controllers (citadel + prothean + legion)
@@ -67,7 +67,14 @@ modules/
     libvirt.nix                  # generic libvirt/KVM infra (libvirtd + qemu_kvm)
     lxc.nix                      # generic LXC infra (lxc + lxc-net bridge + autostart)
     podman.nix                   # Podman + Quadlet infra — replaces Docker Compose
-  services/                      # workloads: VMs, LXCs, and host services (omega)
+  services/                      # generic system services (desktop/server) + omega workloads: VMs, LXCs, host services
+    avahi.nix                    # avahi/mDNS, nssmdns4, publish (imported by common/linux.nix + server/base.nix)
+    flatpak.nix                  # flatpak apps (bitwarden, obsidian, retrodeck) — desktop only
+    fwupd.nix                    # firmware updates — desktop only
+    openssh.nix                  # sshd, no password auth (imported by common/linux.nix + server/base.nix)
+    pipewire.nix                 # audio (alsa + pulse) — desktop only
+    syncthing.nix                # syncthing — desktop only
+    tailscale.nix                # tailscale (imported by common/linux.nix + server/base.nix)
     samba.nix                    # Samba + NTFS mounts (ntfs3) — replaces OMV
     cloudflared.nix              # Cloudflare Tunnel (token-based, host systemd service)
     haos.nix                     # HAOS VM (qcow2 pinned + domain XML) — needs server/libvirt.nix
