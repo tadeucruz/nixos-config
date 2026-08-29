@@ -5,6 +5,7 @@
   homebrew = {
     brews = [ "displayplacer" ];
     casks = [
+      "balenaetcher"
       "betterdisplay"
       "bitwarden"
       "cryptomator"
