@@ -19,7 +19,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TOOLS=(ge cachyos ogc flake)
+# flake first: the OGC base guard evaluates the kernel version from the
+# flake.lock, so it must be updated before ogc is checked/applied.
+TOOLS=(flake ge cachyos ogc)
 # Tools with pending updates, printed on stdout so the workflow can use them
 # in the PR body. Human messages go to stderr.
 PENDING=""
@@ -186,19 +188,20 @@ check_tool() {
 }
 
 check_flake() {
+  local keep="${1:-}"
   echo "checking flake.lock..." >&2
-  # `nix flake update` is the only reliable way to know; it mutates the lock,
-  # so run it and report whether anything changed. The workflow runs apply
-  # directly, so this path is only used manually / by `check`.
+  # `nix flake update` is the only reliable way to know; it mutates the lock.
+  # With --keep the change is left in place so later checks (ogc's base guard)
+  # see the newer nixpkgs; check_all reverts it at the end.
   nix flake update --flake "$ROOT" >&2
   if git -C "$ROOT" diff --quiet -- flake.lock; then
     echo "flake.lock up to date" >&2
-    git -C "$ROOT" checkout -- flake.lock
+    [[ "$keep" == --keep ]] || git -C "$ROOT" checkout -- flake.lock
     return 0
   fi
   echo "flake.lock update available" >&2
   PENDING="$PENDING flake"
-  git -C "$ROOT" checkout -- flake.lock
+  [[ "$keep" == --keep ]] || git -C "$ROOT" checkout -- flake.lock
   return 2
 }
 
@@ -241,11 +244,14 @@ check_all() {
   local rc=0
   for tool in "${TOOLS[@]}"; do
     if [[ "$tool" == flake ]]; then
-      check_flake || rc=2
+      # Keep the lock update so ogc's base guard sees the newer nixpkgs;
+      # revert it after all checks.
+      check_flake --keep || rc=2
     else
       check_tool "$tool" || rc=2
     fi
   done
+  git -C "$ROOT" checkout -- flake.lock 2>/dev/null || true
   echo "pending:${PENDING}"
   return "$rc"
 }
