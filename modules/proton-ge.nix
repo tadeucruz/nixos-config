@@ -3,7 +3,7 @@
 # on icuuc.dll.u_setMemoryFunctions_65, black-screening e.g. Cyberpunk 2077 —
 # upstream issue GloriousEggroll/proton-ge-custom#651, fixed in 11-4), so the
 # latest release is pinned here. Intended for `programs.steam.extraCompatPackages`
-# only. Bump via scripts/update-proton.sh.
+# only. Bump via scripts/update.sh ge.
 {
   lib,
   stdenvNoCC,
