@@ -1,5 +1,3 @@
-# Bazarr (omega) — subtitle manager, native NixOS service. Ported from
-# rannoch's arrservice/docker-compose.yaml.
 {
   ...
 }:

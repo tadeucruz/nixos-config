@@ -1,8 +1,3 @@
-# HermesAgent LXC container (omega). LXC rootfs is imperative (unlike NixOS
-# containers): created once on first boot via the Debian trixie download
-# template, then autostarted by lxc.service on every boot. The container
-# config is declarative (written from this repo). Requires the generic LXC
-# module (modules/server/lxc.nix).
 {
   config,
   pkgs,

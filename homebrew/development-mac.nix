@@ -1,4 +1,3 @@
-# Mobile dev toolchain installed via Homebrew (normandy only).
 { ... }:
 {
   homebrew = {
@@ -13,8 +12,6 @@
   };
 
   system.activationScripts.postActivation.text = ''
-    # Accept the Xcode license and point xcode-select at the full Xcode install.
-    # Runs after `brew bundle` (which installs Xcode via `mas`, see masApps above).
     if [ -d /Applications/Xcode.app ]; then
       /usr/bin/xcode-select -s /Applications/Xcode.app/Contents/Developer \
         || echo "postActivation: xcode-select failed" >> /tmp/darwin-activation.log

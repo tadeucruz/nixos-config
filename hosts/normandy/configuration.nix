@@ -1,4 +1,3 @@
-# nix-darwin configuration for the MacBook (normandy).
 { username, hostname, ... }:
 {
   imports = [

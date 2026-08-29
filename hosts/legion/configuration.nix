@@ -1,4 +1,3 @@
-# legion — Legion Go (APU AMD Z1 Extreme). Handheld.
 {
   config,
   pkgs,
@@ -64,33 +63,23 @@ in
 
   networking.hostName = hostname;
 
-  # MT7921e (Legion Go's WiFi) drops/stalls association with power save on —
-  # observed 2026-08-26: repeated "association took too long" until it connects.
-  # wifi.powersave = 2 disables it (NetworkManager config).
   networking.networkmanager.wifi.powersave = false;
 
-  # InputPlumber (Bazzite 44 stack). TDP works via Steam QAM/SteamOS-Manager.
   services.inputplumber.enable = true;
 
-  # scx_lavd (sched-ext scheduler via scx_rustscheds). Jovian sets
-  # services.scx (package = scx.rustscheds, scheduler = "scx_lavd") but forces
-  # systemd.services.scx.wantedBy = [] (mkForce) so steamos-manager owns it.
-  # Steamos-manager doesn't start it on Legion Go, so override wantedBy to start on boot.
   services.scx = {
     enable = true;
     package = lib.mkDefault pkgs.scx.rustscheds;
     scheduler = lib.mkDefault "scx_lavd";
   };
+
   systemd.services.scx.wantedBy = lib.mkOverride 0 [ "multi-user.target" ];
 
-  # udev rules so InputPlumber sees the Legion Go controllers.
   services.udev.packages = [ pkgs.inputplumber ];
 
-  # LegionGoRemapper decky plugin (button remap); legion_hid.py needs libhidapi.
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 
-  # decky-loader has no declarative plugins option, so symlink it in preStart.
   systemd.services.decky-loader.preStart = lib.mkAfter ''
     mkdir -p ${config.jovian.decky-loader.stateDir}/plugins
     ln -sfn ${legionGoRemapper} ${config.jovian.decky-loader.stateDir}/plugins/LegionGoRemapper

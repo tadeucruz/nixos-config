@@ -2,6 +2,6 @@
 { ... }:
 {
   imports = [
-    ../common/server-cli.nix
+    ../common/server.nix
   ];
 }

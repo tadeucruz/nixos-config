@@ -1,17 +1,3 @@
-# HAOS VM (omega) — Home Assistant OS must run as a VM (appliance). The qcow2
-# image is pinned via fetchurl and decompressed on first boot; the libvirt
-# domain is defined declaratively from the XML in this repo. Requires the
-# generic libvirt module (modules/server/libvirt.nix).
-#
-# The haos-vm service is idempotent: the qcow2 (which holds all HAOS configs)
-# is only decompressed once, and `virsh define` only applies the hardware
-# definition (RAM/CPU/disk), never destroying or recreating the VM.
-#
-# TODO:
-# - pin haosVersion to the version currently running on Proxmox and fill sha256
-#   (`nix-prefetch-url <url>`)
-# - create the br0 bridge on the host (e.g. networking.bridges.br0) so HAOS is
-#   reachable on the LAN, or switch the XML to a NAT network
 {
   config,
   pkgs,

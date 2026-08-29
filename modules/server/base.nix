@@ -1,5 +1,3 @@
-# Shared headless server config (omega). Server subset of modules/common/linux.nix:
-# no plymouth, bluetooth, pipewire, flatpak, or desktop bits.
 {
   pkgs,
   lib,

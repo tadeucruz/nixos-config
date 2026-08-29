@@ -1,5 +1,3 @@
-# Radarr (omega) — movie manager, native NixOS service. Ported from rannoch's
-# arrservice/docker-compose.yaml.
 {
   ...
 }:

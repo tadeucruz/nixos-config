@@ -1,4 +1,3 @@
-# Cross-platform zsh config (aliases, plugins).
 { ... }:
 {
   programs.zsh = {
