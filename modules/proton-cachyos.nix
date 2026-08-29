@@ -1,6 +1,6 @@
 # Proton-CachyOS as a Steam compatibility tool. Not in nixpkgs, so packaged here
 # (pinned to a release). Intended for `programs.steam.extraCompatPackages` only.
-# Bump via scripts/update-proton.sh. The x86_64 build works on all three hosts;
+# Bump via scripts/update.sh cachyos. The x86_64 build works on all three hosts;
 # a separate x86_64_v3 asset exists upstream for AVX2-only machines if wanted.
 {
   lib,

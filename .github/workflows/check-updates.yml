@@ -1,0 +1,61 @@
+name: Check dependency updates
+
+on:
+  schedule:
+    # 07:30 America/Sao_Paulo (UTC-3, no DST) = 10:30 UTC (off-peak minute)
+    - cron: "30 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - id: apply
+        name: Apply pending bumps
+        run: |
+          # scripts/update.sh apply result: 0 = nothing changed, 2 = applied,
+          # anything else = error. The tools applied are printed on stdout.
+          set +e
+          out="$(./scripts/update.sh apply)"
+          rc=$?
+          set -e
+          echo "$out" >&2
+          case $rc in
+            0) echo "updated=false" >> "$GITHUB_OUTPUT" ;;
+            2)
+              applied="${out#applied:}"
+              echo "updated=true" >> "$GITHUB_OUTPUT"
+              echo "APPLIED_TOOLS=$applied" >> "$GITHUB_ENV"
+              ;;
+            *) echo "error applying updates (exit $rc)" >&2; exit 1 ;;
+          esac
+
+      - uses: peter-evans/create-pull-request@v6
+        if: steps.apply.outputs.updated == 'true'
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+          branch: dependency-updates
+          commit-message: "chore: bump dependencies"
+          title: "chore: bump dependencies"
+          body: |
+            Automated bump of the pinned upstream dependencies:
+
+            ${{ env.APPLIED_TOOLS }}
+
+            - **GE-Proton** / **Proton-CachyOS** (`modules/proton-ge.nix` /
+              `modules/proton-cachyos.nix`): latest upstream releases.
+            - **OGC kernel** (`modules/ogc-kernel.nix`): latest
+              [OpenGamingCollective/linux](https://github.com/OpenGamingCollective/linux)
+              release. If the base changed from 7.2, the build must be validated
+              manually before merging.
+            - **flake.lock**: `nix flake update`.
+
+            The `eval` job in `check.yml` validates the configuration.

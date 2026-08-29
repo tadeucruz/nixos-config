@@ -6,7 +6,7 @@ let
   # Two Proton flavors, both pinned to the latest upstream releases (nixpkgs's
   # proton-ge-bin lags and GE-Proton11-3 has the icuuc.dll.u_setMemoryFunctions_65
   # abort — upstream #651, fixed in 11-4). Pick per game in Steam. Bumps go
-  # through scripts/update-proton.sh, surfaced by check-proton-update.yml.
+  # through scripts/update.sh, surfaced by check-updates.yml.
   proton-ge = import ./proton-ge.nix {
     inherit (pkgs) lib stdenvNoCC fetchurl;
   };

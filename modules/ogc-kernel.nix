@@ -16,8 +16,8 @@
 # included.
 #
 # Decoupled from nixpkgs's linux_latest: nixpkgs updates freely, the kernel only
-# moves when a new OGC release is picked up. Bump via scripts/update-ogc-kernel.sh
-# (CI: .github/workflows/check-ogc-update.yml). If OGC ever releases against a
+# moves when a new OGC release is picked up. Bump via scripts/update.sh ogc
+# (CI: .github/workflows/check-updates.yml). If OGC ever releases against a
 # different base (e.g. v7.3), the linux_7_2 base below must be updated manually.
 { pkgs, lib, ... }:
 
