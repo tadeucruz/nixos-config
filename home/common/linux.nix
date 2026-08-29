@@ -1,5 +1,10 @@
 # Linux-only Home Manager config (citadel + prothean + legion).
-{ pkgs, lib, username, ... }:
+{
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 {
   home = {
     homeDirectory = "/home/${username}";

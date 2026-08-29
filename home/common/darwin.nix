@@ -1,5 +1,10 @@
 # macOS-only Home Manager config.
-{ pkgs, username, hostname, ... }:
+{
+  pkgs,
+  username,
+  hostname,
+  ...
+}:
 {
   home = {
     sessionVariables = {
