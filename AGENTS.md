@@ -55,6 +55,7 @@ Makefile                         # local validation entrypoint (also used by che
 flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigurations + 1 darwinConfiguration
 modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
+  common/nix.nix                 # nix optimise + programs.nh (system-level GC service) — NixOS only
   common/linux.nix               # NixOS shared: kernel, hardware, user, zram (services live in modules/services/)
   common/darwin.nix              # nix-darwin shared baseline (any Mac): touch ID sudo, fonts, tailscale, syncthing, defaults
   normandy.nix                   # normandy-only: dock persistent-apps, displayplacer/Xcode postActivation (personal, not dev)
