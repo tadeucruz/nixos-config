@@ -1,5 +1,5 @@
-# omega — home server (NixOS stable 26.05): Samba/NTFS NAS, Podman+Quadlet
-# containers, HAOS VM, HermesAgent LXC, Cloudflare Tunnel.
+# omega — home server (NixOS stable 26.05): Samba/btrfs NAS, *arr apps,
+# HAOS VM, HermesAgent LXC, Cloudflare Tunnel.
 {
   config,
   lib,
@@ -18,6 +18,7 @@
     ../../modules/server/services/cloudflared.nix
     ../../modules/server/services/haos.nix
     ../../modules/server/services/hermesagent.nix
+    ../../modules/server/services/arr.nix
   ];
 
   boot.loader = {
@@ -25,29 +26,31 @@
     systemd-boot.enable = true;
   };
 
-  # NTFS disks — storage is host-specific, kept close to the host (same pattern
-  # as citadel's /GAMES). TODO: replace the placeholder UUIDs with the real
-  # disks (`blkid`).
+  # btrfs disks — storage is host-specific, kept close to the host (same
+  # pattern as citadel's /GAMES). TODO: replace the placeholder UUIDs with the
+  # real disks (`blkid`).
   fileSystems = {
     "/mnt/media" = {
       device = "/dev/disk/by-uuid/REPLACE-ME-MEDIA";
-      fsType = "ntfs3";
+      fsType = "btrfs";
       options = [
+        "compress=zstd"
+        "discard=async"
+        "noatime"
         "nofail"
-        "rw"
-        "uid=1000"
-        "gid=100"
+        "space_cache=v2"
       ];
     };
 
     "/mnt/backup" = {
       device = "/dev/disk/by-uuid/REPLACE-ME-BACKUP";
-      fsType = "ntfs3";
+      fsType = "btrfs";
       options = [
+        "compress=zstd"
+        "discard=async"
+        "noatime"
         "nofail"
-        "rw"
-        "uid=1000"
-        "gid=100"
+        "space_cache=v2"
       ];
     };
   };

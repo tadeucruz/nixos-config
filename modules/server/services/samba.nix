@@ -1,6 +1,6 @@
-# Samba file sharing (omega) — replaces OMV's Samba. The NTFS disks are mounted
-# in hosts/omega/configuration.nix (host-specific storage, same pattern as
-# citadel's /GAMES); this module only exports them as SMB shares.
+# Samba file sharing (omega) — replaces OMV's Samba. The btrfs disks are
+# mounted in hosts/omega/configuration.nix (host-specific storage, same
+# pattern as citadel's /GAMES); this module only exports them as SMB shares.
 #
 # TODO: set the SMB password once: `smbpasswd -a tadeucruz`.
 { ... }:
