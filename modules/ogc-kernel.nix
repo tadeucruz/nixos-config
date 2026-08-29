@@ -11,16 +11,17 @@
 #
 # Decoupled from nixpkgs's linux_latest: nixpkgs updates freely, the kernel only
 # moves when a new OGC release is picked up. Bump via scripts/update.sh ogc
-# (CI: .github/workflows/check-updates.yml). If OGC ever releases against a
-# different base, the linux_latest base below must be updated manually.
+# (CI: .github/workflows/check-updates.yml). scripts/update.sh skips the bump
+# with a warning while the OGC release's base differs from linux_latest (the
+# patch may not apply), applying automatically once nixpkgs catches up.
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2.1-ogc2";
+  ogcRelease = "v7.2-ogc9";
 
   ogcPatch = pkgs.fetchurl {
     url = "https://github.com/OpenGamingCollective/linux/releases/download/${ogcRelease}/monolithic.patch";
-    hash = "sha256-rKHdJWkMBPmyP2g0hUqKH2je8TFiNEDUq5pafVYI1PU=";
+    hash = "sha256-ofzUmMfmz65WqrevKvIv8pGYdIl6izXhp5WsoMwn2W4=";
   };
 
   ogcKernel = pkgs.linux_latest.override {
