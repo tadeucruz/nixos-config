@@ -39,6 +39,7 @@ in
   imports = [
     ./hardware-configuration.nix
     ../../modules/common/linux.nix
+    ../../modules/desktop/kde.nix
     ../../modules/gaming.nix
     ../../modules/jovian.nix
     ../../modules/btrfs-tuning.nix

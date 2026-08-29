@@ -11,7 +11,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/common/linux.nix
-    ../../modules/desktop.nix
+    ../../modules/desktop/kde.nix
     ../../modules/gaming.nix
     inputs.awcc.nixosModules.default
   ];
@@ -59,7 +59,11 @@
   services = {
     awcc.enable = true;
 
+    hardware.openrgb.enable = true;
+
     logind.settings.Login.HandleLidSwitchExternalPower = "ignore"; # stays reachable over Tailscale when parked on AC (e.g. left at parents' house)
+
+    printing.enable = true;
 
     xserver = {
       videoDrivers = [ "nvidia" ];
