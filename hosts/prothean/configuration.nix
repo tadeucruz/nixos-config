@@ -1,4 +1,3 @@
-# prothean (Dell G15 5525): AMD Ryzen 6800H (iGPU Radeon 680M) + Nvidia dGPU. Laptop.
 {
   config,
   pkgs,
@@ -71,7 +70,6 @@
     };
   };
 
-  # awcc calls pkexec to execute ACPI calls (/proc/acpi/call); ensure pkexec wrapper is in PATH
   systemd.services.awccd.path = [
     "/run/wrappers"
     pkgs.polkit

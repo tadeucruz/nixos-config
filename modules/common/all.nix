@@ -1,4 +1,3 @@
-# Shared config applied to ALL machines (cross-platform).
 { ... }:
 {
   nix.settings.experimental-features = [

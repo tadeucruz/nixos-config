@@ -1,4 +1,3 @@
-# Cross-platform git config.
 { ... }:
 {
   programs.git = {

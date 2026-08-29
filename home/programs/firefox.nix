@@ -1,4 +1,3 @@
-# Firefox policies + default search — desktop machines only (not servers).
 { username, ... }:
 {
   programs.firefox = {

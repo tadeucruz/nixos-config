@@ -1,4 +1,3 @@
-# Shared NixOS (Linux) config applied to citadel, prothean, and legion.
 {
   pkgs,
   lib,

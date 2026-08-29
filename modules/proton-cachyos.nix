@@ -12,9 +12,6 @@
 stdenvNoCC.mkDerivation (
   finalAttrs:
   let
-    # Real upstream release (kept out of `version` so the store path stays
-    # `proton-cachyos-latest`; the hash still changes on bump). The "cachyos-"
-    # prefix is part of the release tag only, not of the asset name.
     release = "11.0-20260703-slr";
   in
   {

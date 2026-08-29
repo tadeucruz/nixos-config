@@ -1,4 +1,3 @@
-# Shared nix-darwin (macOS) config — safe baseline for any Mac.
 { pkgs, username, ... }:
 {
   imports = [ ./all.nix ];
@@ -33,9 +32,8 @@
       Clicking = true;
       TrackpadRightClick = true;
     };
-    # Keeps the System Settings trackpad UI in sync with the Clicking above.
+    
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
-    # Dark appearance system-wide; auto light/dark must be off or it overrides.
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
     NSGlobalDomain.AppleInterfaceStyleSwitchesAutomatically = false;
 

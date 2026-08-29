@@ -1,4 +1,3 @@
-# MangoHud overlay — imported by ../gaming.nix (citadel + prothean + legion).
 { ... }:
 {
   programs.mangohud = {

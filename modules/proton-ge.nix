@@ -1,21 +1,12 @@
-# GE-Proton (GloriousEggroll) as a Steam compatibility tool. nixpkgs's
-# proton-ge-bin lags the fast-moving upstream releases (and GE-Proton11-3 broke
-# on icuuc.dll.u_setMemoryFunctions_65, black-screening e.g. Cyberpunk 2077 —
-# upstream issue GloriousEggroll/proton-ge-custom#651, fixed in 11-4), so the
-# latest release is pinned here. Intended for `programs.steam.extraCompatPackages`
-# only. Bump via scripts/update.sh ge.
 {
   lib,
   stdenvNoCC,
   fetchurl,
-  # Can be overridden to alter the display name in steam.
   steamDisplayName ? "GE-Proton",
 }:
 stdenvNoCC.mkDerivation (
   finalAttrs:
   let
-    # Real upstream release tag (kept out of `version` so the store path stays
-    # `proton-ge-latest`; the hash still changes on bump).
     release = "GE-Proton11-6";
   in
   {

@@ -1,4 +1,3 @@
-# Cross-platform starship prompt.
 { ... }:
 {
   programs.starship = {

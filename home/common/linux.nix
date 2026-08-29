@@ -1,4 +1,3 @@
-# Linux-only Home Manager config (citadel + prothean + legion).
 {
   pkgs,
   lib,
@@ -13,12 +12,9 @@
     };
   };
 
-  # kbuildsycoca's incremental check misses store path hash changes on every rebuild, causing stale KDE plasmoid popups.
   home.activation.rebuildKdeSycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${lib.getExe' pkgs.kdePackages.kservice "kbuildsycoca6"} --noincremental || true
   '';
-
-  # systemd-inhibit keeps the machine awake during long builds (e.g. citadel's
-  # OGC kernel) — honored by both logind and KDE powerdevil.
+  
   programs.zsh.shellAliases.rebuild = "cd $NH_FLAKE && git pull && systemd-inhibit --what=sleep --why='Nix build' nh os switch && nh clean all --keep-since 4d --keep 3";
 }

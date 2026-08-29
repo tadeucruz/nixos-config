@@ -1,5 +1,3 @@
-# omega — home server (NixOS stable 26.05). Kept minimal on purpose: modules
-# are imported one by one as they're tested during the Proxmox migration.
 {
   config,
   lib,

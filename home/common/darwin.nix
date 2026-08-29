@@ -1,4 +1,3 @@
-# macOS-only Home Manager config.
 {
   pkgs,
   username,
@@ -24,8 +23,6 @@
     zsh.shellAliases.rebuild = "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && nh clean all --keep-since 4d --keep 3";
   };
 
-  # programs.nh.clean wires a systemd timer, which macOS doesn't run →
-  # same job as a launchd agent instead.
   launchd.agents.nh-clean = {
     enable = true;
     config = {
@@ -40,7 +37,7 @@
       ];
       StartCalendarInterval = [
         {
-          Weekday = 1; # Monday, mirroring systemd timer's "weekly" on Linux
+          Weekday = 1; 
           Hour = 4;
           Minute = 30;
         }

@@ -1,4 +1,3 @@
-# Shared Home Manager config across all machines (cross-platform).
 { ... }:
 {
   imports = [

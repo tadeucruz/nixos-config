@@ -1,4 +1,3 @@
-# CLI-only Home Manager config for headless servers (omega): no firefox/KDE.
 { ... }:
 {
   imports = [
