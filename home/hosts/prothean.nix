@@ -4,7 +4,7 @@
     ../common/all.nix
     ../common/linux.nix
     ../development.nix
-    ../neovim.nix
+    ../programs/neovim.nix
     ../gaming.nix
   ];
 

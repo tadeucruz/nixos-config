@@ -18,7 +18,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
   - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
   - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
 - **prothean: no Jovian, full KDE desktop** (`modules/desktop.nix` + `modules/gaming.nix`, SDDM). PRIME offload + AWCC fan control.
-- **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix` → `home/common/server-cli.nix` (CLI-only: git, starship, fzf, zsh, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/server/services/`:
+- **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix` → `home/common/server-cli.nix` (CLI-only profile pulling `home/programs/{git,starship,fzf,zsh}.nix`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/server/services/`:
   - **Samba + btrfs** (`modules/server/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
   - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
   - **HAOS as a libvirt VM** (`modules/server/services/haos.nix`): qcow2 pinned via `fetchurl` (version + sha256 are TODO), decompressed on first boot, domain XML declared in the repo (bridge `br0` — TODO: create the bridge on the host). HAOS is an appliance, must stay a VM. The `haos-vm` service is idempotent — the qcow2 (HAOS configs) is only written once; `virsh define` only applies the hardware definition. Depends on generic `modules/server/libvirt.nix` (asserted).
@@ -39,7 +39,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
-- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout.
+- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout.
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
 
@@ -80,23 +80,26 @@ hosts/
   <host>/hardware-configuration.nix  # NixOS only; see placeholder note above
 home/
   hosts/<host>.nix               # per-host user overrides
-  common/all.nix                 # desktop aggregator: dotfiles + firefox + unstable-only packages
-  common/server-cli.nix          # headless-server aggregator: CLI only (git, starship, fzf, zsh), no firefox
-  common/base.nix                # cross-platform base settings (stateVersion, username)
-  common/packages.nix            # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
-  common/unstable.nix            # packages only in nixos-unstable (herdr) — desktop hosts only
-  common/git.nix                 # cross-platform git config
-  common/starship.nix            # cross-platform starship prompt
-  common/fzf.nix                 # cross-platform fzf (no nushell — needs fzf >= 0.73)
-  common/zsh.nix                 # cross-platform zsh config
-  common/firefox.nix             # firefox policies — desktop only
-  common/home-manager.nix        # enable home-manager program
-  common/linux.nix               # Linux-only: KDE sycoca, bitwarden SSH agent, rebuild alias
-  common/darwin.nix              # macOS-only: nh (programs.nh, with GC) + rebuild alias
+  common/                        # profiles + platform glue + bare package lists (no program config)
+    all.nix                      # desktop aggregator: base + packages + unstable + programs/*
+    server-cli.nix               # headless-server aggregator: CLI only (git, starship, fzf, zsh), no firefox
+    base.nix                     # cross-platform base settings (stateVersion, username)
+    packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
+    unstable.nix                 # packages only in nixos-unstable (herdr) — desktop hosts only
+    linux.nix                    # Linux-only: KDE sycoca, bitwarden SSH agent, rebuild alias
+    darwin.nix                   # macOS-only: nh (programs.nh, with GC) + rebuild alias
+  programs/                      # one file per configured program (programs.* options)
+    git.nix                      # cross-platform git config
+    starship.nix                 # cross-platform starship prompt
+    fzf.nix                      # cross-platform fzf (no nushell — needs fzf >= 0.73)
+    zsh.nix                      # cross-platform zsh config
+    firefox.nix                  # firefox policies — desktop only
+    home-manager.nix             # enable home-manager program
+    mangohud.nix                 # mangohud overlay — imported by gaming.nix
+    neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
+    neovim/                      # nvim config copied to ~/.config/nvim
   development.nix                # dev tooling (vscode, claude-code, opencode, go, godot_4, jdk) — prothean + normandy
-  neovim.nix                     # LazyVim (java + go extras) — prothean + normandy
-  neovim/                        # nvim config copied to ~/.config/nvim
-  gaming.nix                     # mangohud, steam extraCompatPackages (pinned GE-Proton + Proton-CachyOS)
+  gaming.nix                     # mangohud + Proton session vars + steam autostart entry
 ```
 
 ## Conventions
@@ -104,6 +107,7 @@ home/
 - All file content (comments, READMEs, inline notes) in **English**.
 - Conversation with the user in Portuguese.
 - Keep modules flat — avoid deep nesting or extra abstraction unless clearly needed.
+- **Program config (`programs.*`) lives in `home/programs/`, one file per program.** `home/common/` only holds profiles (aggregators of imports), platform glue and bare package lists — never a program's own config. `home/gaming.nix` and `home/development.nix` are feature profiles composed by hosts.
 - Cross-platform user packages in `home/common/all.nix` (desktop) or `home/common/server-cli.nix` (headless servers); OS-specific in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin. **Note:** `programs.nh.clean` uses a systemd timer, which macOS ignores → darwin replaces it with a `launchd.agents.nh-clean` job (same args).
 - `system.stateVersion` is `"26.05"` on NixOS; normandy uses `7` (nix-darwin).
 - Any `homebrew.*` option goes under `homebrew/`, never `modules/` or `home/`. Split like `modules/`: `common.nix` baseline + per-purpose files.
