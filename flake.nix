@@ -1,5 +1,5 @@
 {
-  description = "NixOS config for citadel (AMD), prothean (AMD+Nvidia), legion (handheld) + nix-darwin for normandy (MacBook)";
+  description = "NixOS config for citadel (AMD), prothean (AMD+Nvidia), legion (handheld), omega (server) + nix-darwin for normandy (MacBook)";
 
   inputs = {
     awcc = {
@@ -25,6 +25,9 @@
     nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # omega (home server) tracks stable; the desktop/laptop machines stay on unstable.
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
   outputs =
@@ -34,6 +37,7 @@
       nix-darwin,
       nix-flatpak,
       nixpkgs,
+      nixpkgs-stable,
       self,
       ...
     }@inputs:
@@ -80,6 +84,15 @@
             }
           ];
         };
+
+      # Headless server (omega): no flatpak, no home-manager. Tracks nixpkgs-stable.
+      mkServer =
+        nixpkgsSource: hostname: extraModules:
+        nixpkgsSource.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs username hostname; };
+          modules = [ ./hosts/${hostname}/configuration.nix ] ++ extraModules;
+        };
     in
     {
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
@@ -88,6 +101,7 @@
         citadel = mkHost nixpkgs "citadel" [ jovian.nixosModules.default ];
         prothean = mkHost nixpkgs "prothean" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
+        omega = mkServer nixpkgs-stable "omega" [ ];
       };
 
       darwinConfigurations = {

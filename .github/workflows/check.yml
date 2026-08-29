@@ -33,4 +33,5 @@ jobs:
           nix eval .#nixosConfigurations.citadel.config.system.build.toplevel.drvPath
           nix eval .#nixosConfigurations.prothean.config.system.build.toplevel.drvPath
           nix eval .#nixosConfigurations.legion.config.system.build.toplevel.drvPath
+          nix eval .#nixosConfigurations.omega.config.system.build.toplevel.drvPath
           nix eval .#darwinConfigurations.normandy.system.drvPath
