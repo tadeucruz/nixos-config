@@ -14,7 +14,6 @@
     ../../modules/common/linux.nix
     ../../modules/desktop.nix
     ../../modules/gaming.nix
-    ../../modules/btrfs-tuning.nix
     inputs.awcc.nixosModules.default
   ];
 
