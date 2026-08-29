@@ -14,7 +14,7 @@
       };
 
       media = {
-        path = "/mnt/media";
+        path = "/Media";
         browseable = "yes";
         "read only" = "no";
         "valid users" = "tadeucruz";
