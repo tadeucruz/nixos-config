@@ -16,7 +16,7 @@ stdenvNoCC.mkDerivation (
   let
     # Real upstream release tag (kept out of `version` so the store path stays
     # `proton-ge-latest`; the hash still changes on bump).
-    release = "GE-Proton11-5";
+    release = "GE-Proton11-6";
   in
   {
     pname = "proton-ge";
@@ -24,7 +24,7 @@ stdenvNoCC.mkDerivation (
 
     src = fetchurl {
       url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${release}/${release}-x86_64.tar.gz";
-      hash = "sha256-3kPEsl88BH20m5bETYR1mVLFoBMypogFoJ5p+V3DinU=";
+      hash = "sha256-ZZ+NcfL3hlk0ASCyDBxaFGSqE4k5MyoTdt6iL20twuQ=";
     };
 
     dontConfigure = true;
