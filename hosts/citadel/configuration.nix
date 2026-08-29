@@ -13,8 +13,28 @@ in
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/common/linux.nix
+    ../../modules/common/all.nix
+    ../../modules/common/nix.nix
+    ../../modules/common/locale.nix
+    ../../modules/common/zsh.nix
+    ../../modules/common/zram.nix
+    ../../modules/boot/base.nix
+    ../../modules/boot/gaming.nix
+    ../../modules/users/base.nix
+    ../../modules/users/gaming.nix
+    ../../modules/networking/networkmanager.nix
+    ../../modules/desktop/fonts.nix
+    ../../modules/desktop/bluetooth.nix
+    ../../modules/desktop/rtkit.nix
+    ../../modules/desktop/rocm.nix
     ../../modules/desktop/kde.nix
+    ../../modules/services/avahi.nix
+    ../../modules/services/flatpak.nix
+    ../../modules/services/fwupd.nix
+    ../../modules/services/openssh.nix
+    ../../modules/services/pipewire.nix
+    ../../modules/services/syncthing.nix
+    ../../modules/services/tailscale.nix
     ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix

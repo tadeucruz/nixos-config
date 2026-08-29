@@ -1,14 +1,23 @@
 {
-  config,
-  lib,
-  pkgs,
   hostname,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/server/base.nix
+    ../../modules/common/all.nix
+    ../../modules/common/nix.nix
+    ../../modules/common/locale.nix
+    ../../modules/common/zsh.nix
+    ../../modules/common/zram.nix
+    ../../modules/boot/base.nix
+    ../../modules/users/base.nix
+    ../../modules/users/server.nix
+    ../../modules/networking/firewall.nix
+    ../../modules/services/avahi.nix
+    ../../modules/services/openssh.nix
+    ../../modules/services/tailscale.nix
+    ../../modules/services/sonarr.nix
     ../../modules/btrfs-tuning.nix
   ];
 
@@ -19,7 +28,6 @@
 
   networking = {
     hostName = hostname;
-    networkmanager.enable = lib.mkForce false;
     useDHCP = false;
 
     interfaces.enp1s0 = {

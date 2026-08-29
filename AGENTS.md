@@ -56,27 +56,42 @@ flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigura
 modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
   common/nix.nix                 # nix optimise + programs.nh (system-level GC service) — NixOS only
-  common/linux.nix               # NixOS shared: kernel, hardware, user, zram (services live in modules/services/)
+  common/locale.nix              # i18n + console.keyMap mkDefault us-acentos (hosts override with br-abnt2)
+  common/zsh.nix                 # programs.zsh.enable
+  common/zram.nix                # zramSwap.enable
   common/darwin.nix              # nix-darwin shared baseline (any Mac): touch ID sudo, fonts, tailscale, syncthing, defaults
+  boot/
+    base.nix                     # common kernel tuning: consoleLogLevel=3, initrd.verbose=false, sysctl fq+bbr
+    gaming.nix                   # desktop/gaming boot: plymouth, quiet/splash, linuxPackages_latest, ntsync, max_map_count
+  users/
+    base.nix                     # tadeucruz user: description, isNormalUser, ssh key, shell
+    gaming.nix                   # desktop extraGroups (audio, gamemode, i2c, input, uinput, video, ...)
+    server.nix                   # server extraGroups (wheel)
+  networking/
+    networkmanager.nix           # NetworkManager — desktop only
+    firewall.nix                 # firewall.enable — server only
+  desktop/
+    kde.nix                      # all KDE: plasma6 + SDDM (mkDefault, jovian mkForce) + DrKonqi mask + sycoca hook + jovian session
+    fonts.nix                    # nerd-fonts.jetbrains-mono — desktop only
+    bluetooth.nix                # hardware.bluetooth — desktop only
+    rtkit.nix                    # security.rtkit (audio scheduling) — desktop only
+    rocm.nix                     # nixpkgs.config.rocmSupport — desktop only
   normandy.nix                   # normandy-only: dock persistent-apps, displayplacer/Xcode postActivation (personal, not dev)
   gaming.nix                     # Steam + gamemode + controllers (citadel + prothean + legion)
   jovian.nix                     # gamescope+Steam session + KDE fallback (citadel + legion)
-  desktop/
-    kde.nix                      # all KDE: plasma6 + SDDM (mkDefault, jovian mkForce) + DrKonqi mask + sycoca hook + jovian session
-  btrfs-tuning.nix               # shared btrfs mount options + fstrim (citadel + legion)
+  btrfs-tuning.nix               # shared btrfs mount options + fstrim (citadel + legion + omega)
   server/
-    base.nix                     # headless server subset of common/linux.nix (no desktop bits)
     libvirt.nix                  # generic libvirt/KVM infra (libvirtd + qemu_kvm)
     lxc.nix                      # generic LXC infra (lxc + lxc-net bridge + autostart)
     podman.nix                   # Podman + Quadlet infra — replaces Docker Compose
   services/                      # generic system services (desktop/server) + omega workloads: VMs, LXCs, host services
-    avahi.nix                    # avahi/mDNS, nssmdns4, publish (imported by common/linux.nix + server/base.nix)
+    avahi.nix                    # avahi/mDNS, nssmdns4, publish
     flatpak.nix                  # flatpak apps (bitwarden, obsidian, retrodeck) — desktop only
     fwupd.nix                    # firmware updates — desktop only
-    openssh.nix                  # sshd, no password auth (imported by common/linux.nix + server/base.nix)
+    openssh.nix                  # sshd, no password auth
     pipewire.nix                 # audio (alsa + pulse) — desktop only
     syncthing.nix                # syncthing — desktop only
-    tailscale.nix                # tailscale (imported by common/linux.nix + server/base.nix)
+    tailscale.nix                # tailscale
     samba.nix                    # Samba + NTFS mounts (ntfs3) — replaces OMV
     cloudflared.nix              # Cloudflare Tunnel (token-based, host systemd service)
     haos.nix                     # HAOS VM (qcow2 pinned + domain XML) — needs server/libvirt.nix
