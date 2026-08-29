@@ -24,6 +24,9 @@ TOOLS=(ge cachyos ogc flake)
 # in the PR body. Human messages go to stderr.
 PENDING=""
 APPLIED=""
+# Markdown lines (one per applied tool) for the PR body, printed on stdout by
+# apply_all.
+SUMMARY_LINES=()
 
 die() {
   echo "error: $*" >&2
@@ -186,6 +189,16 @@ apply_tool() {
   rewrite_pin "$tool" "$release" "$hash"
   echo "$(tool_label "$tool") pinned to ${release}" >&2
   APPLIED="$APPLIED $tool"
+
+  local line="- **$(tool_label "$tool")**: \`${current}\` → \`${release}\`"
+  if [[ "$tool" == ogc ]]; then
+    local base
+    base="$(base_of "$tag")"
+    if [[ "$base" != "$PINNED_BASE" ]]; then
+      line="$line — note: base changed to ${base}, validate the build before merging."
+    fi
+  fi
+  SUMMARY_LINES+=("$line")
 }
 
 apply_flake() {
@@ -197,6 +210,7 @@ apply_flake() {
   fi
   echo "flake.lock updated" >&2
   APPLIED="$APPLIED flake"
+  SUMMARY_LINES+=("- **flake.lock**: updated via \`nix flake update\`")
 }
 
 # Aggregate check: exit 2 if anything is pending, else 0. Errors abort.
@@ -214,6 +228,7 @@ check_all() {
 }
 
 # Aggregate apply: exit 2 if anything was applied, else 0. Errors abort.
+# The markdown summary (PR body) goes to stdout; human messages to stderr.
 apply_all() {
   for tool in "${TOOLS[@]}"; do
     if [[ "$tool" == flake ]]; then
@@ -222,7 +237,10 @@ apply_all() {
       apply_tool "$tool"
     fi
   done
-  echo "applied:${APPLIED}"
+  echo "applied:${APPLIED}" >&2
+  for line in "${SUMMARY_LINES[@]}"; do
+    echo "$line"
+  done
   [[ -z "$APPLIED" ]] || return 2
   return 0
 }
