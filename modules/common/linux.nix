@@ -14,10 +14,10 @@
     kernel.sysctl = {
       "net.core.default_qdisc" = "fq";
       "net.ipv4.tcp_congestion_control" = "bbr";
-      "vm.max_map_count" = 2147483642; # some games (Star Citizen, UE5 titles) crash without this
+      "vm.max_map_count" = 2147483642;
     };
     kernelModules = [
-      "ntsync" # NT sync primitives in-kernel, speeds up Proton on CPU-bound games
+      "ntsync"
       "tcp_bbr"
     ];
     kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
@@ -55,7 +55,7 @@
     };
   };
 
-  nixpkgs.config.rocmSupport = true; # needed for btop's AMD GPU panel (links librocm_smi64.so)
+  nixpkgs.config.rocmSupport = true;
 
   programs = {
     nh = {
