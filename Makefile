@@ -49,7 +49,7 @@ eval-%: git-check
 	  echo "error: unknown host '$*' (known: $(HOSTS))" >&2; exit 1; \
 	fi
 	@echo "==> eval $*"
-	@out="$$(nix eval --raw '.#$(call attr,$*).drvPath')"; echo "    $$out"
+	@out="$$(nix eval --raw '.#$(call attr,$*).drvPath')" || { echo "error: eval failed for $*" >&2; exit 1; }; echo "    $$out"
 
 build-%: git-check
 	@if ! echo '$(HOSTS)' | tr ' ' '\n' | grep -qx '$*'; then \
