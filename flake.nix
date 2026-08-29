@@ -26,7 +26,6 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # omega (home server) tracks stable; the desktop/laptop machines stay on unstable.
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
@@ -85,7 +84,6 @@
           ];
         };
 
-      # Headless server (omega): no flatpak, no home-manager. Tracks nixpkgs-stable.
       mkServer =
         nixpkgsSource: hostname: extraModules:
         nixpkgsSource.lib.nixosSystem {

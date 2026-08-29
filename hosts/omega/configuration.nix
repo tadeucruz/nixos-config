@@ -18,8 +18,6 @@
     systemd-boot.enable = true;
   };
 
-  # Static IP: wired-only headless server. NetworkManager is overkill for a
-  # single NIC, so use NixOS scripted networking instead.
   networking = {
     hostName = hostname;
     networkmanager.enable = lib.mkForce false;
