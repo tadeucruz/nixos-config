@@ -7,6 +7,7 @@
 {
   imports = [
     ./all.nix
+    ./nix.nix
     ../services/avahi.nix
     ../services/flatpak.nix
     ../services/fwupd.nix
@@ -56,26 +57,9 @@
 
   networking.networkmanager.enable = true;
 
-  nix = {
-    optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
-    };
-  };
-
   nixpkgs.config.rocmSupport = true;
 
-  programs = {
-    nh = {
-      enable = true;
-      clean = {
-        enable = true;
-        extraArgs = "--keep-since 4d --keep 3";
-      };
-      flake = "/home/${username}/nixos-config";
-    };
-    zsh.enable = true;
-  };
+  programs.zsh.enable = true;
 
   security.rtkit.enable = true;
 

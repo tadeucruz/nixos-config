@@ -7,6 +7,7 @@
 {
   imports = [
     ../../modules/common/all.nix
+    ../../modules/common/nix.nix
     ../services/avahi.nix
     ../services/openssh.nix
     ../services/tailscale.nix
@@ -38,24 +39,7 @@
     networkmanager.enable = true;
   };
 
-  nix = {
-    optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
-    };
-  };
-
-  programs = {
-    nh = {
-      enable = true;
-      clean = {
-        enable = true;
-        extraArgs = "--keep-since 4d --keep 3";
-      };
-      flake = "/home/${username}/nixos-config";
-    };
-    zsh.enable = true;
-  };
+  programs.zsh.enable = true;
 
   users.users.${username} = {
     description = "Tadeu Cruz";
