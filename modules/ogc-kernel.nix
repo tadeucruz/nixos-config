@@ -20,7 +20,7 @@ let
 
   ogcPatch = pkgs.fetchurl {
     url = "https://github.com/OpenGamingCollective/linux/releases/download/${ogcRelease}/monolithic.patch";
-    hash = "sha256-BZ06Jz3xbG0bYq+BLfSFUfEhkUzJC+JPHZa+WepKvcM=";
+    hash = "sha256-rKHdJWkMBPmyP2g0hUqKH2je8TFiNEDUq5pafVYI1PU=";
   };
 
   ogcKernel = pkgs.linux_latest.override {

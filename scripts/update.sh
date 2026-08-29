@@ -130,7 +130,7 @@ tool, path, release, hash = sys.argv[1:5]
 src = open(path).read()
 if tool == "ogc":
     src = re.sub(r'ogcRelease = "[^"]*";', f'ogcRelease = "{release}";', src)
-    src = re.sub(r'ogcPatchHash = "[^"]*";', f'ogcPatchHash = "{hash}";', src)
+    src = re.sub(r'hash = "sha256-[^"]*";', f'hash = "{hash}";', src)
 else:
     src = re.sub(r'release = "[^"]*";', f'release = "{release}";', src)
     src = re.sub(r'hash = "sha256-[^"]*";', f'hash = "{hash}";', src)
