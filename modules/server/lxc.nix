@@ -1,5 +1,5 @@
 # Generic LXC infrastructure (omega). Workload containers (e.g. HermesAgent)
-# live in modules/server/services/ and are defined on top of this.
+# live in modules/services/ and are defined on top of this.
 {
   pkgs,
   ...

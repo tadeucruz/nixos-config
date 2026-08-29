@@ -18,7 +18,7 @@ in
   assertions = [
     {
       assertion = config.virtualisation.lxc.enable;
-      message = "services/hermesagent.nix requires modules/server/lxc.nix (virtualisation.lxc.enable)";
+      message = "modules/services/hermesagent.nix requires modules/server/lxc.nix (virtualisation.lxc.enable)";
     }
   ];
 

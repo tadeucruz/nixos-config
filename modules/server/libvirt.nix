@@ -1,5 +1,5 @@
 # Generic libvirt/KVM infrastructure (omega). Workload VMs (e.g. HAOS) live in
-# modules/server/services/ and are defined on top of this.
+# modules/services/ and are defined on top of this.
 {
   pkgs,
   ...
