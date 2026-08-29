@@ -117,9 +117,39 @@ base_of() {
   echo "${BASH_REMATCH[1]}"
 }
 
-# nixpkgs's linux_7_2 the OGC patch is applied onto; a bump to a different base
-# is only a warning here (the PR is opened anyway and Tadeu validates the build).
-PINNED_BASE="7.2"
+# Normalize a version to three dot-separated components (7.2 -> 7.2.0) so
+# 7.2 == 7.2.0 but 7.2 != 7.2.1.
+normalize_version() {
+  local v="$1" out="" i
+  IFS='.' read -r -a parts <<< "$v"
+  for i in 0 1 2; do
+    out="${out}${out:+.}${parts[$i]:-0}"
+  done
+  echo "$out"
+}
+
+# The kernel version the OGC patch is applied onto (nixpkgs's linux_latest).
+# The override doesn't change `version`, so this is not circular.
+kernel_version() {
+  nix eval --raw "$ROOT#nixosConfigurations.citadel.config.boot.kernelPackages.kernel.version" 2>/dev/null
+}
+
+# True (exit 0) when the OGC tag's base differs from the kernel nixpkgs
+# provides. The patch may not apply then, so the bump is skipped — it is
+# applied automatically on a later cron once nixpkgs catches up to the base.
+ogc_base_mismatch() {
+  local tag="$1" base nixver
+  base="$(base_of "$tag")"
+  nixver="$(kernel_version)" || {
+    echo "warning: could not evaluate citadel kernel version; skipping OGC bump" >&2
+    return 0
+  }
+  if [[ "$(normalize_version "$base")" != "$(normalize_version "$nixver")" ]]; then
+    echo "warning: OGC ${tag} targets kernel ${base} but nixpkgs linux_latest is ${nixver} — skipping (will bump once nixpkgs reaches ${base})" >&2
+    return 0
+  fi
+  return 1
+}
 
 rewrite_pin() {
   local tool="$1" release="$2" hash="$3" file
@@ -144,6 +174,10 @@ check_tool() {
   latest="$(latest_tag "$tool")"
   if [[ "$(version_of_tag "$tool" "$latest")" == "$current" ]]; then
     echo "$(tool_label "$tool") up to date (${current})" >&2
+    return 0
+  fi
+  # OGC: only bump when the tag's base matches the kernel nixpkgs provides.
+  if [[ "$tool" == ogc ]] && ogc_base_mismatch "$latest"; then
     return 0
   fi
   echo "$(tool_label "$tool") update available: ${current} -> $(version_of_tag "$tool" "$latest")" >&2
@@ -175,12 +209,9 @@ apply_tool() {
   release="$(version_of_tag "$tool" "$tag")"
   [[ "$release" != "$current" ]] || { echo "$(tool_label "$tool") already at ${release}" >&2; return 0; }
 
-  if [[ "$tool" == ogc ]]; then
-    local base
-    base="$(base_of "$tag")"
-    if [[ "$base" != "$PINNED_BASE" ]]; then
-      echo "warning: OGC ${tag} is based on ${base}, but modules/ogc-kernel.nix pins nixpkgs's linux_${PINNED_BASE//./_}. Applying anyway — validate the build before merging." >&2
-    fi
+  # OGC: only bump when the tag's base matches the kernel nixpkgs provides.
+  if [[ "$tool" == ogc ]] && ogc_base_mismatch "$tag"; then
+    return 0
   fi
 
   echo "updating $(tool_label "$tool") ${current} -> ${release}" >&2
@@ -190,15 +221,7 @@ apply_tool() {
   echo "$(tool_label "$tool") pinned to ${release}" >&2
   APPLIED="$APPLIED $tool"
 
-  local line="- **$(tool_label "$tool")**: \`${current}\` → \`${release}\`"
-  if [[ "$tool" == ogc ]]; then
-    local base
-    base="$(base_of "$tag")"
-    if [[ "$base" != "$PINNED_BASE" ]]; then
-      line="$line — note: base changed to ${base}, validate the build before merging."
-    fi
-  fi
-  SUMMARY_LINES+=("$line")
+  SUMMARY_LINES+=("- **$(tool_label "$tool")**: \`${current}\` → \`${release}\`")
 }
 
 apply_flake() {

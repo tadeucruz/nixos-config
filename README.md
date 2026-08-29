@@ -2,7 +2,7 @@
 
 Flake for 4 machines — NixOS (`citadel`, `prothean`, `legion`) and nix-darwin (`normandy`).
 
-legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`, 7.2.0). citadel runs [OpenGamingCollective](https://github.com/OpenGamingCollective/linux)'s `v7.2-ogc4` (`modules/ogc-kernel.nix`): vanilla 7.2.0 + their `monolithic.patch` via `fetchurl` — it adds AMD HDMI 2.1 VRR/ALLM, which vanilla 7.2 lacks. Bumps go through `scripts/update.sh ogc` + the `.github/workflows/check-updates.yml` job, decoupled from nixpkgs's own kernel.
+legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`, 7.2.0). citadel runs [OpenGamingCollective](https://github.com/OpenGamingCollective/linux)'s `v7.2-ogc9` (`modules/ogc-kernel.nix`): the same `linux_latest` base + their `monolithic.patch` via `fetchurl` — it adds AMD HDMI 2.1 VRR/ALLM, which vanilla lacks. Bumps go through `scripts/update.sh ogc` + the `.github/workflows/check-updates.yml` job, decoupled from nixpkgs's own kernel; the bump is skipped with a warning while the OGC release's base differs from `linux_latest` (applied automatically once nixpkgs catches up).
 
 ## Linux (NixOS)
 
