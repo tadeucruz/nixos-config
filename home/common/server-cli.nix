@@ -4,10 +4,10 @@
   imports = [
     ./base.nix
     ./packages.nix
-    ./git.nix
-    ./starship.nix
-    ./fzf.nix
-    ./zsh.nix
-    ./home-manager.nix
+    ../programs/git.nix
+    ../programs/starship.nix
+    ../programs/fzf.nix
+    ../programs/zsh.nix
+    ../programs/home-manager.nix
   ];
 }

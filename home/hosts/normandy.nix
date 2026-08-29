@@ -5,6 +5,6 @@
     ../common/all.nix
     ../common/darwin.nix
     ../development.nix
-    ../neovim.nix
+    ../programs/neovim.nix
   ];
 }
