@@ -89,7 +89,21 @@
         nixpkgsSource.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit inputs username hostname; };
-          modules = [ ./hosts/${hostname}/configuration.nix ] ++ extraModules;
+          modules = [
+            ./hosts/${hostname}/configuration.nix
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = "backup";
+                extraSpecialArgs = { inherit inputs username hostname; };
+                users.${username} = import ./home/hosts/${hostname}.nix;
+              };
+            }
+          ]
+          ++ extraModules;
         };
     in
     {

@@ -1,11 +1,9 @@
-# Shared Home Manager config across all machines (cross-platform).
+# CLI-only Home Manager config for headless servers (omega): no firefox/KDE.
 { ... }:
 {
   imports = [
     ./base.nix
     ./packages.nix
-    ./unstable.nix
-    ./firefox.nix
     ./git.nix
     ./starship.nix
     ./fzf.nix
