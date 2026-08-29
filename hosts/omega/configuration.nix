@@ -11,6 +11,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/server/base.nix
+    ../../modules/btrfs-tuning.nix
   ];
 
   boot.loader = {
