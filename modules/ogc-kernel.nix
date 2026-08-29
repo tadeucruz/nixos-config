@@ -28,7 +28,10 @@ let
     # Keep nixpkgs's default patches (bridge_stp_helper, request_key_helper)
     # and append the OGC one.
     kernelPatches = pkgs.linux_latest.kernelPatches ++ [
-      { name = "opengamingcollective-${ogcRelease}"; patch = ogcPatch; }
+      {
+        name = "opengamingcollective-${ogcRelease}";
+        patch = ogcPatch;
+      }
     ];
   };
 in

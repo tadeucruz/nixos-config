@@ -3,7 +3,10 @@
 {
   homebrew = {
     brews = [ "cocoapods" ];
-    casks = [ "android-studio" "flutter" ];
+    casks = [
+      "android-studio"
+      "flutter"
+    ];
     masApps = {
       Xcode = 497799835;
     };
