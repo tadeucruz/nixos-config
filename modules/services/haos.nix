@@ -14,7 +14,7 @@ in
   assertions = [
     {
       assertion = config.virtualisation.libvirtd.enable;
-      message = "services/haos.nix requires modules/server/libvirt.nix (virtualisation.libvirtd.enable)";
+      message = "modules/services/haos.nix requires modules/server/libvirt.nix (virtualisation.libvirtd.enable)";
     }
   ];
 

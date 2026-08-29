@@ -7,7 +7,7 @@
 {
   imports = [
     ../../modules/common/all.nix
-    services/sonarr.nix
+    ../services/sonarr.nix
   ];
 
   boot = {
