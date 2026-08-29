@@ -17,6 +17,7 @@
     ../../modules/services/avahi.nix
     ../../modules/services/openssh.nix
     ../../modules/services/tailscale.nix
+    ../../modules/services/samba.nix
     ../../modules/services/sonarr.nix
     ../../modules/btrfs-tuning.nix
   ];
