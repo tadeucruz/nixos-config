@@ -97,7 +97,7 @@ home/
   programs/                      # one file per configured program (programs.* options)
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
-    fzf.nix                      # cross-platform fzf (no nushell — needs fzf >= 0.73)
+    fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
     zsh.nix                      # cross-platform zsh config
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
