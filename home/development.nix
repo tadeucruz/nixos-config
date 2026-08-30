@@ -6,7 +6,6 @@
     godot_4
     jdk
     nodejs
-    opencode
     vscode
   ];
 }
