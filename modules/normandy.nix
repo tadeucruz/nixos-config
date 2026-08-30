@@ -14,6 +14,7 @@
     "/System/Applications/Reminders.app"
     "/System/Applications/Notes.app"
     "/System/Applications/TV.app"
+    "/Applications/Infuse.app"
     "/System/Applications/Music.app"
     "/System/Applications/Podcasts.app"
     "/Applications/WhatsApp.app"
