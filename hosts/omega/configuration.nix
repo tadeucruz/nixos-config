@@ -25,6 +25,7 @@
     ../../modules/services/radarr.nix
     ../../modules/services/bazarr.nix
     ../../modules/server/libvirt.nix
+    ../../modules/server/podman.nix
     ../../modules/services/haos.nix
     ../../modules/services/open-webui.nix
     ../../modules/services/forgejo.nix
