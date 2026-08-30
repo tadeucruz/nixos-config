@@ -2,6 +2,7 @@
 # modules/services/ and are defined on top of this.
 {
   pkgs,
+  username,
   ...
 }:
 {
@@ -14,4 +15,15 @@
       };
     };
   };
+
+  users.users.${username}.extraGroups = [ "libvirtd" ];
+
+  security.polkit.extraConfig = ''
+    polkit.addRule(function (action, subject) {
+      if (subject.user == "${username}"
+        && (action.id == "org.libvirt.unix.manage" || action.id == "org.libvirt.unix.monitor")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 }
