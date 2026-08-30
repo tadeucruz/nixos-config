@@ -29,17 +29,39 @@ jobs:
             echo "updated=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create Pull Request
+      - name: Create or update pull request
         if: steps.apply.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.ACTIONS_TOKEN_TADEU }}
-          branch: dependency-updates
-          commit-message: "chore: update dependencies"
-          title: "chore: update dependencies"
-          body-path: pr-body.md
-          add-paths: |
-            modules/proton-ge.nix
-            modules/proton-cachyos.nix
-            modules/ogc-kernel.nix
-            flake.lock
+        env:
+          TOKEN: ${{ secrets.ACTIONS_TOKEN_TADEU }}
+        run: |
+          set -euo pipefail
+          API=https://git.tadeucruz.com/api/v1
+          OWNER=tadeucruz
+          REPO=nixos-config
+          PUSH_URL="https://forgejo:${TOKEN}@git.tadeucruz.com/${OWNER}/${REPO}.git"
+
+          git config user.name "forgejo-actions"
+          git config user.email "forgejo@git.tadeucruz.com"
+          git switch -c dependency-updates
+          git add modules/proton-ge.nix modules/proton-cachyos.nix modules/ogc-kernel.nix flake.lock
+          git commit -m "chore: update dependencies" || true
+          git push -f "$PUSH_URL" dependency-updates
+
+          body="$(cat pr-body.md)"
+          body="${body//\\/\\\\}"
+          body="${body//\"/\\\"}"
+          body="${body//$'\n'/\\n}"
+          payload="{\"title\":\"chore: update dependencies\",\"head\":\"dependency-updates\",\"base\":\"main\",\"body\":\"${body}\"}"
+
+          list="$(curl -fsS -H "Authorization: token ${TOKEN}" \
+            "${API}/repos/${OWNER}/${REPO}/pulls?state=open&head=${OWNER}:dependency-updates&base=main")"
+          index="$(printf '%s' "$list" | grep -o '"number": *[0-9]*' | head -n 1 | grep -o '[0-9]*' || true)"
+          if [ -n "$index" ]; then
+            curl -fsS -X PATCH -H "Authorization: token ${TOKEN}" -H "Content-Type: application/json" \
+              -d "$payload" "${API}/repos/${OWNER}/${REPO}/pulls/${index}" >/dev/null
+            echo "updated PR #${index}"
+          else
+            curl -fsS -X POST -H "Authorization: token ${TOKEN}" -H "Content-Type: application/json" \
+              -d "$payload" "${API}/repos/${OWNER}/${REPO}/pulls" >/dev/null
+            echo "created PR"
+          fi
