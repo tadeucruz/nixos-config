@@ -3,6 +3,8 @@
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cpu;
+    host = "0.0.0.0";
+    openFirewall = true;
     loadModels = [
       "deepseek-r1:14b"
       "nomic-embed-text"
