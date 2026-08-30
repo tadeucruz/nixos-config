@@ -8,6 +8,7 @@
     settings = {
       server = {
         DOMAIN = "git.tadeucruz.com";
+        SSH_DOMAIN = "omega.tail0a0fce.ts.net";
         ROOT_URL = "https://git.tadeucruz.com/";
         HTTP_PORT = 3001;
         SSH_PORT = 2222;
