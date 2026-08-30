@@ -20,6 +20,10 @@
     ../../modules/services/samba.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/sonarr.nix
+    ../../modules/services/qbittorrent.nix
+    ../../modules/services/prowlarr.nix
+    ../../modules/services/radarr.nix
+    ../../modules/services/bazarr.nix
     ../../modules/btrfs-tuning.nix
   ];
 
