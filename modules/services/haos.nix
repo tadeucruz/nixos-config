@@ -42,12 +42,6 @@ in
           <source bridge='br0'/>
           <model type='virtio'/>
         </interface>
-        <serial type='pty'>
-          <target port='0'/>
-        </serial>
-        <console type='pty'>
-          <target type='serial' port='0'/>
-        </console>
         <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1' passwd='e9acc490'>
           <listen type='address' address='127.0.0.1'/>
         </graphics>
