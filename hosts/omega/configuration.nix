@@ -27,6 +27,7 @@
     ../../modules/server/libvirt.nix
     ../../modules/services/haos.nix
     ../../modules/services/open-webui.nix
+    ../../modules/services/forgejo.nix
     ../../modules/btrfs-tuning.nix
   ];
 
