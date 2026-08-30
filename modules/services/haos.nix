@@ -26,7 +26,6 @@ in
       <vcpu>4</vcpu>
       <os firmware='efi'>
         <type arch='x86_64'>hvm</type>
-        <boot dev='hd'/>
       </os>
       <features>
         <acpi/>
