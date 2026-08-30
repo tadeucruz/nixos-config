@@ -1,0 +1,13 @@
+name: Check configurations
+
+on:
+  pull_request:
+
+jobs:
+  eval:
+    runs-on: nix
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check formatting and evaluate configurations
+        run: make check
