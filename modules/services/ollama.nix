@@ -2,13 +2,10 @@
 {
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-cpu;
+    package = pkgs.ollama-vulkan;
     host = "0.0.0.0";
     openFirewall = true;
-    loadModels = [
-      "deepseek-r1:7b"
-      "nomic-embed-text"
-    ];
+    loadModels = [ "deepseek-r1:14b" ];
     syncModels = true;
   };
 
@@ -17,9 +14,5 @@
     host = "0.0.0.0";
     port = 3000;
     openFirewall = true;
-    environment = {
-      RAG_EMBEDDING_ENGINE = "ollama";
-      RAG_EMBEDDING_MODEL = "nomic-embed-text";
-    };
   };
 }
