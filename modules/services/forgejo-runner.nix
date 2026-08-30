@@ -9,7 +9,7 @@
     instances.default = {
       enable = true;
       name = "omega-runner";
-      url = "http://127.0.0.1:3001";
+      url = "https://git.tadeucruz.com";
       tokenFile = "/etc/forgejo-runner/token";
       labels = [
         "nix:docker://git.tadeucruz.com/tadeucruz/nix-ci-builder:latest"

@@ -10,19 +10,16 @@ jobs:
   update:
     runs-on: nix
     steps:
-      - name: Checkout
-        run: |
-          rm -rf .git ./*
-          git clone --depth 1 --branch main \
-            "https://forgejo:${{ secrets.ACTIONS_TOKEN_TADEU }}@git.tadeucruz.com/tadeucruz/nixos-config.git" .
-          git config user.name "forgejo-actions"
-          git config user.email "forgejo@git.tadeucruz.com"
+      - uses: actions/checkout@v4
 
       - name: Apply pending bumps
         run: make update
 
       - name: Commit and push
         run: |
+          git config user.name "forgejo-actions"
+          git config user.email "forgejo@git.tadeucruz.com"
+          git remote set-url origin "https://forgejo:${{ secrets.ACTIONS_TOKEN_TADEU }}@git.tadeucruz.com/tadeucruz/nixos-config.git"
           git add -A
           git diff-index --quiet HEAD || {
             git commit -m "chore: update dependencies"
