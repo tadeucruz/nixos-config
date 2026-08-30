@@ -20,6 +20,10 @@
         log.level = "info";
         runner.capacity = 2;
         runner.timeout = "3h";
+        # Always pull `:latest` before a job: the runner otherwise reuses the
+        # already-downloaded image and never picks up rebuilt images (e.g. the
+        # nix-ci-builder with make/python3).
+        container.force_pull = true;
       };
     };
   };
