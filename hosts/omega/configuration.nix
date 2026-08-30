@@ -29,6 +29,7 @@
     ../../modules/services/open-webui.nix
     ../../modules/services/forgejo.nix
     ../../modules/btrfs-tuning.nix
+    ../../modules/services/cloudflared.nix
   ];
 
   boot.loader = {
