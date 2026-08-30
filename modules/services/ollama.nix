@@ -6,9 +6,10 @@
     host = "0.0.0.0";
     openFirewall = true;
     loadModels = [
-      "deepseek-r1:14b"
+      "deepseek-r1:7b"
       "nomic-embed-text"
     ];
+    syncModels = true;
   };
 
   services.open-webui = {
