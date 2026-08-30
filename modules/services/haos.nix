@@ -4,10 +4,10 @@
   ...
 }:
 let
-  haosVersion = "13.2"; # TODO: pin to the version currently running on Proxmox
+  haosVersion = "18.2";
   haosImage = pkgs.fetchurl {
     url = "https://github.com/home-assistant/operating-system/releases/download/${haosVersion}/haos_ova-${haosVersion}.qcow2.xz";
-    sha256 = ""; # TODO: fill via `nix-prefetch-url <url>` after picking haosVersion
+    sha256 = "0ki59x2mqrjg822khw3bvzq57pq7391yb6y0mzikj1yzakrm6ki5";
   };
 in
 {
