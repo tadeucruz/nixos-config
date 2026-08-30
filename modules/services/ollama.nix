@@ -3,11 +3,19 @@
   services.ollama = {
     enable = true;
     package = pkgs.ollama-cpu;
-    loadModels = [ "deepseek-r1:14b" ];
+    loadModels = [
+      "deepseek-r1:14b"
+      "nomic-embed-text"
+    ];
   };
 
   services.open-webui = {
     enable = true;
+    port = 3000;
     openFirewall = true;
+    environment = {
+      RAG_EMBEDDING_ENGINE = "ollama";
+      RAG_EMBEDDING_MODEL = "nomic-embed-text";
+    };
   };
 }
