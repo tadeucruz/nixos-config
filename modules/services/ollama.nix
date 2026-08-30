@@ -5,7 +5,7 @@
     package = pkgs.ollama-vulkan;
     host = "0.0.0.0";
     openFirewall = true;
-    loadModels = [ "deepseek-r1:14b" ];
+    loadModels = [ "deepseek-r1:7b" ];
     syncModels = true;
   };
 
