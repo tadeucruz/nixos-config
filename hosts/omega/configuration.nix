@@ -22,6 +22,7 @@
     ../../modules/services/sonarr.nix
     ../../modules/services/qbittorrent.nix
     ../../modules/services/prowlarr.nix
+    ../../modules/services/flaresolverr.nix
     ../../modules/services/radarr.nix
     ../../modules/services/bazarr.nix
     ../../modules/server/libvirt.nix
