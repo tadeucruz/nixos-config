@@ -24,7 +24,7 @@ in
       <uuid>fd42671f-5507-4ae5-ae91-f333557a2d4e</uuid>
       <memory unit='GiB'>4</memory>
       <vcpu>4</vcpu>
-      <os>
+      <os firmware='efi'>
         <type arch='x86_64'>hvm</type>
         <boot dev='hd'/>
       </os>
