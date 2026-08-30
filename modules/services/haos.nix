@@ -21,6 +21,7 @@ in
   environment.etc."libvirt/qemu/haos.xml".text = ''
     <domain type='kvm'>
       <name>haos</name>
+      <uuid>193a192e-bc8a-4951-b3fd-d72627fefd24</uuid>
       <memory unit='GiB'>4</memory>
       <vcpu>4</vcpu>
       <os>
