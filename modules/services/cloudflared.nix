@@ -12,6 +12,14 @@
       ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run";
       EnvironmentFile = "/etc/cloudflared/token";
       DynamicUser = true;
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      RestrictAddressFamilies = [
+        "AF_INET"
+        "AF_INET6"
+      ];
       Restart = "on-failure";
       RestartSec = 5;
     };
