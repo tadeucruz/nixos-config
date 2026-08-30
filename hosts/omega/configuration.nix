@@ -38,6 +38,7 @@
   networking = {
     hostName = hostname;
     useDHCP = false;
+    enableIPv6 = false;
 
     bridges.br0.interfaces = [ "enp1s0" ];
 
