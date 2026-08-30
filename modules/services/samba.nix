@@ -8,23 +8,23 @@
         "server string" = "omega NAS";
         "workgroup" = "WORKGROUP";
         "security" = "user";
-        "map to guest" = "Never";
+        "map to guest" = "Bad User";
         "server min protocol" = "SMB2";
         "hosts allow" = "127.0.0.1 192.168.0.0/16";
       };
 
       media = {
-        path = "/Media";
+        path = "/mnt/data/Media";
         browseable = "yes";
         "read only" = "no";
         "valid users" = "tadeucruz";
       };
 
-      backup = {
-        path = "/mnt/backup";
+      public = {
+        path = "/mnt/data/Public";
         browseable = "yes";
         "read only" = "no";
-        "valid users" = "tadeucruz";
+        "guest ok" = "yes";
       };
     };
   };
