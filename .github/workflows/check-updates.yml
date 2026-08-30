@@ -6,17 +6,14 @@ on:
     - cron: "30 10 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   updates:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@main
+      # No nix-installer step: the Forgejo runner executes natively on the
+      # NixOS host (`ubuntu-latest:host` label), where nix is already present.
 
       - id: apply
         name: Apply pending bumps
@@ -50,18 +47,29 @@ jobs:
             echo "updated=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: peter-evans/create-pull-request@v6
+      # Read the PR body into a step output; forgejo-create-pr takes pr-body as
+      # a string (no file input).
+      - id: body
+        if: steps.apply.outputs.updated == 'true'
+        run: |
+          {
+            echo "text<<EOF"
+            cat pr-body.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: https://github.com/maxking/forgejo-create-pr@main
         if: steps.apply.outputs.updated == 'true'
         with:
+          # PAT (not the automatic FORGEJO_TOKEN): a PR created with the
+          # automatic token would not trigger check.yml (anti-recursion guard).
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          branch: dependency-updates
+          base: main
+          pr-branch: dependency-updates
           commit-message: "chore: bump dependencies"
-          title: "chore: bump dependencies"
-          body-path: pr-body.md
+          pr-title: "chore: bump dependencies"
+          pr-body: ${{ steps.body.outputs.text }}
           # Only the pin files belong in the PR; pr-body.md is a working-tree
-          # scratch file and would otherwise be committed too.
-          add-paths: |
-            modules/proton-ge.nix
-            modules/proton-cachyos.nix
-            modules/ogc-kernel.nix
-            flake.lock
+          # scratch file and would otherwise be committed too. Space-separated
+          # (the action runs `git add <add-paths>`).
+          add-paths: modules/proton-ge.nix modules/proton-cachyos.nix modules/ogc-kernel.nix flake.lock

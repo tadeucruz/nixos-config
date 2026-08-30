@@ -28,8 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@main
-
+      # No nix-installer step: the Forgejo runner executes natively on the
+      # NixOS host (`ubuntu-latest:host` label), where nix is already present.
       # Same entrypoint developers run locally (`make check`): nixfmt --check
       # plus evaluation of every NixOS and nix-darwin configuration. Keeping the
       # host list in the Makefile avoids it drifting from CI.
