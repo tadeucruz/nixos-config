@@ -28,6 +28,7 @@
     ../../modules/services/haos.nix
     ../../modules/services/open-webui.nix
     ../../modules/services/forgejo.nix
+    ../../modules/services/forgejo-runner.nix
     ../../modules/btrfs-tuning.nix
     ../../modules/services/cloudflared.nix
   ];
