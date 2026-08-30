@@ -32,9 +32,10 @@
   # no container runtime needed. Registration token (one-time use) goes in
   # /etc/forgejo-runner/token as `TOKEN=...`, outside git (same pattern as the
   # cloudflared token). The `gitea-actions-runner` module also serves Forgejo;
-  # the package is overridden to Forgejo's own runner.
+  # using its native package (the module predates forgejo-runner v12, which
+  # dropped the `register` flow in favour of server.connections).
   services.gitea-actions-runner = {
-    package = pkgs.forgejo-runner;
+    package = pkgs.gitea-actions-runner;
     instances.forgejo = {
       enable = true;
       name = "forgejo";
