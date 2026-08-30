@@ -1,15 +1,27 @@
-name: Update NIXOS 
+name: Update dependencies
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * *"
+    # 09:00 America/Sao_Paulo (UTC-3, sem DST) = 12:00 UTC
+    - cron: "0 12 * * *"
 
 jobs:
-  update-flake-lock:
+  update:
     runs-on: nix
-    environment: production
     steps:
-      - name: "Teste"
+      - uses: actions/checkout@v4
+
+      - name: Apply pending bumps
+        run: make update
+
+      - name: Commit and push
         run: |
-          echo "Teste"
+          git config user.name "forgejo-actions"
+          git config user.email "forgejo@git.tadeucruz.com"
+          git remote set-url origin "https://forgejo:${{ secrets.ACTIONS_TOKEN_TADEU }}@git.tadeucruz.com/tadeucruz/nixos-config.git"
+          git add -A
+          git diff-index --quiet HEAD || {
+            git commit -m "chore: update dependencies"
+            git push origin main
+          }
