@@ -21,31 +21,34 @@ jobs:
       - id: apply
         name: Apply pending bumps
         run: |
-          # scripts/update.sh apply result: 0 = nothing changed, 2 = applied,
-          # anything else = error. The markdown summary (PR body) is printed on
-          # stdout; human messages go to stderr.
+          # scripts/update.sh apply exits 0 on success (applied or not) and
+          # non-zero on error. The markdown summary (PR body) is printed on
+          # stdout — empty when nothing was applied; human messages go to
+          # stderr.
           set +e
           out="$(./scripts/update.sh apply)"
           rc=$?
           set -e
-          case $rc in
-            0) echo "updated=false" >> "$GITHUB_OUTPUT" ;;
-            2)
-              echo "updated=true" >> "$GITHUB_OUTPUT"
-              {
-                echo "Automated bump of the pinned upstream dependencies."
-                echo
-                echo "### Changes"
-                echo
-                echo "$out"
-                echo
-                echo "### Validation"
-                echo
-                echo "The \`eval\` job in \`check.yml\` validates the configuration."
-              } > pr-body.md
-              ;;
-            *) echo "error applying updates (exit $rc)" >&2; exit 1 ;;
-          esac
+          if [ "$rc" -ne 0 ]; then
+            echo "error applying updates (exit $rc)" >&2
+            exit 1
+          fi
+          if [ -n "$out" ]; then
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "Automated bump of the pinned upstream dependencies."
+              echo
+              echo "### Changes"
+              echo
+              echo "$out"
+              echo
+              echo "### Validation"
+              echo
+              echo "The \`eval\` job in \`check.yml\` validates the configuration."
+            } > pr-body.md
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: peter-evans/create-pull-request@v6
         if: steps.apply.outputs.updated == 'true'

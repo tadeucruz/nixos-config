@@ -9,11 +9,12 @@
 # Used manually and by .github/workflows/check-updates.yml (single pipeline
 # that opens one PR with every bump).
 #
-# Exit codes: 0 = nothing to do / applied cleanly, 2 = update available (check)
-# or applied (apply), 1 = error.
+# Exit codes: 0 = success (nothing to do / applied), 1 = error. Results are
+# communicated on stdout: check prints "pending:<tools>", apply prints the
+# markdown summary (empty when nothing applied).
 #
-#   ./scripts/update.sh check                    # aggregate: 0 none, 2 pending, 1 error
-#   ./scripts/update.sh apply                    # aggregate: 0 none, 2 applied, 1 error
+#   ./scripts/update.sh check                    # aggregate: prints pending, exit 0
+#   ./scripts/update.sh apply                    # aggregate: prints summary, exit 0
 #   ./scripts/update.sh <tool> --check
 #   ./scripts/update.sh <tool> --apply [tag]
 set -euo pipefail
@@ -184,7 +185,6 @@ check_tool() {
   fi
   echo "$(tool_label "$tool") update available: ${current} -> $(version_of_tag "$tool" "$latest")" >&2
   PENDING="$PENDING $tool"
-  return 2
 }
 
 check_flake() {
@@ -202,7 +202,6 @@ check_flake() {
   echo "flake.lock update available" >&2
   PENDING="$PENDING flake"
   [[ "$keep" == --keep ]] || git -C "$ROOT" checkout -- flake.lock
-  return 2
 }
 
 apply_tool() {
@@ -239,24 +238,23 @@ apply_flake() {
   SUMMARY_LINES+=("- **flake.lock**: updated via \`nix flake update\`")
 }
 
-# Aggregate check: exit 2 if anything is pending, else 0. Errors abort.
+# Aggregate check: prints "pending:<tools>" on stdout (empty when nothing is
+# pending) and exits 0. Errors abort.
 check_all() {
-  local rc=0
   for tool in "${TOOLS[@]}"; do
     if [[ "$tool" == flake ]]; then
       # Keep the lock update so ogc's base guard sees the newer nixpkgs;
       # revert it after all checks.
-      check_flake --keep || rc=2
+      check_flake --keep
     else
-      check_tool "$tool" || rc=2
+      check_tool "$tool"
     fi
   done
   git -C "$ROOT" checkout -- flake.lock 2>/dev/null || true
   echo "pending:${PENDING}"
-  return "$rc"
 }
 
-# Aggregate apply: exit 2 if anything was applied, else 0. Errors abort.
+# Aggregate apply: exits 0 whether or not anything was applied. Errors abort.
 # The markdown summary (PR body) goes to stdout; human messages to stderr.
 apply_all() {
   for tool in "${TOOLS[@]}"; do
@@ -270,8 +268,6 @@ apply_all() {
   for line in "${SUMMARY_LINES[@]}"; do
     echo "$line"
   done
-  [[ -z "$APPLIED" ]] || return 2
-  return 0
 }
 
 usage() {

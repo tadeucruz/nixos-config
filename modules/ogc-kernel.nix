@@ -1,11 +1,11 @@
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2-ogc9";
+  ogcRelease = "v7.2.1-ogc3";
 
   ogcPatch = pkgs.fetchurl {
     url = "https://github.com/OpenGamingCollective/linux/releases/download/${ogcRelease}/monolithic.patch";
-    hash = "sha256-ofzUmMfmz65WqrevKvIv8pGYdIl6izXhp5WsoMwn2W4=";
+    hash = "sha256-RCGhHnCJIx+Ori+TPwRBarAcFMBxDY3IS1zvDXBmDSM=";
   };
 
   ogcKernel = pkgs.linux_latest.override {
