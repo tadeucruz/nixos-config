@@ -130,7 +130,8 @@ home/
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
     neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
     neovim/                      # nvim config copied to ~/.config/nvim
-  development.nix                # dev tooling (vscode, claude-code, opencode, go, godot_4, jdk) — prothean + normandy
+    opencode.nix                 # opencode package + config (small_model free, compaction) — prothean + normandy
+  development.nix                # dev tooling (vscode, claude-code, go, godot_4, jdk) — prothean + normandy
   gaming.nix                     # mangohud + Proton session vars + steam autostart entry
 ```
 
