@@ -26,6 +26,7 @@
     ../../modules/services/bazarr.nix
     ../../modules/server/libvirt.nix
     ../../modules/services/haos.nix
+    ../../modules/services/ollama.nix
     ../../modules/btrfs-tuning.nix
   ];
 
