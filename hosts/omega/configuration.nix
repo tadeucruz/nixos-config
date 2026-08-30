@@ -24,6 +24,8 @@
     ../../modules/services/prowlarr.nix
     ../../modules/services/radarr.nix
     ../../modules/services/bazarr.nix
+    ../../modules/server/libvirt.nix
+    ../../modules/services/haos.nix
     ../../modules/btrfs-tuning.nix
   ];
 
@@ -36,9 +38,11 @@
     hostName = hostname;
     useDHCP = false;
 
-    interfaces.enp1s0 = {
-      useDHCP = false;
-      ipv4.addresses = [
+    bridges.br0.interfaces = [ "enp1s0" ];
+
+    interfaces = {
+      enp1s0.useDHCP = false;
+      br0.ipv4.addresses = [
         {
           address = "192.168.0.2";
           prefixLength = 24;
