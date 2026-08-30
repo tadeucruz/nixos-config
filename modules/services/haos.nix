@@ -49,7 +49,7 @@ in
         <console type='pty'>
           <target type='serial' port='0'/>
         </console>
-        <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1'>
+        <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1' passwd='eaaf418d4e2b'>
           <listen type='address' address='127.0.0.1'/>
         </graphics>
         <video>
