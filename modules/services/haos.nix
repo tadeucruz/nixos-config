@@ -36,7 +36,8 @@ in
         <disk type='file' device='disk'>
           <driver name='qemu' type='qcow2'/>
           <source file='/var/lib/libvirt/images/haos.qcow2'/>
-          <target dev='vda' bus='virtio'/>
+          <target dev='sda' bus='sata'/>
+          <boot order='1'/>
         </disk>
         <interface type='bridge'>
           <source bridge='br0'/>
