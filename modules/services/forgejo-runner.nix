@@ -12,7 +12,7 @@
   ...
 }:
 let
-  runnerConfig = pkgs.formats.yaml { }.generate "forgejo-runner.yaml" {
+  runnerConfig = (pkgs.formats.yaml { }).generate "forgejo-runner.yaml" {
     log.level = "info";
     runner = {
       capacity = 1;
