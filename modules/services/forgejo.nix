@@ -37,6 +37,7 @@
     package = pkgs.forgejo-runner;
     instances.forgejo = {
       enable = true;
+      name = "forgejo";
       url = "http://127.0.0.1:3001";
       tokenFile = "/etc/forgejo-runner/token";
       labels = [ "ubuntu-latest:host" ];
