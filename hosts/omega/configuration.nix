@@ -60,5 +60,7 @@
 
   systemd.tmpfiles.rules = [ "d /mnt/data 2775 root media - -" ];
 
+  security.polkit.enable = true;
+
   system.stateVersion = "26.05";
 }
