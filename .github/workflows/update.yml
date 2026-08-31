@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # 09:00 America/Sao_Paulo (UTC-3, sem DST) = 12:00 UTC
-    - cron: "0 12 * * *"
+    - cron: "30 11 * * *"
 
 jobs:
   update:
