@@ -118,7 +118,7 @@ hosts/
 home/
   hosts/<host>.nix               # per-host user overrides
   common/                        # platform glue + bare package lists (no program config, no profiles)
-    base.nix                     # cross-platform base settings (stateVersion, username)
+    base.nix                     # cross-platform base settings (username; stateVersion is per-host in home/hosts/)
     packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
     unstable.nix                 # packages only in nixos-unstable (herdr) — desktop hosts only
     linux.nix                    # Linux-only: bitwarden SSH agent

@@ -10,4 +10,6 @@
     ../programs/zsh.nix
     ../programs/home-manager.nix
   ];
+
+  home.stateVersion = "26.05";
 }

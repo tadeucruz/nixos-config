@@ -26,6 +26,8 @@ in
     ../gaming.nix
   ];
 
+  home.stateVersion = "26.11";
+
   home.sessionVariables = {
     DXVK_FRAME_RATE = "120";
     SteamDeck = "0";

@@ -16,4 +16,6 @@
     ../development.nix
     ../programs/neovim.nix
   ];
+
+  home.stateVersion = "26.11";
 }
