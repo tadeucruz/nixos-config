@@ -2,7 +2,7 @@
 {
   home = {
     enableNixpkgsReleaseCheck = true;
-    stateVersion = "26.05";
+    stateVersion = "26.11";
     inherit username;
   };
 }
