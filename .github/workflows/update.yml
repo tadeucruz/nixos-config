@@ -45,8 +45,8 @@ jobs:
       - name: Push bumps to main
         if: steps.apply.outputs.updated == 'true'
         run: |
-          git config user.name "forgejo-actions"
-          git config user.email "forgejo@git.tadeucruz.com"
+          git config user.name "Tadeu Cruz"
+          git config user.email "tadeucruz@gmail.com"
           git add modules/proton-ge.nix modules/proton-cachyos.nix modules/ogc-kernel.nix flake.lock
           git commit -m "chore: update dependencies" || true
           git push "$PUSH_URL" HEAD:main
