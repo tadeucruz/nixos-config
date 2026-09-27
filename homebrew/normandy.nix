@@ -6,6 +6,7 @@
       "balenaetcher"
       "betterdisplay"
       "bitwarden"
+      "crossover"
       "cryptomator"
       "rectangle"
       "zoom"
