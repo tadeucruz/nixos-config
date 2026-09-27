@@ -9,6 +9,7 @@
       "crossover"
       "cryptomator"
       "rectangle"
+      "steam"
       "zoom"
     ];
     masApps = {
