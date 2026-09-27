@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788185587,
-        "narHash": "sha256-V6r5hlubKqZ6artMqMeCsnl5I6m7XnojFaAKPdN27R8=",
+        "lastModified": 1790502316,
+        "narHash": "sha256-15DG0rr9+1nKci+HkGOnM6OfeOn3FyF+g+0Zjwrcfd4=",
         "owner": "tr1xem",
         "repo": "AWCC",
-        "rev": "0e396b9aca6ebddaacf7c57597dcb933f149d14c",
+        "rev": "5be8e4c1551dda39dbc719625818d28fbce4ad3c",
         "type": "github"
       },
       "original": {
