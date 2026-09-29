@@ -18,10 +18,5 @@
     ../programs/neovim.nix
   ];
 
-  programs.ghostty.settings = {
-    macos-option-as-alt = true;
-    macos-titlebar-style = "hidden";
-  };
-
   home.stateVersion = "26.11";
 }
