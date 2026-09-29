@@ -13,9 +13,15 @@
     ../programs/zsh.nix
     ../programs/home-manager.nix
     ../programs/opencode.nix
+    ../programs/ghostty.nix
     ../development.nix
     ../programs/neovim.nix
   ];
+
+  programs.ghostty.settings = {
+    macos-option-as-alt = true;
+    macos-titlebar-style = "hidden";
+  };
 
   home.stateVersion = "26.11";
 }

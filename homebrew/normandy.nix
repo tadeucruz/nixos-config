@@ -8,6 +8,7 @@
       "bitwarden"
       "crossover"
       "cryptomator"
+      "ghostty"
       "rectangle"
       "steam"
       "zoom"
