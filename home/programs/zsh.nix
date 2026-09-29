@@ -9,6 +9,8 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     shellAliases = {
+      ls =
+        if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color=auto";
       ll = "ls -alh";
       rebuild =
         if pkgs.stdenv.hostPlatform.isDarwin then
