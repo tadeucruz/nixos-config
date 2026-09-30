@@ -2,7 +2,7 @@
 
 Flake for 5 machines — NixOS (`citadel`, `prothean`, `legion`, `omega` headless server) and nix-darwin (`normandy`).
 
-legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`). citadel boots the [CachyOS kernel](https://github.com/xddxdd/nix-cachyos-kernel) (`linuxPackages-cachyos-latest`, `modules/cachyos-kernel.nix`): pulled prebuilt from the author's binary cache — no local kernel compilation. The former [OpenGamingCollective](https://github.com/OpenGamingCollective/linux) kernel (`modules/ogc-kernel.nix`, AMD HDMI 2.1 VRR/ALLM) is kept as a tracked fallback and still bumped by CI via `scripts/update.sh ogc` — it's just no longer imported by citadel.
+legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`). citadel runs [OpenGamingCollective](https://github.com/OpenGamingCollective/linux)'s `v7.2.7-ogc1` (`modules/ogc-kernel.nix`): the same `linux_latest` base + their `monolithic.patch` via `fetchurl` — it adds AMD HDMI 2.1 VRR/ALLM, which vanilla lacks. Bumps go through `scripts/update.sh ogc` + the `.github/workflows/update.yml` job, decoupled from nixpkgs's own kernel; the bump is skipped with a warning while the OGC release's base differs from `linux_latest` (applied automatically once nixpkgs catches up). A binary-cached [CachyOS kernel](https://github.com/xddxdd/nix-cachyos-kernel) option (`modules/cachyos-kernel.nix`) is kept for the future but not in use.
 
 ## Validating changes
 
