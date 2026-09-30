@@ -48,6 +48,7 @@ in
     ../../modules/users/base.nix
     ../../modules/users/gaming.nix
     ../../modules/networking/networkmanager.nix
+    ../../modules/networking/firewall.nix
     ../../modules/desktop/fonts.nix
     ../../modules/desktop/bluetooth.nix
     ../../modules/desktop/rtkit.nix
