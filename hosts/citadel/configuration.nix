@@ -44,7 +44,10 @@ in
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
     kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
-    kernelParams = [ "transparent_hugepage=always" ];
+    kernelParams = [
+      "transparent_hugepage=always"
+      "amdgpu.dcfeaturemask=0x402"
+    ];
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot = {
