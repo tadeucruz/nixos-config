@@ -120,6 +120,16 @@
         };
     in
     {
+      # Attic cache for the CachyOS kernel: client-side trust so the very first
+      # switch can fetch the kernel (the host's nix.settings only kicks in after
+      # the switch, too late for the kernel it brings in).
+      nixConfig = {
+        extra-substituters = [ "https://attic.xuyh0120.win/lantian" ];
+        extra-trusted-public-keys = [
+          "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+        ];
+      };
+
       formatter = forAllSystems (s: nixpkgs.legacyPackages.${s}.nixfmt);
 
       nixosConfigurations = {
