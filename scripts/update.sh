@@ -132,9 +132,11 @@ normalize_version() {
 }
 
 # The kernel version the OGC patch is applied onto (nixpkgs's linux_latest).
-# The override doesn't change `version`, so this is not circular.
+# citadel no longer runs linux_latest (CachyOS), so evaluate prothean — it
+# still uses the stock linux_latest from modules/boot/gaming.nix. The override
+# doesn't change `version`, so this is not circular.
 kernel_version() {
-  nix eval --raw "$ROOT#nixosConfigurations.citadel.config.boot.kernelPackages.kernel.version" 2>/dev/null
+  nix eval --raw "$ROOT#nixosConfigurations.prothean.config.boot.kernelPackages.kernel.version" 2>/dev/null
 }
 
 # True (exit 0) when the OGC tag's base differs from the kernel nixpkgs

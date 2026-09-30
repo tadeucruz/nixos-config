@@ -24,6 +24,11 @@
 
     nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
 
+    # Release branch: prebuilt on the author's Hydra (attic cache), so the
+    # kernel is fetched, not compiled. Its nixpkgs input intentionally NOT
+    # followed (repo requirement — keeps patches/kernel in sync).
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
