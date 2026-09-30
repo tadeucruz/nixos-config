@@ -3,7 +3,6 @@ name: Update dependencies
 on:
   workflow_dispatch:
   schedule:
-    # 09:00 America/Sao_Paulo (UTC-3, sem DST) = 12:00 UTC
     - cron: "30 11 * * *"
 
 env:
@@ -36,18 +35,22 @@ jobs:
             echo "updated=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Validate configurations
-        if: steps.apply.outputs.updated == 'true'
-        run: | 
-          set -euo pipefail
-          make check
-
-      - name: Push bumps to main
+      - name: Commit configurations if has changes
         if: steps.apply.outputs.updated == 'true'
         run: |
           git config user.name "Tadeu Cruz"
           git config user.email "tadeucruz@gmail.com"
           git add modules/proton-ge.nix modules/proton-cachyos.nix modules/ogc-kernel.nix flake.lock
+
+      - name: Validate configurations if has changes
+        if: steps.apply.outputs.updated == 'true'
+        run: | 
+          set -euo pipefail
+          make check
+
+      - name: Push bumps to main if has changes
+        if: steps.apply.outputs.updated == 'true'
+        run: |
           git commit -m "chore: update dependencies" || true
           git push "$PUSH_URL" HEAD:main
 
