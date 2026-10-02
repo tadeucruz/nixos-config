@@ -35,6 +35,7 @@
     ../../modules/services/forgejo-runner.nix
     ../../modules/btrfs-tuning.nix
     ../../modules/services/cloudflared.nix
+    ../../modules/services/wake-on-lan.nix
   ];
 
   boot.loader = {
