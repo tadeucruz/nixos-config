@@ -24,6 +24,7 @@ in
     ../../modules/users/gaming.nix
     ../../modules/networking/networkmanager.nix
     ../../modules/networking/firewall.nix
+    ../../modules/networking/dns.nix
     ../../modules/desktop/fonts.nix
     ../../modules/desktop/bluetooth.nix
     ../../modules/desktop/rtkit.nix

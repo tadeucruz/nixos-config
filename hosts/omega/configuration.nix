@@ -14,6 +14,7 @@
     ../../modules/users/base.nix
     ../../modules/users/server.nix
     ../../modules/networking/firewall.nix
+    ../../modules/networking/dns.nix
     ../../modules/services/avahi.nix
     ../../modules/services/openssh.nix
     ../../modules/services/tailscale.nix
