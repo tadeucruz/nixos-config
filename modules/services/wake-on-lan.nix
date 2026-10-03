@@ -10,8 +10,5 @@
     (pkgs.writeShellScriptBin "wake-citadel" ''
       exec ${pkgs.wakeonlan}/bin/wakeonlan 9c:6b:00:52:64:7a
     '')
-    (pkgs.writeShellScriptBin "wake-normandy" ''
-      exec ${pkgs.wakeonlan}/bin/wakeonlan fc:b0:de:62:ce:dd
-    '')
   ];
 }
