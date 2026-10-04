@@ -23,8 +23,11 @@ in
     ../programs/fzf.nix
     ../programs/zsh.nix
     ../programs/home-manager.nix
+    ../programs/ollama.nix
     ../gaming.nix
   ];
+
+  ollama.gpu = "rocm";
 
   home.stateVersion = "26.11";
 
