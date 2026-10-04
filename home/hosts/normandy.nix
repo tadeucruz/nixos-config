@@ -16,6 +16,7 @@
     ../programs/ghostty.nix
     ../development.nix
     ../programs/neovim.nix
+    ../programs/ollama.nix
   ];
 
   home.stateVersion = "26.11";

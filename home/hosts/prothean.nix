@@ -15,6 +15,7 @@
     ../programs/ghostty.nix
     ../development.nix
     ../programs/neovim.nix
+    ../programs/ollama.nix
     ../gaming.nix
   ];
 
