@@ -46,7 +46,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
-- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is the native macOS Terminal on normandy (dock in `modules/normandy.nix`).
+- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is the native macOS Terminal on normandy (dock in `modules/normandy.nix`). **Aider** (`home/programs/aider.nix`): prothean + normandy, package `aider-chat` + managed `~/.aider.conf.yml` (dark-mode, cache-prompts — no secrets; API keys live in `~/.env`, outside git).
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
 - **`Makefile` validates all five hosts** (`make check` = `fmt-check` + `eval` of all hosts) — but the user runs it, not the agent. One gotcha affects editing: **`git-check`** — flakes copy the git tree to the store *excluding untracked files*, so a new module is invisible to `nix eval` until `git add -N`. The target fails early with instructions (bypass with `ALLOW_UNTRACKED=1`).
@@ -134,6 +134,7 @@ home/
     zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
+    aider.nix                    # Aider (aider-chat) + ~/.aider.conf.yml (no secrets) — prothean + normandy
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
     neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
     neovim/                      # nvim config copied to ~/.config/nvim
