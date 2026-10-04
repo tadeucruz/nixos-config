@@ -3,6 +3,7 @@
   homebrew = {
     brews = [ "displayplacer" ];
     casks = [
+      "appcleaner"
       "balenaetcher"
       "betterdisplay"
       "bitwarden"
