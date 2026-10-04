@@ -13,8 +13,8 @@
             "baseURL": "http://citadel.tail0a0fce.ts.net:11434/v1"
           },
           "models": {
-            "gemma4:26b": {
-              "name": "gemma4:26b (citadel)"
+            "qwen3.8": {
+              "name": "qwen3.8 (citadel)"
             }
           }
         }
