@@ -4,6 +4,7 @@
     brews = [ "cocoapods" ];
     casks = [
       "android-studio"
+      "appcleaner"
       "flutter"
     ];
     masApps = {
