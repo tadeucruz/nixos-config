@@ -5,6 +5,7 @@
     casks = [
       "android-studio"
       "flutter"
+      "ollama"
     ];
     masApps = {
       Xcode = 497799835;
