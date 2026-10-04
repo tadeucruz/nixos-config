@@ -5,21 +5,19 @@
   xdg.configFile."opencode/opencode.jsonc".text = ''
     {
       "$schema": "https://opencode.ai/config.json",
-      "model": "ollama/gemma4:26b",
       "provider": {
         "ollama": {
-          "npm": "@ai-sdk/ollama",
+          "npm": "@ai-sdk/openai-compatible",
+          "name": "Ollama",
           "options": {
-            "baseURL": "http://citadel.tail0a0fce.ts.net:11434/api"
+            "baseURL": "http://citadel.tail0a0fce.ts.net:11434/v1"
           },
           "models": {
-            "gemma4:26b": { "name": "Gemma 4 26B (citadel)" }
+            "qwen3.5": {
+              "name": "qwen3.5"
+            }
           }
         }
-      },
-      "compaction": {
-        "auto": true,
-        "prune": true,
       }
     }
   '';
