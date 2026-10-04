@@ -3,6 +3,7 @@
 # metal (default — darwin uses Metal automatically, Linux falls back to CPU).
 # Listens on 0.0.0.0 so tailnet peers reach it; the firewall already trusts
 # tailscale0 (modules/services/tailscale.nix), so LAN/external stay blocked.
+# On darwin, Ollama is installed via Homebrew (see homebrew/common.nix).
 {
   config,
   lib,
@@ -21,7 +22,7 @@
   };
 
   config = {
-    home.packages = [
+    home.packages = lib.optionals (lib.systems.isLinux) [
       (
         {
           metal = pkgs.ollama;
