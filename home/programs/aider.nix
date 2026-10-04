@@ -13,7 +13,9 @@ in
   home.packages = [ aider ];
 
   home.file.".aider.conf.yml".text = ''
+    model: ollama/llama3
     dark-mode: true
     cache-prompts: true
+    auto-commits: true
   '';
 }
