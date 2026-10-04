@@ -1,4 +1,4 @@
 model: ollama_chat/qwen3.8
 dark-mode: true
 cache-prompts: true
-auto-commits: true
+auto-commits: false
