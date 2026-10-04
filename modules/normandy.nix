@@ -5,7 +5,7 @@
 {
   system.defaults.dock.persistent-apps = [
     "/System/Cryptexes/App/System/Applications/Safari.app"
-    "/Applications/Ghostty.app"
+    "/System/Applications/Utilities/Terminal.app"
     "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
     "/System/Applications/Mail.app"
     "/System/Applications/Photos.app"

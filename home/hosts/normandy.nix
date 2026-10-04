@@ -13,7 +13,6 @@
     ../programs/zsh.nix
     ../programs/home-manager.nix
     ../programs/opencode.nix
-    ../programs/ghostty.nix
     ../development.nix
     ../programs/neovim.nix
   ];
