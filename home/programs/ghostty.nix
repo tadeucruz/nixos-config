@@ -12,7 +12,6 @@
       font-family = "JetBrainsMono Nerd Font";
       cursor-style = "block";
       mouse-hide-while-typing = true;
-      theme = "tokyonight-night";
     };
   };
 }
