@@ -3,6 +3,9 @@
   homebrew = {
     enable = true;
     enableZshIntegration = true;
-    onActivation.cleanup = "zap";
+    onActivation = {
+      cleanup = "zap";
+      upgrade = true;
+    };
   };
 }
