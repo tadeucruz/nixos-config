@@ -90,7 +90,3 @@ update: ## Apply dependency bumps (flake.lock, Proton, OGC kernel)
 clean: ## Remove nix build result symlinks
 	@rm -fv result result-*
 
-commit: ## Stage all changes and commit
-	@echo "==> Staging and committing changes"
-	@git add .
-	@git commit -m "Work in progress"
