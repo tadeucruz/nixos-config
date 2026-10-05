@@ -22,8 +22,7 @@ jobs:
         uses: https://data.forgejo.org/actions/cache@v4
         with:
           path: ~/.cache/nix
-          key: nix-cache-${{ hashFiles('flake.nix', 'Makefile', 'scripts/update.sh') }}
-          restore-keys: nix-cache-
+          key: nix-cache
 
       - id: apply
         name: Apply pending bumps
