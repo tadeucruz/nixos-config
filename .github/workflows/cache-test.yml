@@ -1,0 +1,42 @@
+name: Cache round-trip test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  roundtrip:
+    runs-on: nix
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore nix cache
+        id: restore
+        uses: https://data.forgejo.org/actions/cache@v4
+        with:
+          path: ~/.cache/nix
+          key: nix-cache
+
+      - name: Check whether the marker survived from a previous run
+        shell: bash
+        run: |
+          if [ -f ~/.cache/nix/ping ]; then
+            echo "RESTORED=$(cat ~/.cache/nix/ping)" >> "$GITHUB_ENV"
+          else
+            echo "RESTORED=miss" >> "$GITHUB_ENV"
+          fi
+          echo "job.id=${{ github.job }}"
+
+      - name: Show restore result
+        if: env.RESTORED == 'miss'
+        run: echo "Cache miss — writing marker so the save (post step) persists it"
+      - name: Write marker on miss
+        if: env.RESTORED == 'miss'
+        shell: bash
+        run: |
+          mkdir -p ~/.cache/nix
+          echo "hello-from-${{ github.run_id }}" > ~/.cache/nix/ping
+
+      - name: Report
+        run: |
+          echo "restored-cache-key=${{ steps.restore.outputs.cache-hit }}"
+          echo "marker=$RESTORED"
