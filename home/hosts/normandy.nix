@@ -1,5 +1,5 @@
 # Home Manager config for the MacBook (normandy).
-{ ... }:
+{ pkgs, ... }:
 {
   imports = [
     ../common/base.nix
@@ -15,6 +15,10 @@
     ../programs/opencode.nix
     ../development.nix
     ../programs/neovim.nix
+  ];
+
+  home.packages = with pkgs; [
+    cline
   ];
 
   home.stateVersion = "26.11";
