@@ -2,10 +2,11 @@
 {
   imports = [
     ../../modules/common/darwin.nix
+    ../../modules/darwin/xcode.nix
     ../../modules/normandy.nix
     ../../homebrew/common.nix
     ../../homebrew/normandy.nix
-    ../../homebrew/development-mac.nix
+    ../../homebrew/development.nix
   ];
 
   networking.hostName = hostname;

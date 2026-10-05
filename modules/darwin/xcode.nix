@@ -1,17 +1,8 @@
+# Xcode activation (darwin only): point xcode-select at the Xcode app and
+# accept the license. Idempotent — only acts if /Applications/Xcode.app exists.
+# The Xcode masApp itself lives in homebrew/development.nix.
 { ... }:
 {
-  homebrew = {
-    brews = [ "cocoapods" ];
-    casks = [
-      "android-studio"
-      "flutter"
-      "ollama"
-    ];
-    masApps = {
-      Xcode = 497799835;
-    };
-  };
-
   system.activationScripts.postActivation.text = ''
     if [ -d /Applications/Xcode.app ]; then
       /usr/bin/xcode-select -s /Applications/Xcode.app/Contents/Developer \

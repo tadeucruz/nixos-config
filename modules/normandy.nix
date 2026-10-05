@@ -1,6 +1,6 @@
 # Dock layout and activation scripts specific to normandy's physical hardware
 # and personal app choices — not dev tooling, just this one machine.
-# (Homebrew casks/brews/masApps live in homebrew/development-mac.nix instead.)
+# (Homebrew casks/brews/masApps live in homebrew/development.nix.)
 { username, ... }:
 {
   system.defaults.dock.persistent-apps = [
