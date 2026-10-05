@@ -9,5 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Restore nix cache
+        uses: https://data.forgejo.org/actions/cache@v4
+        with:
+          path: ~/.cache/nix
+          key: nix-cache-${{ hashFiles('flake.nix', 'Makefile', 'scripts/update.sh') }}
+          restore-keys: nix-cache-
+
       - name: Check formatting and evaluate configurations
         run: make check
