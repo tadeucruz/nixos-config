@@ -19,6 +19,7 @@
 
   home.packages = with pkgs; [
     cline
+    pi-coding-agent
   ];
 
   home.stateVersion = "26.11";
