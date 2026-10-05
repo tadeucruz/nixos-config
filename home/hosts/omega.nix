@@ -8,6 +8,7 @@
     ../programs/starship.nix
     ../programs/fzf.nix
     ../programs/zsh.nix
+    ../programs/tmux.nix
     ../programs/home-manager.nix
   ];
 

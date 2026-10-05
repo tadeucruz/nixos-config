@@ -46,6 +46,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
 - **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is the native macOS Terminal on normandy (dock in `modules/normandy.nix`).
+- **tmux replaces herdr** (`home/programs/tmux.nix`, all 5 hosts): declarative `programs.tmux` with herdr-like UX — prefix `C-b`, `keyMode = vi` (h/j/k/l panes, H/J/K/L resize), `mouse = true`, `|`/`-` splits, Alt+arrows pane jumps. `sensibleOnTop` + `tmuxPlugins.{resurrect,continuum,vim-tmux-navigator,catppuccin}` (continuum restores layout across reboots). `herdr` (an agent multiplexer, not just a pager) was dropped, and `home/common/unstable.nix` (which existed only for it) was removed.
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
 - **`Makefile` validates all five hosts** (`make check` = `fmt-check` + `eval` of all hosts) — but the user runs it, not the agent. One gotcha affects editing: **`git-check`** — flakes copy the git tree to the store *excluding untracked files*, so a new module is invisible to `nix eval` until `git add -N`. The target fails early with instructions (bypass with `ALLOW_UNTRACKED=1`).
@@ -123,7 +124,7 @@ home/
   common/                        # platform glue + bare package lists (no program config, no profiles)
     base.nix                     # cross-platform base settings (username; stateVersion is per-host in home/hosts/)
     packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
-    unstable.nix                 # packages only in nixos-unstable (herdr) — desktop hosts only    linux.nix                    # Linux-only: bitwarden SSH agent
+    linux.nix                    # Linux-only: bitwarden SSH agent
     darwin.nix                   # macOS-only: nh (programs.nh, with GC)
   desktop/
     kde.nix                      # KDE home bits (sycoca hook) — wired via modules/desktop/kde.nix
@@ -132,13 +133,14 @@ home/
     starship.nix                 # cross-platform starship prompt
     fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
     zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
+    tmux.nix                     # cross-platform tmux (herdr-style panes: prefix C-b, vi, mouse, splits)
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
     neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
     neovim/                      # nvim config copied to ~/.config/nvim
     opencode.nix                 # opencode package + config (small_model free, compaction) — prothean + normandy
-  development.nix                # dev tooling (vscode, claude-code, go, godot_4, jdk) — prothean + normandy
+  development.nix                # dev tooling (vscode, claude-code, cline, go, godot_4, jdk) — prothean + normandy
   gaming.nix                     # mangohud + Proton session vars + steam autostart entry
 ```
 
@@ -148,6 +150,6 @@ home/
 - Conversation with the user in Portuguese.
 - Keep modules flat — avoid deep nesting or extra abstraction unless clearly needed.
 - **Program config (`programs.*`) lives in `home/programs/`, one file per program.** `home/common/` only holds platform glue and bare package lists — never a program's own config. Each `home/hosts/<host>.nix` imports its pieces explicitly (no aggregators). `home/gaming.nix` and `home/development.nix` are feature profiles composed by hosts.
-- Cross-platform user packages in `home/common/packages.nix` (all hosts) with `home/common/unstable.nix` on desktop hosts; OS-specific glue in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin. **Note:** `programs.nh.clean` uses a systemd timer, which macOS ignores → darwin replaces it with a `launchd.agents.nh-clean` job (same args).
+- Cross-platform user packages in `home/common/packages.nix` (all hosts); OS-specific glue in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin. **Note:** `programs.nh.clean` uses a systemd timer, which macOS ignores → darwin replaces it with a `launchd.agents.nh-clean` job (same args).
 - `system.stateVersion` is `"26.05"` on NixOS; normandy uses `7` (nix-darwin).
 - Any `homebrew.*` option goes under `homebrew/`, never `modules/` or `home/`. Split like `modules/`: `common.nix` baseline + per-purpose files.

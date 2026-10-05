@@ -3,13 +3,13 @@
   imports = [
     ../common/base.nix
     ../common/packages.nix
-    ../common/unstable.nix
     ../common/linux.nix
     ../programs/firefox.nix
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix
     ../programs/zsh.nix
+    ../programs/tmux.nix
     ../programs/home-manager.nix
     ../gaming.nix
   ];
