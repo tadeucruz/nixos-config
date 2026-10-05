@@ -9,6 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Ensure GNU tar for actions/cache
+        shell: bash
+        run: |
+          # nix-ci-builder is Alpine-based (busybox tar); actions/cache needs
+          # GNU tar (--posix) for both saving and restoring. Install it so the
+          # cache action's post step finds /usr/bin/tar ahead of /bin/tar.
+          if tar --version 2>&1 | grep -qi busybox; then
+            apk add --no-cache tar
+          fi
+
       - name: Restore nix cache
         id: restore
         uses: https://data.forgejo.org/actions/cache@v4
