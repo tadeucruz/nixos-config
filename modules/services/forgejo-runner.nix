@@ -25,15 +25,18 @@
         # re-downloading. Already the upstream default; pinned so upgrades can't
         # regress it. Blobs persist in /var/lib/gitea-runner/<name>/.cache/actcache.
         #
-        # host/port are explicit because auto-detect binds the cache server on
-        # the tailscale IP with a random port, which the host firewall drops
-        # (jobs hit "Request timeout" on restore). Bind on the static br0 LAN IP
-        # with a fixed port; port 5059 is opened in the firewall below — keep
-        # both in sync.
+        # ACTIONS_CACHE_URL points job containers at a one-shot cache proxy; its
+        # host/port come from cache.host/cache.proxy_port (both random by
+        # default). cache.host is the static br0 LAN IP, confirmed reachable from
+        # real job containers via the cache-diag run (avoiding tailscale). The
+        # proxy_port MUST be pinned so the host firewall can allow it — port 5059
+        # is opened below, keep both in sync. The proxy authenticates with a
+        # per-job secret, so LAN exposure is safe. The internal backend
+        # (cache.port) stays random and only the proxy talks to it locally.
         cache = {
           enabled = true;
           host = "192.168.0.2";
-          port = 5059;
+          proxy_port = 5059;
         };
         # Always pull `:latest` before a job: the runner otherwise reuses the
         # already-downloaded image and never picks up rebuilt images (e.g. the
