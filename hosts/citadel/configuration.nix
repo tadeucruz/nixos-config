@@ -37,6 +37,7 @@ in
     ../../modules/services/pipewire.nix
     ../../modules/services/syncthing.nix
     ../../modules/services/tailscale.nix
+    ../../modules/services/ollama.nix
     ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
