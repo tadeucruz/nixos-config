@@ -1,8 +1,8 @@
 { ... }:
 {
   programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
+    enable = false;
+    enableZshIntegration = false;
 
     settings = {
       add_newline = false;
