@@ -21,6 +21,7 @@ in
     ../programs/starship.nix
     ../programs/fzf.nix
     ../programs/zsh.nix
+    ../programs/tmux.nix
     ../programs/home-manager.nix
     ../programs/ollama.nix
     ../gaming.nix

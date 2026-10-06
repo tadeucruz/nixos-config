@@ -46,6 +46,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
 - **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is the native macOS Terminal on normandy (dock in `modules/normandy.nix`).
+- **tmux** (`home/programs/tmux.nix`, all 5 hosts): declarative `programs.tmux` — prefix `C-b`, `keyMode = emacs`, `mouse = true`, splits. Plugins: `sensibleOnTop` + `tmuxPlugins.{dracula,resurrect,continuum}`. **Plugin options must go in the plugin submodule `extraConfig`, never the top-level `extraConfig`**: Home Manager emits the plugin `run-shell`s before top-level `extraConfig`, and `run-shell` blocks — so top-level options are read only after the plugin ran with defaults. `zsh-autosuggestions` is disabled in `home/programs/zsh.nix` (it broke backspace editing after history search inside tmux).
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
 - **`Makefile` validates all five hosts** (`make check` = `fmt-check` + `eval` of all hosts) — but the user runs it, not the agent. One gotcha affects editing: **`git-check`** — flakes copy the git tree to the store *excluding untracked files*, so a new module is invisible to `nix eval` until `git add -N`. The target fails early with instructions (bypass with `ALLOW_UNTRACKED=1`).
@@ -132,6 +133,7 @@ home/
     starship.nix                 # cross-platform starship prompt
     fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
     zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
+    tmux.nix                     # cross-platform tmux (prefix C-b, emacs, mouse, splits) + dracula theme + resurrect/continuum
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix

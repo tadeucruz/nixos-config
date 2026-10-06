@@ -9,6 +9,7 @@
     ../programs/starship.nix
     ../programs/fzf.nix
     ../programs/zsh.nix
+    ../programs/tmux.nix
     ../programs/home-manager.nix
     ../programs/opencode.nix
     ../development.nix
