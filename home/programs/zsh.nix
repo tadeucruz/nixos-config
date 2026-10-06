@@ -6,7 +6,7 @@
 {
   programs.zsh = {
     enable = true;
-    autosuggestion.enable = true;
+    autosuggestion.enable = false;
     syntaxHighlighting.enable = true;
     shellAliases = {
       ls = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color=auto";
