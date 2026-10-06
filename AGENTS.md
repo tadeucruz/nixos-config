@@ -25,7 +25,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
   - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
   - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
 - **prothean: no Jovian, full KDE desktop** (`modules/desktop/kde.nix` + `modules/gaming.nix`, SDDM). PRIME offload + AWCC fan control.
-- **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,zsh,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
+- **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,fish,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
   - **Samba + btrfs** (`modules/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
   - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
   - **HAOS as a libvirt VM** (`modules/services/haos.nix`): qcow2 pinned via `fetchurl` (version + sha256 are TODO), decompressed on first boot, domain XML declared in the repo (bridge `br0` — TODO: create the bridge on the host). HAOS is an appliance, must stay a VM. The `haos-vm` service is idempotent — the qcow2 (HAOS configs) is only written once; `virsh define` only applies the hardware definition. Depends on generic `modules/server/libvirt.nix` (asserted).
@@ -64,7 +64,7 @@ modules/
   common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
   common/nix.nix                 # nix optimise + programs.nh (system-level GC service) — NixOS only
   common/locale.nix              # i18n + console.keyMap mkDefault us-acentos (hosts override with br-abnt2)
-  common/zsh.nix                 # programs.zsh.enable
+  common/fish.nix                # programs.fish.enable
   common/zram.nix                # zramSwap.enable
   common/darwin.nix              # nix-darwin shared baseline (any Mac): touch ID sudo, fonts, tailscale, syncthing, defaults
   darwin/
@@ -136,7 +136,7 @@ home/
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
     fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
-    zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
+    fish.nix                     # cross-platform fish config (per-OS rebuild alias)
     tmux.nix                     # cross-platform tmux (prefix C-b, vi, mouse, splits) + dracula theme + resurrect/continuum
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program

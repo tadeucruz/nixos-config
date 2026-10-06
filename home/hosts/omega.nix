@@ -7,7 +7,7 @@
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix
-    ../programs/zsh.nix
+    ../programs/fish.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
   ];

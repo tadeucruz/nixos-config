@@ -16,7 +16,7 @@ in
     ../../modules/common/all.nix
     ../../modules/common/nix.nix
     ../../modules/common/locale.nix
-    ../../modules/common/zsh.nix
+    ../../modules/common/fish.nix
     ../../modules/common/zram.nix
     ../../modules/boot/base.nix
     ../../modules/boot/gaming.nix

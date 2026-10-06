@@ -2,6 +2,8 @@
 {
   imports = [ ./all.nix ];
 
+  programs.fish.enable = true;
+
   security.pam.services.sudo_local.touchIdAuth = true;
 
   fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
@@ -11,6 +13,7 @@
   users.users.${username} = {
     name = username;
     home = "/Users/${username}";
+    shell = pkgs.fish;
   };
 
   launchd.user.agents.syncthing = {
