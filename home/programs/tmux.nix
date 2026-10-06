@@ -35,6 +35,12 @@
       # removed — otherwise it would override the theme's left segment.
       set -g @dracula-show-powerline true
       set -g @dracula-show-left-icon session
+
+      # Segment selection. Dracula's default is "battery network weather"; the
+      # weather segment (scripts/weather.sh) curls https://wttr.in, which
+      # geo-locates us by IP — and it re-runs every @dracula-refresh-rate (5s).
+      # Keep only local, no-network segments.
+      set -g @dracula-plugins "time uptime git cwd"
     '';
   };
 }
