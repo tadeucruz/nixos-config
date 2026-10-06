@@ -5,9 +5,9 @@
     enableZshIntegration = true;
 
     settings = {
-      add_newline = true;
+      add_newline = false;
       command_timeout = 2000;
-      format = "╭─$username$hostname$directory$git_branch$git_status$golang$nodejs$java$dart$cmd_duration$jobs$line_break╰─$character";
+      format = "$username$hostname$directory$git_branch$git_status$golang$nodejs$java$dart$cmd_duration$jobs$character";
 
       os = {
         disabled = true;
