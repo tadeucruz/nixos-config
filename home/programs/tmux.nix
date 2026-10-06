@@ -32,10 +32,15 @@
         plugin = resurrect;
         # Restore state is read by resurrect at restore time, so these live in the
         # plugin's own extraConfig (see AGENTS.md note on plugin load order).
+        #  - @resurrect-dir: pin the save location explicitly instead of relying
+        #    on the pinned plugin's default (this tmux-resurrect version already
+        #    defaults to ~/.tmux/resurrect — set here so a future plugin bump
+        #    never silently moves the history)
         #  - @resurrect-processes ':all:': re-run every program that was running
         #    (default only restores a built-in whitelist: vim/nvim, less, ssh, ...)
         #  - @resurrect-capture-pane-contents: also restore each pane's scrollback
         extraConfig = ''
+          set -g @resurrect-dir '~/.tmux/resurrect'
           set -g @resurrect-processes ':all:'
           set -g @resurrect-capture-pane-contents 'on'
         '';
