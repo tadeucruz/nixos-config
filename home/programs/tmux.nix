@@ -14,11 +14,9 @@
     sensibleOnTop = true;
 
     # Plugins.
-    #  - vim-tmux-navigator: hjkl crosses the vim <-> pane boundary
     #  - dracula: theme (owns status-left/status-right)
-    #  - resurrect + continuum: manual + automatic session state save/restore
+    #  - resurrect + continuum: manual and automatic session state save/restore
     plugins = with pkgs.tmuxPlugins; [
-      vim-tmux-navigator
       {
         plugin = dracula;
         extraConfig = ''
