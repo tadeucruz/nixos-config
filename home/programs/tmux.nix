@@ -3,7 +3,7 @@
   programs.tmux = {
     enable = true;
 
-    # Behaviour close to herdr: same prefix, mouse-first, vi pane navigation.
+    # Core: standard prefix, vi keys, mouse, sensible splits, generous scrollback.
     prefix = "C-b";
     keyMode = "vi";
     mouse = true;
@@ -13,32 +13,30 @@
     newSession = true;
     sensibleOnTop = true;
 
-    # Session/layout restore (herdr's "detach without stopping work").
+    # Plugins (ordered: behaviour first, cosmetics last).
+    #  - vim-tmux-navigator: hjkl crosses the vim <-> pane boundary
+    #  - resurrect + continuum: manual + automatic session state save/restore
+    #  - catppuccin: colour theme (mocha flavour)
     plugins = with pkgs.tmuxPlugins; [
+      vim-tmux-navigator
       resurrect
       continuum
-      vim-tmux-navigator
       catppuccin
     ];
 
     extraConfig = ''
-      # Side-by-side panes: | split right, - split down (v/s as mnemonics).
-      bind | split-window -h -c "#{pane_current_path}"
-      bind - split-window -v -c "#{pane_current_path}"
-      bind v split-window -h -c "#{pane_current_path}"
-      bind s split-window -v -c "#{pane_current_path}"
-
-      # Jump between panes with Alt+arrows, no prefix needed.
-      bind -n M-Left select-pane -L
-      bind -n M-Right select-pane -R
-      bind -n M-Up select-pane -U
-      bind -n M-Down select-pane -D
-
       # Copy to the system clipboard (works over ssh via OSC 52).
       set -g set-clipboard on
 
-      # Flavour for the catppuccin plugin loaded from `plugins`.
+      # Catppuccin flavour for the plugin above.
       set -g @catppuccin_flavour 'mocha'
+
+      # Hide the "current command" from the status bar — it leaks what you're
+      # typing (zsh history, git commands, etc.). Keep hostname + session name.
+      set -g status-left "[#{session_name}] "
+
+      # Put the status bar at the top of the window (not the bottom).
+      set -g status-position top
     '';
   };
 }
