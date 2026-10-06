@@ -8,7 +8,10 @@
     keyMode = "emacs";
     mouse = true;
     baseIndex = 1;
-    escapeTime = 0;
+    # Small nonzero delay: 0 makes tmux skip reassembling ESC-prefixed key
+    # sequences, breaking Delete/setas/End (and thus editing after fzf + the
+    # zsh-autosuggestions). 10ms is enough and below noticeable for ESC in vim.
+    escapeTime = 10;
     historyLimit = 100000;
     newSession = true;
     sensibleOnTop = true;
