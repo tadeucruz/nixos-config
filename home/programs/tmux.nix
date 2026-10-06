@@ -20,18 +20,21 @@
       vim-tmux-navigator
       resurrect
       continuum
+      dracula
     ];
 
     extraConfig = ''
       # Copy to the system clipboard (works over ssh via OSC 52).
       set -g set-clipboard on
 
-      # Hide the "current command" from the status bar — it leaks what you're
-      # typing (zsh history, git commands, etc.). Keep hostname + session name.
-      set -g status-left "[#{session_name}] "
-
       # Put the status bar at the top of the window (not the bottom).
       set -g status-position top
+
+      # Dracula theme (https://draculatheme.com/tmux).
+      # It owns status-left/status-right, so the old custom status-left was
+      # removed — otherwise it would override the theme's left segment.
+      set -g @dracula-show-powerline true
+      set -g @dracula-show-left-icon session
     '';
   };
 }
