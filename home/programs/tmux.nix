@@ -3,9 +3,9 @@
   programs.tmux = {
     enable = true;
 
-    # Core: standard prefix, vi keys, mouse, sensible splits, generous scrollback.
+    # Core: standard prefix, emacs keys, mouse, sensible splits, generous scrollback.
     prefix = "C-b";
-    keyMode = "vi";
+    keyMode = "emacs";
     mouse = true;
     baseIndex = 1;
     escapeTime = 0;
