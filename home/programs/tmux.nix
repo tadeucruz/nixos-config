@@ -27,7 +27,18 @@
           set -g @dracula-plugins "time git cwd"
         '';
       }
-      resurrect
+      {
+        plugin = resurrect;
+        # Restore state is read by resurrect at restore time, so these live in the
+        # plugin's own extraConfig (see AGENTS.md note on plugin load order).
+        #  - @resurrect-processes ':all:': re-run every program that was running
+        #    (default only restores a built-in whitelist: vim/nvim, less, ssh, ...)
+        #  - @resurrect-capture-pane-contents: also restore each pane's scrollback
+        extraConfig = ''
+          set -g @resurrect-processes ':all:'
+          set -g @resurrect-capture-pane-contents 'on'
+        '';
+      }
       {
         plugin = continuum;
         extraConfig = ''
