@@ -4,13 +4,13 @@
   ...
 }:
 {
-  programs.fish = {
+  programs.zsh = {
     enable = true;
-    interactiveShellInit = "set -g fish_greeting ''";
+    autosuggestion.enable = false;
+    syntaxHighlighting.enable = true;
     shellAliases = {
       ls = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color=auto";
       ll = "ls -alh";
-      ta = "tmux attach 2>/dev/null || tmux new-session";
       rebuild =
         if pkgs.stdenv.hostPlatform.isDarwin then
           "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && nh clean all --keep-since 4d --keep 3"

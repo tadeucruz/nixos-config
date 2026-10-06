@@ -2,7 +2,7 @@
 {
   programs.fzf = {
     enable = true;
-    enableFishIntegration = true;
+    enableZshIntegration = true;
     enableBashIntegration = false;
   };
 }
