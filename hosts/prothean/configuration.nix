@@ -35,6 +35,7 @@
     ../../modules/services/syncthing.nix
     ../../modules/services/tailscale.nix
     ../../modules/gaming.nix
+    ../../modules/btrfs-tuning.nix
     inputs.awcc.nixosModules.default
   ];
 
