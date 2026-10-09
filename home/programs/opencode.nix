@@ -6,11 +6,11 @@
     {
       "$schema": "https://opencode.ai/config.json",
       "provider": {
-        "ollama": {
+        "llama-cpp": {
           "npm": "@ai-sdk/openai-compatible",
-          "name": "Ollama",
+          "name": "llama.cpp",
           "options": {
-            "baseURL": "http://citadel.tail0a0fce.ts.net:11434/v1"
+            "baseURL": "http://citadel.tail0a0fce.ts.net:8080/v1"
           },
           "models": {
             "qwen3.8": {

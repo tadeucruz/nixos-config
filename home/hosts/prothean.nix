@@ -14,11 +14,11 @@
     ../programs/opencode.nix
     ../development.nix
     ../programs/neovim.nix
-    ../programs/ollama.nix
+    ../programs/llama-cpp.nix
     ../gaming.nix
   ];
 
-  ollama.gpu = "cuda";
+  llama-cpp.gpu = "cuda";
 
   home.stateVersion = "26.11";
 

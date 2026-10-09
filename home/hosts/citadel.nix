@@ -23,11 +23,11 @@ in
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
-    ../programs/ollama.nix
+    ../programs/llama-cpp.nix
     ../gaming.nix
   ];
 
-  ollama.gpu = "rocm";
+  llama-cpp.gpu = "rocm";
 
   home.stateVersion = "26.11";
 
