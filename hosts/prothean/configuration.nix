@@ -84,7 +84,8 @@
 
     hardware.openrgb.enable = true;
 
-    logind.settings.Login.HandleLidSwitchExternalPower = "ignore"; # stays reachable over Tailscale when parked on AC (e.g. left at parents' house)
+    # stays reachable over Tailscale when parked on AC (e.g. left at parents' house)    
+    # logind.settings.Login.HandleLidSwitchExternalPower = "ignore"; 
 
     printing.enable = true;
 
