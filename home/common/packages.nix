@@ -6,5 +6,6 @@
     ripgrep
     vim
     wget
+    make
   ];
 }
