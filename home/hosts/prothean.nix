@@ -14,11 +14,8 @@
     ../programs/opencode.nix
     ../development.nix
     ../programs/neovim.nix
-    ../programs/llama-cpp.nix
     ../gaming.nix
   ];
-
-  llama-cpp.gpu = "cuda";
 
   home.stateVersion = "26.11";
 
