@@ -18,7 +18,7 @@
     };
 
     programs.kde-pim.enable = false;
-    
+
     home-manager.users.${username}.imports = [ ../../home/desktop/kde.nix ];
   };
 }
