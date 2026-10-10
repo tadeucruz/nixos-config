@@ -17,9 +17,8 @@
       displayManager.plasma-login-manager.enable = lib.mkDefault true;
     };
 
-    # Mask to prevent DrKonqi's unbounded crash-loop when it can't find a display (KDE bug 524048, unfixed): https://bugs.kde.org/show_bug.cgi?id=524048
-    systemd.user.sockets."drkonqi-coredump-launcher".enable = false;
-
+    programs.kde-pim.enable = false;
+    
     home-manager.users.${username}.imports = [ ../../home/desktop/kde.nix ];
   };
 }
