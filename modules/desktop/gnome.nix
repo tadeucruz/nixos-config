@@ -35,19 +35,6 @@
       # GNOME has no native system tray — this extension provides it (enabled
       # per-user via dconf in home/desktop/gnome.nix).
       systemPackages = [ pkgs.gnomeExtensions.appindicator ];
-
-      gnome.excludePackages = with pkgs; [
-        cheese
-        epiphany
-        gnome-contacts
-        gnome-maps
-        gnome-music
-        gnome-tour
-        gnome-weather
-        simple-scan
-        totem
-        yelp
-      ];
     };
 
     home-manager.users.${username}.imports = [ ../../home/desktop/gnome.nix ];
