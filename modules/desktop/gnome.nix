@@ -1,7 +1,7 @@
 # GNOME desktop stack — imported by prothean.
-# Drop-in replacement for modules/desktop/kde.nix: import one or the other,
-# never both (they fight over the display manager and both declare
-# options.desktop.sessionName).
+# Drop-in replacement for modules/desktop/kde.nix (imported by citadel/legion):
+# import one or the other per host, never both (they fight over the display
+# manager and both declare options.desktop.sessionName).
 {
   lib,
   pkgs,
