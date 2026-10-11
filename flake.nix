@@ -31,12 +31,6 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
     home-manager-stable = {
       url = "github:nix-community/home-manager/release-26.05";
