@@ -59,7 +59,7 @@
       set -g status-position top
 
       # Forward the active pane's title (set by the shell via OSC 0, see
-      # programs.zsh.initContent) to the outer terminal, so GNOME Console tab
+      # programs.zsh.initContent) to the outer terminal, so terminal tab
       # labels follow the pane's cwd instead of freezing at whatever the title
       # was when tmux started.
       set -g set-titles on

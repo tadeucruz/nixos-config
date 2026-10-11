@@ -9,12 +9,12 @@
     autosuggestion.enable = false;
     syntaxHighlighting.enable = true;
 
-    # Terminal/tab title: GNOME Console (kgx) has no title setting — the tab
-    # label is just the OSC 0 title emitted from inside the terminal, so
-    # without this it stays the generic default. Re-emitted on every prompt so
-    # `cd` (and exiting vim/htop, which clear the title) is reflected; preexec
-    # shows the running command meanwhile. Also works in Terminal.app and over
-    # SSH. add-zsh-hook instead of a bare `precmd()` so starship's hook isn't
+    # Terminal/tab title: terminals without a title setting (e.g. macOS
+    # Terminal.app) rely on the OSC 0 title emitted from inside the terminal,
+    # so without this the label stays the generic default. Re-emitted on every
+    # prompt so `cd` (and exiting vim/htop, which clear the title) is reflected;
+    # preexec shows the running command meanwhile. Also works over SSH.
+    # add-zsh-hook instead of a bare `precmd()` so starship's hook isn't
     # clobbered.
     initContent = ''
       autoload -Uz add-zsh-hook
