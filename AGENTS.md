@@ -135,8 +135,8 @@ home/
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
     fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
-    zsh.nix                      # cross-platform zsh config (per-OS rebuild alias)
-    tmux.nix                     # cross-platform tmux (prefix C-b, emacs, mouse, splits) + dracula theme + resurrect/continuum
+    zsh.nix                      # cross-platform zsh config (per-OS rebuild alias; OSC 0 tab titles — kgx has no title setting)
+    tmux.nix                     # cross-platform tmux (prefix C-b, emacs, mouse, splits) + dracula theme + resurrect/continuum + set-titles passthrough
     firefox.nix                  # firefox policies — desktop only
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix

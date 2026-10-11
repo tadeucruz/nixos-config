@@ -8,6 +8,31 @@
     enable = true;
     autosuggestion.enable = false;
     syntaxHighlighting.enable = true;
+
+    # Terminal/tab title: GNOME Console (kgx) has no title setting — the tab
+    # label is just the OSC 0 title emitted from inside the terminal, so
+    # without this it stays the generic default. Re-emitted on every prompt so
+    # `cd` (and exiting vim/htop, which clear the title) is reflected; preexec
+    # shows the running command meanwhile. Also works in Terminal.app and over
+    # SSH. add-zsh-hook instead of a bare `precmd()` so starship's hook isn't
+    # clobbered.
+    initContent = ''
+      autoload -Uz add-zsh-hook
+
+      set-dir-title() {
+        print -Pn '\e]0;%n@%m: %~\a'
+      }
+
+      set-cmd-title() {
+        # $1 is the command line as typed; printf %s keeps it literal so
+        # `%` chars in the command can't be interpreted.
+        printf '\e]0;%s | %s\a' "$(print -P '%n@%m: %~')" "$1"
+      }
+
+      add-zsh-hook precmd set-dir-title
+      add-zsh-hook preexec set-cmd-title
+    '';
+
     shellAliases = {
       ls = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color=auto";
       ll = "ls -alh";
