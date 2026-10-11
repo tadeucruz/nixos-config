@@ -26,7 +26,7 @@
     ../../modules/desktop/bluetooth.nix
     ../../modules/desktop/rtkit.nix
     ../../modules/desktop/rocm.nix
-    ../../modules/desktop/gnome.nix
+    ../../modules/desktop/kde.nix
     ../../modules/services/avahi.nix
     ../../modules/services/flatpak.nix
     ../../modules/services/fwupd.nix

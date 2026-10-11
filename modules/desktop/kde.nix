@@ -19,6 +19,10 @@
 
     programs.kde-pim.enable = false;
 
+    # Electron apps (VSCode etc.) run on native Wayland instead of XWayland
+    # under Plasma's Wayland session (same as the GNOME module).
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
     home-manager.users.${username}.imports = [ ../../home/desktop/kde.nix ];
   };
 }
