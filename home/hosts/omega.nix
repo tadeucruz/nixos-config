@@ -10,6 +10,7 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
+    ../ai.nix
   ];
 
   home.stateVersion = "26.05";

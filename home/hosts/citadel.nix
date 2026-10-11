@@ -24,6 +24,7 @@ in
     ../programs/tmux.nix
     ../programs/home-manager.nix
     ../programs/llama-cpp.nix
+    ../ai.nix
     ../gaming.nix
   ];
 

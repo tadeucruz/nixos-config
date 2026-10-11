@@ -11,6 +11,7 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
+    ../ai.nix
     ../gaming.nix
   ];
 
