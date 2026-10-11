@@ -32,6 +32,10 @@
     programs.dconf.enable = true;
 
     environment = {
+      # Electron apps (VSCode etc.) run on native Wayland instead of XWayland
+      # under GNOME's Wayland session.
+      sessionVariables.NIXOS_OZONE_WL = "1";
+
       # GNOME has no native system tray — this extension provides it (enabled
       # per-user via dconf in home/desktop/gnome.nix).
       systemPackages = [ pkgs.gnomeExtensions.appindicator ];
