@@ -1,10 +1,10 @@
-{ pkgs, ... }:
+# Dev toolchain (languages + editor) — prothean + normandy only.
 {
-  home.packages = with pkgs; [
-    go
-    godot_4
-    jdk
-    nodejs
-    vscode
+  imports = [
+    ./programs/go.nix
+    ./programs/godot.nix
+    ./programs/java.nix
+    ./programs/nodejs.nix
+    ./programs/vscode.nix
   ];
 }

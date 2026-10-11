@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   imports = [
     ../common/base.nix
@@ -14,12 +14,11 @@
     ../development.nix
     ../ai.nix
     ../programs/neovim.nix
+    ../programs/flutter.nix
     ../gaming.nix
   ];
 
   home.stateVersion = "26.11";
-
-  home.packages = with pkgs; [ flutter ];
 
   home.sessionVariables = {
     PROTON_ENABLE_WAYLAND = "1";
