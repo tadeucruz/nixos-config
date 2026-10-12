@@ -1,9 +1,12 @@
 {
   lib,
+  inputs,
   username,
   ...
 }:
 {
+  imports = [ inputs.laminix.nixosModules.default ];
+
   options.desktop.sessionName = lib.mkOption {
     type = lib.types.str;
     description = "Session name used by the desktop environment (e.g. the Jovian/gamescope fallback session).";
@@ -11,6 +14,8 @@
 
   config = {
     desktop.sessionName = "plasma";
+
+    environment.laminix.enable = true;
 
     services = {
       desktopManager.plasma6.enable = true;
