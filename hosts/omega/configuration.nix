@@ -13,6 +13,7 @@
     ../../modules/boot/base.nix
     ../../modules/users/base.nix
     ../../modules/users/server.nix
+    ../../modules/desktop/tpm2.nix
     ../../modules/networking/firewall.nix
     ../../modules/networking/dns.nix
     ../../modules/services/avahi.nix

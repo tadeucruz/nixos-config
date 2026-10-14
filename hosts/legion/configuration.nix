@@ -54,6 +54,7 @@ in
     ../../modules/desktop/bluetooth.nix
     ../../modules/desktop/rtkit.nix
     ../../modules/desktop/rocm.nix
+    ../../modules/desktop/tpm2.nix
     ../../modules/desktop/kde.nix
     ../../modules/services/avahi.nix
     ../../modules/services/flatpak.nix
