@@ -11,12 +11,15 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
+    ../programs/llama-cpp.nix
     ../development.nix
     ../ai.nix
     ../programs/neovim.nix
     ../programs/flutter.nix
     ../gaming.nix
   ];
+
+  llama-cpp.gpu = "cuda";
 
   home.stateVersion = "26.11";
 
