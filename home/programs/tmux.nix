@@ -1,35 +1,15 @@
 {
-  lib,
   pkgs,
   ...
 }:
 let
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-
-  # Write the yank to the system clipboard when one is reachable: wl-copy on a
-  # local Wayland session, pbcopy on macOS. Over SSH there is no local
-  # clipboard, so drain stdin instead — tmux still sends OSC 52 to the client.
-  copyToClipboard = pkgs.writeShellScript "tmux-copy-clipboard" (
-    if isDarwin then
-      ''
-        /usr/bin/pbcopy
-      ''
+  # Ghostty handles OSC 52 (local and over SSH). The copy command is only a
+  # fallback for local terminals without OSC 52 (e.g. Konsole).
+  copyCommand =
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      "/usr/bin/pbcopy"
     else
-      ''
-        if [ -n "''${WAYLAND_DISPLAY:-}" ]; then
-          ${pkgs.wl-clipboard}/bin/wl-copy
-        else
-          cat >/dev/null
-        fi
-      ''
-  );
-
-  # Modern tmux routes every copy-pipe binding (mouse yank, M-w/C-w, Enter on
-  # vi) through this command, so it is also where the "Copied" banner lives.
-  copyCommand = pkgs.writeShellScript "tmux-copy" ''
-    ${copyToClipboard}
-    ${pkgs.tmux}/bin/tmux display-message -d 1000 Copied
-  '';
+      "${pkgs.wl-clipboard}/bin/wl-copy";
 in
 {
   programs.tmux = {
@@ -87,16 +67,14 @@ in
     ];
 
     extraConfig = ''
-      # OSC 52 (set-clipboard) only reaches terminals that implement it — macOS
-      # Terminal.app and konsole do not. copy-command pipes every yank/mouse
-      # selection to the real system clipboard instead (when one is reachable),
-      # and ends by printing the "Copied" banner. Over SSH the script no-ops
-      # the clipboard part and tmux still sends OSC 52 to the client.
+      # OSC 52 reaches Ghostty (local and over SSH). copy-command covers local
+      # terminals that don't implement OSC 52 (e.g. Konsole) and is harmless
+      # over SSH, where tmux also emits OSC 52.
       set -g set-clipboard on
       set -g copy-command '${copyCommand}'
 
       # tmux 3.7 no longer binds Enter in emacs copy-mode; wire it to the same
-      # copy-pipe path as the mouse yank so it copies and shows the banner.
+      # copy-pipe path as the mouse yank.
       bind -T copy-mode Enter send-keys -X copy-pipe-and-cancel
       bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel
       set -g status-position top
