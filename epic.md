@@ -26,18 +26,18 @@ enabled, which are skipped, and why.
 | 5 | IOMMU | ✅ Enabled | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. **citadel/legion:** Jovian's SteamOS cmdline config injected `amd_iommu=off`, which overrides `iommu=on`; `jovian.steamos.useSteamOSConfig` is now `false` in `modules/jovian.nix` (only `earlyoom` is enabled, plus SD automount on legion), so the flag is gone without duplicating Deck-tuned parameters. Validated 2026-10-17 (`/sys/kernel/iommu_groups` non-empty). |
 | 6 | Kernel lockdown integrity | ⏸️ Rolled back | Was `lockdown=integrity` in `modules/boot/base.nix`. The OGC kernel did not recognize the parameter and `/sys/kernel/security/lockdown` never existed → never active. |
 | 7 | Kexec disabled | ✅ Enabled | `boot.kernel.sysctl."kernel.kexec_load_disabled" = 1` in `modules/boot/eac-kexec.nix` (all Linux hosts). Uses the sysctl instead of the `kexec_load_disabled=1` kernel param: applies without reboot and avoids the "unknown parameter" issue. Validated 2026-10-17. |
-| 8 | BPF LSM | ⏳ Pending verification | Current nixpkgs sets `security.lsm = [ "landlock" "yama" "bpf" ]`, emitted as `lsm=landlock,yama,bpf` (seen on citadel's `/proc/cmdline`); `bpf` may already be active with no repo change. `boot.kernelModules = [ "bpf" ]` is not needed (BPF LSM is built-in). Verify `cat /sys/kernel/security/lsm` contains `bpf`. `omega` is on nixpkgs-stable and may not have the `security.lsm` option. |
+| 8 | BPF LSM | ✅ Enabled | nixpkgs (unstable and 26.05) sets `security.lsm = [ "landlock" "yama" "bpf" ]`, emitted as `lsm=landlock,yama,bpf`. No repo change needed (`boot.kernelModules = [ "bpf" ]` is unnecessary — BPF LSM is built-in). Validated 2026-10-17: `/sys/kernel/security/lsm` contains `bpf` on all Linux hosts. |
 
-**Score: 3 / 8 enabled** (#2, #5 and #7 re-enabled 2026-10-17; the rest remain rolled back).
+**Score: 4 / 8 enabled** (#2, #5, #7 and #8 active as of 2026-10-17).
 
 ## Per-host status
 
-| Host | TPM2 | IOMMU/lockdown/kexec/BPF | Score | Notes |
+| Host | TPM2 | IOMMU/kexec/BPF | Score | Notes |
 |---|---|---|---|---|
-| `citadel` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17). Still suspect for Witcher 3 DX12 freezes. |
-| `legion` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17). |
-| `omega` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17); libvirt passthrough verified. |
-| `prothean` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17); #8 pending; #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
+| `citadel` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅ (2026-10-17). Still suspect for Witcher 3 DX12 freezes. |
+| `legion` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅ (2026-10-17). |
+| `omega` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅ (2026-10-17); libvirt passthrough verified. |
+| `prothean` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅ (2026-10-17); #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
 | `normandy` | N/A | N/A | — | macOS / nix-darwin, out of scope. |
 
 ## Rollback notes (2026-10-16)
