@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{
+  lib,
+  pkgs,
+  ...
+}:
 {
   programs.tmux = {
     enable = true;
@@ -55,7 +59,12 @@
     ];
 
     extraConfig = ''
+      # OSC 52 (set-clipboard) only reaches terminals that implement it — macOS
+      # Terminal.app and konsole do not. copy-command pipes every yank/mouse
+      # selection to the real system clipboard instead, so Enter in copy-mode
+      # (and drag-to-select with the mouse) actually copies.
       set -g set-clipboard on
+      set -g copy-command '${if pkgs.stdenv.hostPlatform.isDarwin then "/usr/bin/pbcopy" else "${pkgs.wl-clipboard}/bin/wl-copy"}'
       set -g status-position top
 
       # Forward the active pane's title (set by the shell via OSC 0, see
