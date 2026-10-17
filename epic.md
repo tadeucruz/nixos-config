@@ -24,7 +24,7 @@ enabled, which are skipped, and why.
 | 3 | Secure Boot | ❌ Not enabled | Deliberately skipped for now. Would also require a well-known key (same blocker as #1). |
 | 4 | Measured boot | ⚠️ Partial (verified) | Verified 2026-10-17 on all Linux hosts: firmware event log `/sys/kernel/security/tpm0/binary_bios_measurements` exists, and PCRs 0–7 (plus 9/10/12) are populated. `bootctl status` still reports `Secure Boot: disabled`, `Measured UKI: no`, `Measured OS: no`, so it is not counted as a full requirement. |
 | 5 | IOMMU | ✅ Enabled | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. **citadel/legion:** Jovian's SteamOS cmdline config injected `amd_iommu=off`, which overrides `iommu=on`; `jovian.steamos.useSteamOSConfig` is now `false` in `modules/jovian.nix` (only `earlyoom` is enabled, plus SD automount on legion), so the flag is gone without duplicating Deck-tuned parameters. Validated 2026-10-17 (`/sys/kernel/iommu_groups` non-empty). |
-| 6 | Kernel lockdown integrity | ⏸️ Rolled back | Was `lockdown=integrity` in `modules/boot/base.nix`. The OGC kernel did not recognize the parameter and `/sys/kernel/security/lockdown` never existed → never active. |
+| 6 | Kernel lockdown integrity | ❌ Not available | Verified 2026-10-17 on all Linux hosts: the running kernels have `CONFIG_SECURITY_LOCKDOWN_LSM` and `CONFIG_MODULE_SIG` **not set**; `/sys/kernel/security/lockdown` does not exist and `lockdown` is absent from `/sys/kernel/security/lsm`. Enabling it requires a custom kernel build with those options. |
 | 7 | Kexec disabled | ✅ Enabled | `boot.kernel.sysctl."kernel.kexec_load_disabled" = 1` in `modules/boot/eac-kexec.nix` (all Linux hosts). Uses the sysctl instead of the `kexec_load_disabled=1` kernel param: applies without reboot and avoids the "unknown parameter" issue. Validated 2026-10-17. |
 | 8 | BPF LSM | ✅ Enabled | nixpkgs (unstable and 26.05) sets `security.lsm = [ "landlock" "yama" "bpf" ]`, emitted as `lsm=landlock,yama,bpf`. No repo change needed (`boot.kernelModules = [ "bpf" ]` is unnecessary — BPF LSM is built-in). Validated 2026-10-17: `/sys/kernel/security/lsm` contains `bpf` on all Linux hosts. |
 
@@ -37,7 +37,7 @@ enabled, which are skipped, and why.
 | `citadel` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅; #4 measured boot active but partial (2026-10-17). Still suspect for Witcher 3 DX12 freezes. |
 | `legion` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅; #4 measured boot active but partial (2026-10-17). |
 | `omega` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅; #4 measured boot active but partial (2026-10-17); libvirt passthrough verified. |
-| `prothean` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅; #4 measured boot active but partial (2026-10-17); #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
+| `prothean` | ✅ | ✅ | 4/8 | #2 TPM2 ✅, #5 IOMMU ✅, #7 kexec ✅ and #8 BPF LSM ✅; #4 measured boot active but partial (2026-10-17); #6 unavailable (kernel config; also NVIDIA + `acpi_call` unsigned modules). |
 | `normandy` | N/A | N/A | — | macOS / nix-darwin, out of scope. |
 
 ## Rollback notes (2026-10-16)
@@ -66,8 +66,10 @@ Reverted commit `ba69f4b` on all hosts, keeping this file for tracking.
 - **Well-known signed kernel (#1):** blocked until either NixOS is added to
   EAC's well-known list (contact: `linux-gaming@epicgames.com`) or the kernel
   is signed with a key from a distro already on the list (Fedora/Debian/etc).
-- **prothean lockdown/IOMMU/TPM2:** postponed — lockdown breaks NVIDIA MSR
-  writes and `acpi_call`; needs hands-on testing.
+- **Kernel lockdown (#6):** not available in the current kernels on any host
+  (verified 2026-10-17): `CONFIG_SECURITY_LOCKDOWN_LSM` and
+  `CONFIG_MODULE_SIG` are not set. Would require a custom kernel build (and
+  signed modules, including NVIDIA/`acpi_call` on prothean).
 
 ## Next steps to reach 8/8
 
@@ -76,9 +78,9 @@ Reverted commit `ba69f4b` on all hosts, keeping this file for tracking.
    Fedora/Debian key).
 3. Enable Secure Boot with that well-known key (likely via shim, not
    lanzaboote — own keys don't count).
-4. Re-enable TPM2/IOMMU/BPF LSM on the hosts (kexec done; note: `amd_iommu=on`
-   and `lockdown=integrity` were ignored by the OGC kernel — use `iommu=on`
-   and verify `cat /sys/kernel/security/lockdown`).
+4. TPM2/IOMMU/kexec/BPF LSM are done. Lockdown (#6) needs a custom kernel
+   with `CONFIG_SECURITY_LOCKDOWN_LSM` + `CONFIG_MODULE_SIG`; the current
+   kernels do not set them.
 5. Re-verify measured boot (#4) once Secure Boot is on.
 
 ## Rebuild notes
