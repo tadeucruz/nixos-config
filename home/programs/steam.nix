@@ -3,6 +3,8 @@
 { ... }:
 {
   home.sessionVariables = {
+    PROTON_FSR4_UPGRADE = "1";
+    PROTON_FSR4_RDNA3_UPGRADE = "1";
     PROTON_USE_NTSYNC = "1";
   };
 
