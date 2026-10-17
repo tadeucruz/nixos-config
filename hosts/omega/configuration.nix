@@ -12,6 +12,7 @@
     ../../modules/common/zram.nix
     ../../modules/boot/base.nix
     ../../modules/boot/eac-kexec.nix
+    ../../modules/boot/eac-iommu.nix
     ../../modules/security/tpm2.nix
     ../../modules/users/base.nix
     ../../modules/users/server.nix
