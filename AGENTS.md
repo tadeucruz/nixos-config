@@ -46,7 +46,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
-- **AI agent profile (`home/ai.nix`), all 5 hosts:** imports `home/programs/{claude-code,cline,opencode}.nix` — `claude-code` uses home-manager's native `programs.claude-code` option (exists on both master and release-26.05); `cline` and `opencode` have no HM module, so they're package wrappers (`opencode` also writes the llama-cpp provider config pointing at citadel over tailscale) — so any machine (incl. headless omega) can run AI CLIs remotely/agent-style without the dev toolchain. Split out of `home/development.nix` (now `vscode`, `go`, `godot_4`, `jdk`, `nodejs` only, still prothean + normandy). **Caveat:** omega is the only host on `nixpkgs-stable` — `claude-code` and `opencode` exist on 26.05, but `cline` does not, so `home/programs/cline.nix` guards it with `lib.optional (pkgs ? cline) pkgs.cline` (omega gets the other two agents; cline appears there automatically once stable catches up — never remove `../ai.nix` from omega for this).
+- **AI agent profile (`home/ai.nix`), all 5 hosts:** imports `home/programs/opencode.nix` — no HM module, so it's a package wrapper (`opencode` also writes the llama-cpp provider config pointing at citadel over tailscale) — so any machine (incl. headless omega) can run the AI CLI remotely/agent-style without the dev toolchain. Split out of `home/development.nix` (now `vscode`, `go`, `godot_4`, `jdk`, `nodejs` only, still prothean + normandy).
 - **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is the native macOS Terminal on normandy (dock in `modules/normandy.nix`).
 - **tmux** (`home/programs/tmux.nix`, all 5 hosts): declarative `programs.tmux` — prefix `C-b`, `keyMode = emacs`, `mouse = true`, splits. Plugins: `sensibleOnTop` + `tmuxPlugins.{dracula,resurrect,continuum}`. **Plugin options must go in the plugin submodule `extraConfig`, never the top-level `extraConfig`**: Home Manager emits the plugin `run-shell`s before top-level `extraConfig`, and `run-shell` blocks — so top-level options are read only after the plugin ran with defaults. `zsh-autosuggestions` is disabled in `home/programs/zsh.nix` (it broke backspace editing after history search inside tmux).
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
@@ -140,10 +140,7 @@ home/
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
     neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
-    neovim/                      # nvim config copied to ~/.config/nvim
-    claude-code.nix              # Claude Code CLI — programs.claude-code.enable (HM module) — all 5 hosts
-    cline.nix                    # Cline CLI — package wrapper (no HM module), guarded: pkgs.cline missing on 26.05 — all 5 hosts
-    opencode.nix                 # opencode package + llama-cpp provider config — imported by ai.nix
+    neovim/                      # nvim config copied to ~/.config/nvim    opencode.nix                 # opencode package + llama-cpp provider config — imported by ai.nix
     vscode.nix                   # VS Code — programs.vscode.enable (HM module) — imported by development.nix
     java.nix                     # JDK — programs.java.enable (HM module) — imported by development.nix
     go.nix                       # Go — package wrapper — imported by development.nix
@@ -153,7 +150,7 @@ home/
     obsidian.nix                 # Obsidian — package wrapper — imported by common/darwin.nix
     steam.nix                    # Steam session glue (Proton env vars + autostart entry) — imported by gaming.nix
   development.nix                # dev toolchain profile — imports programs/{go,godot,java,nodejs,vscode}.nix — prothean + normandy
-  ai.nix                         # AI agent tooling (claude-code, cline, opencode) — all 5 hosts
+  ai.nix                         # AI agent tooling (opencode) — all 5 hosts
   gaming.nix                     # gaming profile — imports programs/{mangohud,steam}.nix
 ```
 
