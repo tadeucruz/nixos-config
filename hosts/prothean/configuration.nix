@@ -12,6 +12,7 @@
     ./hardware-configuration.nix
     ../../modules/common/all.nix
     ../../modules/common/nix.nix
+    ../../modules/common/ghostty.nix
     ../../modules/common/locale.nix
     ../../modules/common/zsh.nix
     ../../modules/common/zram.nix
