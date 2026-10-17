@@ -20,24 +20,24 @@ enabled, which are skipped, and why.
 | # | Requirement | Status | How / Why |
 |---|---|---|---|
 | 1 | Signed kernel & modules (well-known key) | ❌ Not enabled | Needs a key from EAC's well-known list (Canonical, Fedora, Debian, openSUSE, Universal Blue, Microsoft UEFI CA, ...). NixOS is not on the list yet. Own keys (lanzaboote / custom MOK) do not count. |
-| 2 | TPM 2.0 | ⏸️ Rolled back | Was `security.tpm2.enable = true` via `modules/desktop/tpm2.nix` (now removed). Hardware has TPM 2.0 (`/dev/tpm0` present). |
+| 2 | TPM 2.0 | ⏳ Implemented, pending validation | `security.tpm2.enable = true` via `modules/security/tpm2.nix` (all Linux hosts, 2026-10-17). Hardware must have TPM 2.0 enabled in BIOS. |
 | 3 | Secure Boot | ❌ Not enabled | Deliberately skipped for now. Would also require a well-known key (same blocker as #1). |
 | 4 | Measured boot | ⚠️ Partial | systemd-boot measures into TPM PCRs by default, but without Secure Boot (#3) EAC may not accept the attestation. |
 | 5 | IOMMU | ⏸️ Rolled back | Was `amd_iommu=on` in `modules/boot/base.nix`. Kernel rejects `on` as an unknown option; the pre-existing `amd_iommu=off` was what actually applied. |
 | 6 | Kernel lockdown integrity | ⏸️ Rolled back | Was `lockdown=integrity` in `modules/boot/base.nix`. The OGC kernel did not recognize the parameter and `/sys/kernel/security/lockdown` never existed → never active. |
-| 7 | Kexec disabled | ⏸️ Rolled back | Was `kexec_load_disabled=1` in `modules/boot/base.nix`. |
+| 7 | Kexec disabled | ✅ Enabled | `boot.kernel.sysctl."kernel.kexec_load_disabled" = 1` in `modules/boot/eac-kexec.nix` (all Linux hosts). Uses the sysctl instead of the `kexec_load_disabled=1` kernel param: applies without reboot and avoids the "unknown parameter" issue. Validated 2026-10-17. |
 | 8 | BPF LSM | ⏸️ Rolled back | Was `lsm=...,bpf` + `boot.kernelModules = [ "bpf" ]` in `modules/boot/base.nix`. |
 
-**Score: 0 / 8 enabled** (all prerequisite changes rolled back on 2026-10-16).
+**Score: 1 / 8 enabled** (#7 re-enabled 2026-10-17; the rest remain rolled back).
 
 ## Per-host status
 
 | Host | TPM2 | IOMMU/lockdown/kexec/BPF | Score | Notes |
 |---|---|---|---|---|
-| `citadel` | ⏸️ | ⏸️ | 0/8 | Rolled back — suspect for Witcher 3 DX12 freezes. |
-| `legion` | ⏸️ | ⏸️ | 0/8 | Rolled back. |
-| `omega` | ⏸️ | ⏸️ | 0/8 | Rolled back. |
-| `prothean` | ⏳ Pending | ⏳ Pending | — | Deferred: NVIDIA out-of-tree driver + `acpi_call` + AWCC conflict with `lockdown=integrity`. Needs physical access to test. |
+| `citadel` | ⏳ | ⏸️ | 1/8 | #7 kexec ✅ (2026-10-17); #2 TPM2 implemented, pending validation. Still suspect for Witcher 3 DX12 freezes. |
+| `legion` | ⏳ | ⏸️ | 1/8 | #7 kexec ✅ (2026-10-17); #2 TPM2 implemented, pending validation. |
+| `omega` | ⏳ | ⏸️ | 1/8 | #7 kexec ✅ (2026-10-17); #2 TPM2 implemented, pending validation. |
+| `prothean` | ⏳ | ⏳ Pending | 1/8 | #7 kexec ✅ (2026-10-17); #2 TPM2 implemented, pending validation. #5/#8 pending; #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
 | `normandy` | N/A | N/A | — | macOS / nix-darwin, out of scope. |
 
 ## Rollback notes (2026-10-16)
@@ -76,8 +76,8 @@ Reverted commit `ba69f4b` on all hosts, keeping this file for tracking.
    Fedora/Debian key).
 3. Enable Secure Boot with that well-known key (likely via shim, not
    lanzaboote — own keys don't count).
-4. Re-enable TPM2/IOMMU/lockdown/kexec/BPF LSM on the hosts (note: `amd_iommu=on`
-   and `lockdown=integrity` are ignored by the OGC kernel — use valid options
+4. Re-enable TPM2/IOMMU/BPF LSM on the hosts (kexec done; note: `amd_iommu=on`
+   and `lockdown=integrity` were ignored by the OGC kernel — use `iommu=on`
    and verify `cat /sys/kernel/security/lockdown`).
 5. Re-verify measured boot (#4) once Secure Boot is on.
 
