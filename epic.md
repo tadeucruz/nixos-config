@@ -23,21 +23,21 @@ enabled, which are skipped, and why.
 | 2 | TPM 2.0 | ✅ Enabled | `security.tpm2.enable = true` via `modules/security/tpm2.nix` (all Linux hosts). Validated 2026-10-17 with `systemd-cryptenroll --tpm2-device=list` (device listed) and `tpm_version_major = 2`. |
 | 3 | Secure Boot | ❌ Not enabled | Deliberately skipped for now. Would also require a well-known key (same blocker as #1). |
 | 4 | Measured boot | ⚠️ Partial | systemd-boot measures into TPM PCRs by default, but without Secure Boot (#3) EAC may not accept the attestation. |
-| 5 | IOMMU | ⏳ Implemented, pending validation | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts, 2026-10-17). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. **citadel/legion:** Jovian's SteamOS cmdline config injected `amd_iommu=off`, which overrides `iommu=on`; `jovian.steamos.useSteamOSConfig` is now `false` in `modules/jovian.nix` (only `earlyoom` is enabled, plus SD automount on legion), so the flag is gone without duplicating Deck-tuned parameters. Verify `/sys/kernel/iommu_groups` is non-empty after reboot. |
+| 5 | IOMMU | ✅ Enabled | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. **citadel/legion:** Jovian's SteamOS cmdline config injected `amd_iommu=off`, which overrides `iommu=on`; `jovian.steamos.useSteamOSConfig` is now `false` in `modules/jovian.nix` (only `earlyoom` is enabled, plus SD automount on legion), so the flag is gone without duplicating Deck-tuned parameters. Validated 2026-10-17 (`/sys/kernel/iommu_groups` non-empty). |
 | 6 | Kernel lockdown integrity | ⏸️ Rolled back | Was `lockdown=integrity` in `modules/boot/base.nix`. The OGC kernel did not recognize the parameter and `/sys/kernel/security/lockdown` never existed → never active. |
 | 7 | Kexec disabled | ✅ Enabled | `boot.kernel.sysctl."kernel.kexec_load_disabled" = 1` in `modules/boot/eac-kexec.nix` (all Linux hosts). Uses the sysctl instead of the `kexec_load_disabled=1` kernel param: applies without reboot and avoids the "unknown parameter" issue. Validated 2026-10-17. |
 | 8 | BPF LSM | ⏳ Pending verification | Current nixpkgs sets `security.lsm = [ "landlock" "yama" "bpf" ]`, emitted as `lsm=landlock,yama,bpf` (seen on citadel's `/proc/cmdline`); `bpf` may already be active with no repo change. `boot.kernelModules = [ "bpf" ]` is not needed (BPF LSM is built-in). Verify `cat /sys/kernel/security/lsm` contains `bpf`. `omega` is on nixpkgs-stable and may not have the `security.lsm` option. |
 
-**Score: 2 / 8 enabled** (#2 and #7 re-enabled 2026-10-17; the rest remain rolled back).
+**Score: 3 / 8 enabled** (#2, #5 and #7 re-enabled 2026-10-17; the rest remain rolled back).
 
 ## Per-host status
 
 | Host | TPM2 | IOMMU/lockdown/kexec/BPF | Score | Notes |
 |---|---|---|---|---|
-| `citadel` | ✅ | ⏳ | 2/8 | #2 TPM2 ✅ and #7 kexec ✅ (2026-10-17); #5 IOMMU implemented, pending validation. Still suspect for Witcher 3 DX12 freezes. |
-| `legion` | ✅ | ⏳ | 2/8 | #2 TPM2 ✅ and #7 kexec ✅ (2026-10-17); #5 IOMMU implemented, pending validation. |
-| `omega` | ✅ | ⏳ | 2/8 | #2 TPM2 ✅ and #7 kexec ✅ (2026-10-17); #5 IOMMU implemented, pending validation. Verify libvirt passthrough after reboot. |
-| `prothean` | ✅ | ⏳ | 2/8 | #2 TPM2 ✅ and #7 kexec ✅ (2026-10-17); #5 IOMMU implemented, pending validation; #8 pending; #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
+| `citadel` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17). Still suspect for Witcher 3 DX12 freezes. |
+| `legion` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17). |
+| `omega` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17); libvirt passthrough verified. |
+| `prothean` | ✅ | ✅ | 3/8 | #2 TPM2 ✅, #5 IOMMU ✅ and #7 kexec ✅ (2026-10-17); #8 pending; #6 blocked by NVIDIA + `acpi_call` (unsigned modules). |
 | `normandy` | N/A | N/A | — | macOS / nix-darwin, out of scope. |
 
 ## Rollback notes (2026-10-16)
