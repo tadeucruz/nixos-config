@@ -23,10 +23,10 @@ enabled, which are skipped, and why.
 | 2 | TPM 2.0 | ✅ Enabled | `security.tpm2.enable = true` via `modules/security/tpm2.nix` (all Linux hosts). Validated 2026-10-17 with `systemd-cryptenroll --tpm2-device=list` (device listed) and `tpm_version_major = 2`. |
 | 3 | Secure Boot | ❌ Not enabled | Deliberately skipped for now. Would also require a well-known key (same blocker as #1). |
 | 4 | Measured boot | ⚠️ Partial | systemd-boot measures into TPM PCRs by default, but without Secure Boot (#3) EAC may not accept the attestation. |
-| 5 | IOMMU | ⏳ Implemented, pending validation | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts, 2026-10-17). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. Verify `/sys/kernel/iommu_groups` is non-empty after reboot. |
+| 5 | IOMMU | ⏳ Implemented, pending validation | `iommu=on` via `modules/boot/eac-iommu.nix` (all Linux hosts, 2026-10-17). The old `amd_iommu=on` was invalid; `iommu=on` is the correct parameter. **citadel/legion:** Jovian's `jovian.steamos.enableDefaultCmdlineConfig` injected `amd_iommu=off`, which overrides `iommu=on`; it is now disabled in `modules/jovian.nix` and the SteamOS flags are redeclared without the IOMMU flag. Verify `/sys/kernel/iommu_groups` is non-empty after reboot. |
 | 6 | Kernel lockdown integrity | ⏸️ Rolled back | Was `lockdown=integrity` in `modules/boot/base.nix`. The OGC kernel did not recognize the parameter and `/sys/kernel/security/lockdown` never existed → never active. |
 | 7 | Kexec disabled | ✅ Enabled | `boot.kernel.sysctl."kernel.kexec_load_disabled" = 1` in `modules/boot/eac-kexec.nix` (all Linux hosts). Uses the sysctl instead of the `kexec_load_disabled=1` kernel param: applies without reboot and avoids the "unknown parameter" issue. Validated 2026-10-17. |
-| 8 | BPF LSM | ⏸️ Rolled back | Was `lsm=...,bpf` + `boot.kernelModules = [ "bpf" ]` in `modules/boot/base.nix`. |
+| 8 | BPF LSM | ⏳ Pending verification | Current nixpkgs sets `security.lsm = [ "landlock" "yama" "bpf" ]`, emitted as `lsm=landlock,yama,bpf` (seen on citadel's `/proc/cmdline`); `bpf` may already be active with no repo change. `boot.kernelModules = [ "bpf" ]` is not needed (BPF LSM is built-in). Verify `cat /sys/kernel/security/lsm` contains `bpf`. `omega` is on nixpkgs-stable and may not have the `security.lsm` option. |
 
 **Score: 2 / 8 enabled** (#2 and #7 re-enabled 2026-10-17; the rest remain rolled back).
 
