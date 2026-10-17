@@ -123,11 +123,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791844554,
-        "narHash": "sha256-PdbRmlu4xiCHc+QFvMpxBz7RQAwq9AAYLcrsrWBED0E=",
+        "lastModified": 1792199912,
+        "narHash": "sha256-GLCvjG946n3UmX2O8OziJegH5SJpTRBbb/GBxRIRghg=",
         "owner": "jackboykin",
         "repo": "laminix",
-        "rev": "af2778c6e186e52d9974fb714bb386b03713255e",
+        "rev": "a32adb584a6204a2bdf85c03fec34b1ee59298cd",
         "type": "github"
       },
       "original": {
