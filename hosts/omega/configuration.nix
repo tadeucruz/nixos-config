@@ -11,6 +11,7 @@
     ../../modules/common/zsh.nix
     ../../modules/common/zram.nix
     ../../modules/boot/base.nix
+    ../../modules/boot/eac-kexec.nix
     ../../modules/users/base.nix
     ../../modules/users/server.nix
     ../../modules/networking/firewall.nix
