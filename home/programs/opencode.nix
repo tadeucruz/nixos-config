@@ -6,15 +6,15 @@
     {
       "$schema": "https://opencode.ai/config.json",
       "provider": {
-        "llama-cpp": {
+        "personal-llama-cpp": {
           "npm": "@ai-sdk/openai-compatible",
-          "name": "llama.cpp",
+          "name": "personal-llama-cpp",
           "options": {
-            "baseURL": "http://citadel.tail0a0fce.ts.net:8080/v1"
+            "baseURL": "http://prothean:9931/v1"
           },
           "models": {
-            "qwen3.8": {
-              "name": "qwen3.8 (citadel)"
+            "unsloth/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M": {
+              "name": "local prothean"
             }
           }
         }
