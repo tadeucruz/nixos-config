@@ -6,10 +6,7 @@ let
   # Ghostty handles OSC 52 (local and over SSH). The copy command is only a
   # fallback for local terminals without OSC 52 (e.g. Konsole).
   copyCommand =
-    if pkgs.stdenv.hostPlatform.isDarwin then
-      "/usr/bin/pbcopy"
-    else
-      "${pkgs.wl-clipboard}/bin/wl-copy";
+    if pkgs.stdenv.hostPlatform.isDarwin then "/usr/bin/pbcopy" else "${pkgs.wl-clipboard}/bin/wl-copy";
 in
 {
   programs.tmux = {
