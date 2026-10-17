@@ -2,8 +2,6 @@
 
 Flake for 5 machines — NixOS (`citadel`, `prothean`, `legion`, `omega` headless server) and nix-darwin (`normandy`).
 
-legion and prothean run the stock nixpkgs kernel (`linuxPackages_latest`). citadel runs [OpenGamingCollective](https://github.com/OpenGamingCollective/linux)'s `v7.2.7-ogc1` (`modules/ogc-kernel.nix`): the same `linux_latest` base + their `monolithic.patch` via `fetchurl` — it adds AMD HDMI 2.1 VRR/ALLM, which vanilla lacks. Bumps go through `scripts/update.sh ogc` + the `.github/workflows/update.yml` job, decoupled from nixpkgs's own kernel; the bump is skipped with a warning while the OGC release's base differs from `linux_latest` (applied automatically once nixpkgs catches up). A binary-cached [CachyOS kernel](https://github.com/xddxdd/nix-cachyos-kernel) option (`modules/cachyos-kernel.nix`) is kept for the future but not in use.
-
 ## Validating changes
 
 `make` is the pre-commit gate — it checks formatting and evaluates every configuration, which is what CI runs too. Evaluation is cross-platform, so any machine (including the MacBook) can validate all five hosts:
