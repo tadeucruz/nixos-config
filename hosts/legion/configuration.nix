@@ -103,6 +103,8 @@ in
 
   services.udev.packages = [ pkgs.inputplumber ];
 
+  jovian.steamos.enableAutoMountUdevRules = true;
+
   jovian.decky-loader.extraPackages = with pkgs; [ hidapi ];
   systemd.services.decky-loader.environment.LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
 

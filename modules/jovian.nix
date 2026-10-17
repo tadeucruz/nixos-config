@@ -18,27 +18,14 @@
       user = username;
     };
 
+    # SteamOS defaults are tuned for the Steam Deck; only enable what makes
+    # sense on this hardware. In particular, the default cmdline config
+    # injects "amd_iommu=off", which would block EAC v2 requirement #5.
     steamos = {
-      useSteamOSConfig = true;
-
-      # Jovian's default cmdline includes "amd_iommu=off", which takes
-      # precedence over "iommu=on" and blocks EAC v2 requirement #5. Keep the
-      # rest of the SteamOS tuning below, but drop the IOMMU flag.
-      enableDefaultCmdlineConfig = false;
+      useSteamOSConfig = false;
+      enableEarlyOOM = true;
     };
   };
-
-  # Copied from Jovian's modules/steamos/boot.nix (SteamOS cmdline flags),
-  # minus "amd_iommu=off". Re-sync this list when bumping the jovian input:
-  # https://github.com/Jovian-Experiments/Jovian-NixOS/blob/master/modules/steamos/boot.nix
-  boot.kernelParams = [
-    "log_buf_len=4M"
-    "amdgpu.lockup_timeout=5000,10000,10000,5000"
-    "ttm.pages_min=2097152"
-    "amdgpu.sched_hw_submission=4"
-    "amdgpu.dcdebugmask=0x20000"
-    "audit=0"
-  ];
 
   jovian.steam.desktopSession = config.desktop.sessionName;
 
