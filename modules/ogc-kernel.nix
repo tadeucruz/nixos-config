@@ -14,10 +14,12 @@ let
   };
 in
 # linux_latest.override does not propagate src/version, so build the kernel
-# from the OGC source via customPackage. Reuse linux_latest's configfile to
-# keep nixpkgs's full config (ntsync, amdgpu, etc.).
-pkgs.linuxKernel.customPackage {
-  version = ogcVersion;
+# from the OGC source via buildLinux (generic.nix) — this keeps nixpkgs's
+# common config (ntsync, amdgpu) and the `features` attrset NixOS asserts on
+# (efiBootStub, netfilterRPFilter, ia32Emulation).
+pkgs.linuxPackagesFor (pkgs.buildLinux {
   src = ogcSrc;
-  configfile = pkgs.linux_latest.configfile;
-}
+  version = ogcVersion;
+  modDirVersion = lib.versions.pad 3 ogcVersion;
+  kernelPatches = [ ];
+})
