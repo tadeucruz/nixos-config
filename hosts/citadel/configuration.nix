@@ -44,11 +44,11 @@ in
     ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
-    ../../modules/cachyos-kernel.nix
   ];
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
+    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
     kernelParams = [
       "transparent_hugepage=always"
       "amdgpu.dcfeaturemask=0x402"

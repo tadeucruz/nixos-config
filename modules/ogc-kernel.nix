@@ -1,22 +1,23 @@
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2.9-ogc3";
+  ogcRelease = "v7.2.9-ogc7";
 
-  ogcPatch = pkgs.fetchurl {
-    url = "https://github.com/OpenGamingCollective/linux/releases/download/${ogcRelease}/monolithic.patch";
-    hash = "sha256-nqGZbAhMnR4FmvTrXVejJjE2rVxoXKJFFA7bMDfpE4U=";
-  };
+  # OGC renumbers the kernel (Makefile VERSION=7), so the source tarball
+  # reports e.g. 7.2.9. Built directly from OGC's git-archive source (patches
+  # already applied), no nixpkgs patches on top.
+  ogcVersion = lib.removePrefix "v" (lib.head (lib.splitString "-ogc" ogcRelease));
 
-  ogcKernel = pkgs.linux_latest.override {
-    # Keep nixpkgs's default patches (bridge_stp_helper, request_key_helper)
-    # and append the OGC one.
-    kernelPatches = pkgs.linux_latest.kernelPatches ++ [
-      {
-        name = "opengamingcollective-${ogcRelease}";
-        patch = ogcPatch;
-      }
-    ];
+  ogcSrc = pkgs.fetchurl {
+    url = "https://github.com/OpenGamingCollective/linux/archive/refs/tags/${ogcRelease}.tar.gz";
+    hash = "sha256-6ibBkSHdLxzrwK8K92WGfARDq4hMKig8vGNAytGFn+M=";
   };
 in
-pkgs.linuxPackagesFor ogcKernel
+pkgs.linuxPackagesFor (
+  pkgs.linux_latest.override {
+    src = ogcSrc;
+    version = ogcVersion;
+    modDirVersion = lib.versions.pad 3 ogcVersion;
+    kernelPatches = [ ];
+  }
+)

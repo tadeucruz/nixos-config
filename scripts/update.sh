@@ -20,8 +20,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-# flake first: the OGC base guard evaluates the kernel version from the
-# flake.lock, so it must be updated before ogc is checked/applied.
 TOOLS=(flake ge cachyos ogc)
 # Tools with pending updates, printed on stdout so the workflow can use them
 # in the PR body. Human messages go to stderr.
@@ -103,7 +101,7 @@ asset_url() {
   case "$tool" in
     ge) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/${tag}-x86_64.tar.gz" ;;
     cachyos) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/proton-cachyos-${version}-x86_64.tar.xz" ;;
-    ogc) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/monolithic.patch" ;;
+    ogc) echo "https://github.com/$(tool_repo "$tool")/archive/refs/tags/${tag}.tar.gz" ;;
     flake) die "flake has no assets" ;;
   esac
 }
@@ -111,47 +109,6 @@ asset_url() {
 # Pure file hash (fetchurl), version-independent across nix versions.
 sri() {
   nix hash convert --hash-algo sha256 --to sri "$1"
-}
-
-# OGC tags are v<kernel-base>-ogc<N>, e.g. v7.2-ogc4, v7.2.1-ogc2.
-base_of() {
-  local tag="$1"
-  [[ "$tag" =~ ^v([0-9.]+)-ogc[0-9]+$ ]] || die "unexpected OGC tag format: $tag"
-  echo "${BASH_REMATCH[1]}"
-}
-
-# Normalize a version to three dot-separated components (7.2 -> 7.2.0) so
-# 7.2 == 7.2.0 but 7.2 != 7.2.1.
-normalize_version() {
-  local v="$1" out="" i
-  IFS='.' read -r -a parts <<< "$v"
-  for i in 0 1 2; do
-    out="${out}${out:+.}${parts[$i]:-0}"
-  done
-  echo "$out"
-}
-
-# The kernel version the OGC patch is applied onto (nixpkgs's linux_latest).
-# The override doesn't change `version`, so this is not circular.
-kernel_version() {
-  nix eval --raw "$ROOT#nixosConfigurations.citadel.config.boot.kernelPackages.kernel.version" 2>/dev/null
-}
-
-# True (exit 0) when the OGC tag's base differs from the kernel nixpkgs
-# provides. The patch may not apply then, so the bump is skipped — it is
-# applied automatically on a later cron once nixpkgs catches up to the base.
-ogc_base_mismatch() {
-  local tag="$1" base nixver
-  base="$(base_of "$tag")"
-  nixver="$(kernel_version)" || {
-    echo "warning: could not evaluate citadel kernel version; skipping OGC bump" >&2
-    return 0
-  }
-  if [[ "$(normalize_version "$base")" != "$(normalize_version "$nixver")" ]]; then
-    echo "warning: OGC ${tag} targets kernel ${base} but nixpkgs linux_latest is ${nixver} — skipping (will bump once nixpkgs reaches ${base})" >&2
-    return 0
-  fi
-  return 1
 }
 
 rewrite_pin() {
@@ -179,10 +136,6 @@ check_tool() {
     echo "$(tool_label "$tool") up to date (${current})" >&2
     return 0
   fi
-  # OGC: only bump when the tag's base matches the kernel nixpkgs provides.
-  if [[ "$tool" == ogc ]] && ogc_base_mismatch "$latest"; then
-    return 0
-  fi
   echo "$(tool_label "$tool") update available: ${current} -> $(version_of_tag "$tool" "$latest")" >&2
   PENDING="$PENDING $tool"
 }
@@ -191,8 +144,8 @@ check_flake() {
   local keep="${1:-}"
   echo "checking flake.lock..." >&2
   # `nix flake update` is the only reliable way to know; it mutates the lock.
-  # With --keep the change is left in place so later checks (ogc's base guard)
-  # see the newer nixpkgs; check_all reverts it at the end.
+  # With --keep the change is left in place so later checks see the newer
+  # nixpkgs; check_all reverts it at the end.
   nix flake update --flake "$ROOT" >&2
   if git -C "$ROOT" diff --quiet -- flake.lock; then
     echo "flake.lock up to date" >&2
@@ -210,11 +163,6 @@ apply_tool() {
   current="$(current_release "$tool")"
   release="$(version_of_tag "$tool" "$tag")"
   [[ "$release" != "$current" ]] || { echo "$(tool_label "$tool") already at ${release}" >&2; return 0; }
-
-  # OGC: only bump when the tag's base matches the kernel nixpkgs provides.
-  if [[ "$tool" == ogc ]] && ogc_base_mismatch "$tag"; then
-    return 0
-  fi
 
   echo "updating $(tool_label "$tool") ${current} -> ${release}" >&2
   echo "fetching hash ($(asset_url "$tool" "$release" "$tag"))..." >&2
@@ -243,8 +191,8 @@ apply_flake() {
 check_all() {
   for tool in "${TOOLS[@]}"; do
     if [[ "$tool" == flake ]]; then
-      # Keep the lock update so ogc's base guard sees the newer nixpkgs;
-      # revert it after all checks.
+      # Keep the lock update so later tools see the newer nixpkgs; revert it
+      # after all checks.
       check_flake --keep
     else
       check_tool "$tool"
