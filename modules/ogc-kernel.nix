@@ -13,11 +13,11 @@ let
     hash = "sha256-6ibBkSHdLxzrwK8K92WGfARDq4hMKig8vGNAytGFn+M=";
   };
 in
-pkgs.linuxPackagesFor (
-  pkgs.linux_latest.override {
-    src = ogcSrc;
-    version = ogcVersion;
-    modDirVersion = lib.versions.pad 3 ogcVersion;
-    kernelPatches = [ ];
-  }
-)
+# linux_latest.override does not propagate src/version, so build the kernel
+# from the OGC source via customPackage. Reuse linux_latest's configfile to
+# keep nixpkgs's full config (ntsync, amdgpu, etc.).
+pkgs.linuxKernel.customPackage {
+  version = ogcVersion;
+  src = ogcSrc;
+  configfile = pkgs.linux_latest.configfile;
+}
