@@ -15,6 +15,7 @@
       "ghostty"
       "rectangle"
       "steam"
+      "ungoogled-chromium"
       "zoom"
     ];
     masApps = {

@@ -5,6 +5,7 @@
     ../common/packages.nix
     ../common/linux.nix
     ../programs/firefox.nix
+    ../programs/ungoogled-chromium.nix
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix
