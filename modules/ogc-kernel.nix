@@ -17,9 +17,11 @@ in
 # from the OGC source via buildLinux (generic.nix) — this keeps nixpkgs's
 # common config (ntsync, amdgpu) and the `features` attrset NixOS asserts on
 # (efiBootStub, netfilterRPFilter, ia32Emulation).
-pkgs.linuxPackagesFor (pkgs.buildLinux {
-  src = ogcSrc;
-  version = ogcVersion;
-  modDirVersion = lib.versions.pad 3 ogcVersion;
-  kernelPatches = [ ];
-})
+pkgs.linuxPackagesFor (
+  pkgs.buildLinux {
+    src = ogcSrc;
+    version = ogcVersion;
+    modDirVersion = lib.versions.pad 3 ogcVersion;
+    kernelPatches = [ ];
+  }
+)
