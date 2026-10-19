@@ -7,7 +7,7 @@
 stdenvNoCC.mkDerivation (
   finalAttrs:
   let
-    release = "GE-Proton11-9";
+    release = "GE-Proton11-10";
   in
   {
     pname = "proton-ge";
@@ -15,7 +15,7 @@ stdenvNoCC.mkDerivation (
 
     src = fetchurl {
       url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${release}/${release}-x86_64.tar.gz";
-      hash = "sha256-ss9KYypw7DIc25kE+jlqKkXUBhEp+f3InYon6lzuudY=";
+      hash = "sha256-PCbulnNc6fQt4BjbT4KrM+J18ZFQ1s6iXqeTe38lMN0=";
     };
 
     dontConfigure = true;
