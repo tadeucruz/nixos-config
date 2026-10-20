@@ -12,7 +12,7 @@
 stdenvNoCC.mkDerivation (
   finalAttrs:
   let
-    release = "11.0-20261014-slr";
+    release = "11.0-20261015-slr";
   in
   {
     pname = "proton-cachyos";
@@ -20,7 +20,7 @@ stdenvNoCC.mkDerivation (
 
     src = fetchurl {
       url = "https://github.com/CachyOS/proton-cachyos/releases/download/cachyos-${release}/proton-cachyos-${release}-x86_64.tar.xz";
-      hash = "sha256-K/tQwQYGWmd2I2811IHTJ1jGUhA4DSq0WVXdgf8oPnU=";
+      hash = "sha256-NeFuq2NnJOPteqji28M+uOEC4MY7vCi1o5r1RMddW9M=";
     };
 
     dontConfigure = true;
