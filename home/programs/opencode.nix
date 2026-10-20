@@ -31,6 +31,19 @@
               "name": "Ornith-1.5-9B (citadel)"
             }
           }
+        },
+        "ornith-prothean": {
+          "npm": "@ai-sdk/openai-compatible",
+          "name": "Ornith (prothean)",
+          "options": {
+            "baseURL": "http://prothean:9931/v1",
+            "apiKey": "EMPTY"
+          },
+          "models": {
+            "ornith-1.5-9b": {
+              "name": "Ornith-1.5-9B (prothean)"
+            }
+          }
         }
       }
     }
