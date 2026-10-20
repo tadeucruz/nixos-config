@@ -6,15 +6,29 @@
     {
       "$schema": "https://opencode.ai/config.json",
       "provider": {
-        "personal-llama-cpp": {
+        "ornith": {
           "npm": "@ai-sdk/openai-compatible",
-          "name": "personal-llama-cpp",
+          "name": "Ornith (local)",
           "options": {
-            "baseURL": "http://prothean:9931/v1"
+            "baseURL": "http://localhost:8080/v1",
+            "apiKey": "EMPTY"
           },
           "models": {
-            "unsloth/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M": {
-              "name": "local prothean"
+            "ornith-1.5-9b": {
+              "name": "Ornith-1.5-9B"
+            }
+          }
+        },
+        "ornith-citadel": {
+          "npm": "@ai-sdk/openai-compatible",
+          "name": "Ornith (citadel)",
+          "options": {
+            "baseURL": "http://citadel:8080/v1",
+            "apiKey": "EMPTY"
+          },
+          "models": {
+            "ornith-1.5-9b": {
+              "name": "Ornith-1.5-9B (citadel)"
             }
           }
         }
