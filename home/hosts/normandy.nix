@@ -12,6 +12,7 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
+    ../programs/llama-cpp.nix
     ../development.nix
     ../ai.nix
     ../programs/neovim.nix
