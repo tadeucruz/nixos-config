@@ -10,6 +10,7 @@
       "balenaetcher"
       "betterdisplay"
       "bitwarden"
+      "comfy"
       "crossover"
       "cryptomator"
       "ghostty"
