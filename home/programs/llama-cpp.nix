@@ -1,7 +1,7 @@
 # llama.cpp — LLM runner (on-demand: `llama-server`; no auto-start service).
 # GPU backend per host via `llama-cpp.gpu`: rocm (AMD/citadel), cuda (Nvidia/prothean),
 # metal (default — darwin uses Metal automatically, Linux falls back to CPU).
-# LLAMA_ARG_HOST/PORT make the server listen on 0.0.0.0:8080 so tailnet peers
+# LLAMA_ARG_HOST/PORT make the server listen on 0.0.0.0:9931 so tailnet peers
 # reach it; the firewall already trusts tailscale0 (modules/services/tailscale.nix),
 # so LAN/external stay blocked.
 {
@@ -35,7 +35,7 @@
 
     home.sessionVariables = {
       LLAMA_ARG_HOST = lib.mkDefault "0.0.0.0";
-      LLAMA_ARG_PORT = lib.mkDefault "8080";
+      LLAMA_ARG_PORT = lib.mkDefault "9931";
     };
   };
 }

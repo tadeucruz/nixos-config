@@ -10,7 +10,7 @@
           "npm": "@ai-sdk/openai-compatible",
           "name": "Ornith (local)",
           "options": {
-            "baseURL": "http://localhost:8080/v1",
+            "baseURL": "http://localhost:9931/v1",
             "apiKey": "EMPTY"
           },
           "models": {
@@ -23,7 +23,7 @@
           "npm": "@ai-sdk/openai-compatible",
           "name": "Ornith (citadel)",
           "options": {
-            "baseURL": "http://citadel:8080/v1",
+            "baseURL": "http://citadel:9931/v1",
             "apiKey": "EMPTY"
           },
           "models": {
