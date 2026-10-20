@@ -26,8 +26,18 @@
       (
         {
           metal = pkgs.llama-cpp;
-          rocm = pkgs.llama-cpp-rocm;
-          cuda = pkgs.llama-cpp.override { cudaSupport = true; };
+          # `rocmSupport`/`cudaSupport` default to `config.*`, which is global
+          # (prothean enables rocmSupport for the iGPU), so pin both per host —
+          # otherwise the CUDA build also gets the HIP backend and the AMD iGPU
+          # shows up as a device.
+          rocm = pkgs.llama-cpp.override {
+            cudaSupport = false;
+            rocmSupport = true;
+          };
+          cuda = pkgs.llama-cpp.override {
+            cudaSupport = true;
+            rocmSupport = false;
+          };
         }
         .${config.llama-cpp.gpu}
       )
