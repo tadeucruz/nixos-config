@@ -45,12 +45,16 @@ in
         #    on the pinned plugin's default (this tmux-resurrect version already
         #    defaults to ~/.tmux/resurrect — set here so a future plugin bump
         #    never silently moves the history)
-        #  - @resurrect-processes ':all:': re-run every program that was running
-        #    (default only restores a built-in whitelist: vim/nvim, less, ssh, ...)
+        #  - @resurrect-default-processes: neutralise the built-in whitelist
+        #    (vi/vim/nvim/emacs/man/less/more/tail/top/htop/irssi/weechat/mutt)
+        #    with a token that never matches a command — resurrect treats an
+        #    empty string as "unset" and would fall back to the default list.
+        #  - @resurrect-processes: re-open only these programs on restore
         #  - @resurrect-capture-pane-contents: also restore each pane's scrollback
         extraConfig = ''
           set -g @resurrect-dir '~/.tmux/resurrect'
-          set -g @resurrect-processes ':all:'
+          set -g @resurrect-default-processes '__none__'
+          set -g @resurrect-processes 'btop opencode'
           set -g @resurrect-capture-pane-contents 'on'
         '';
       }
