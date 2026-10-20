@@ -52,8 +52,8 @@
           "INSTALL_MOD_DIR=misc"
           "DEPMOD=true"
         ];
-        installPhase = ''
-          make install
+        installPhase = null;
+        postInstall = ''
           install -D -m755 examples/turn_off_gpu.sh $out/bin/test_discrete_video_off.sh
         '';
       }))
