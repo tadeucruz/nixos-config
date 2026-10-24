@@ -72,6 +72,17 @@
 
   console.keyMap = "br-abnt2";
 
+  # Gaming env for the KDE session. Steam is autostarted from that session, which
+  # comes from PAM, so `environment.sessionVariables` (/etc/environment) reaches
+  # it — unlike `home.sessionVariables`, which Steam never sees.
+  environment.sessionVariables = {
+    PROTON_FSR4_UPGRADE = "1";
+    PROTON_FSR4_RDNA3_UPGRADE = "1";
+    PROTON_USE_NTSYNC = "1";
+    PROTON_ENABLE_WAYLAND = "1";
+    SteamDeck = "0";
+  };
+
   hardware = {
     graphics = {
       enable = true;

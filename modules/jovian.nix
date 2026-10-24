@@ -29,9 +29,23 @@
 
   jovian.steam.desktopSession = config.desktop.sessionName;
 
-  jovian.steam.environment.STEAM_EXTRA_COMPAT_TOOLS_PATHS =
-    lib.makeSearchPathOutput "steamcompattool" ""
-      config.programs.steam.extraCompatPackages;
+  # Env for the Steam session. `home.sessionVariables` never reaches Steam here:
+  # it is started by `steam-launcher.service`, outside the user session, so
+  # gaming vars must be injected through Jovian (it wires them into the
+  # service's EnvironmentFile).
+  jovian.steam.environment = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+      lib.makeSearchPathOutput "steamcompattool" ""
+        config.programs.steam.extraCompatPackages;
+
+    # Upgrade FSR 3.1 games to FSR 4. GE-Proton >= 11-2 does this automatically
+    # on RDNA3/4, but keeping it explicit pins the behaviour and leaves the
+    # RDNA3 path (needed on the 7900 and the Legion Go's Z1 Extreme) on.
+    PROTON_FSR4_UPGRADE = "1";
+    PROTON_FSR4_RDNA3_UPGRADE = "1";
+
+    PROTON_USE_NTSYNC = "1";
+  };
 
   services = {
     displayManager.plasma-login-manager.enable = lib.mkForce false;

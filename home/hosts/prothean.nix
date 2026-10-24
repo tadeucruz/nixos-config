@@ -24,9 +24,4 @@
   llama-cpp.gpu = "cuda";
 
   home.stateVersion = "26.11";
-
-  home.sessionVariables = {
-    PROTON_ENABLE_WAYLAND = "1";
-    SteamDeck = "0";
-  };
 }

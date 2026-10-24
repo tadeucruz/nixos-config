@@ -1,13 +1,14 @@
 # Steam session glue (Steam itself comes from `programs.steam` in modules/gaming.nix):
-# Proton env vars + the autostart entry.
+# the autostart entry.
+#
+# Proton/gaming env vars are NOT set here. `home.sessionVariables` is not part of
+# the session Steam actually runs in (on citadel/legion it is started by
+# `steam-launcher.service`, and on prothean by this autostart entry), so the vars
+# live where they are actually honoured:
+#   citadel/legion -> modules/jovian.nix (`jovian.steam.environment`)
+#   prothean       -> hosts/prothean/configuration.nix (`environment.sessionVariables`)
 { ... }:
 {
-  home.sessionVariables = {
-    PROTON_FSR4_UPGRADE = "1";
-    PROTON_FSR4_RDNA3_UPGRADE = "1";
-    PROTON_USE_NTSYNC = "1";
-  };
-
   xdg.configFile."autostart/steam.desktop".text = ''
     [Desktop Entry]
     Type=Application

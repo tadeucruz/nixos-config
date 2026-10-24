@@ -33,11 +33,6 @@ in
 
   home.stateVersion = "26.11";
 
-  home.sessionVariables = {
-    DXVK_FRAME_RATE = "120";
-    SteamDeck = "0";
-  };
-
   home.file = {
     ".local/share/applications/return-to-steam.desktop".source = return-to-steam-desktop;
     "Desktop/return-to-steam.desktop" = {

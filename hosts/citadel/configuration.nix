@@ -85,6 +85,14 @@ in
 
   console.keyMap = "br-abnt2";
 
+  # Extra env for the Steam session (base lives in modules/jovian.nix).
+  # SteamDeck=0 stops games from hiding desktop graphics options; the frame cap
+  # matches the 120 Hz output.
+  jovian.steam.environment = {
+    SteamDeck = "0";
+    DXVK_FRAME_RATE = "120";
+  };
+
   environment.etc."jovian/gamescope-session/pre-start".text = ''
     export PATH=${gamescope-hdr-shim}/bin:$PATH
   '';
