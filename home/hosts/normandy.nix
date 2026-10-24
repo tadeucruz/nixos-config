@@ -7,6 +7,9 @@
     ../common/darwin.nix
     ../programs/firefox.nix
     ../programs/element.nix
+    ../programs/ghostty.nix
+    ../programs/rectangle.nix
+    ../programs/zoom.nix
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix

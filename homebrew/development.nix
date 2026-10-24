@@ -5,10 +5,7 @@
 { ... }:
 {
   homebrew = {
-    brews = [
-      "cocoapods"
-      "llama.cpp"
-    ];
+    brews = [ "cocoapods" ];
     casks = [
       "android-studio"
       "flutter"

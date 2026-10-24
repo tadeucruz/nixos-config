@@ -1,11 +1,11 @@
 # Dock layout and activation scripts specific to normandy's physical hardware
 # and personal app choices — not dev tooling, just this one machine.
-# (Homebrew casks/brews/masApps live in homebrew/development.nix.)
+# (Homebrew casks/brews/masApps live in homebrew/normandy.nix.)
 { username, ... }:
 {
   system.defaults.dock.persistent-apps = [
     "/System/Cryptexes/App/System/Applications/Safari.app"
-    "/Applications/Ghostty.app"
+    "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"
     "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
     "/System/Applications/Mail.app"
     "/System/Applications/Photos.app"
