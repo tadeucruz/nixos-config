@@ -40,6 +40,7 @@
     ../../modules/services/tailscale.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
+    ./battery-charge-limit.nix
     ./stay-awake-ac.nix
     inputs.awcc.nixosModules.default
   ];
