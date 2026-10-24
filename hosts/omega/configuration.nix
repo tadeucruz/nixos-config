@@ -39,6 +39,7 @@
     ../../modules/services/forgejo.nix
     ../../modules/services/forgejo-runner.nix
     ../../modules/btrfs-tuning.nix
+    ../../modules/storage-health.nix
     ../../modules/services/cloudflared.nix
     ../../modules/services/wake-on-lan.nix
   ];

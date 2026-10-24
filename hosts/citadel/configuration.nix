@@ -44,6 +44,7 @@ in
     ../../modules/jovian.nix
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
+    ../../modules/storage-health.nix
   ];
 
   boot = {
