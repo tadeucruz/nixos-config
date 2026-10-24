@@ -46,7 +46,23 @@
   ];
 
   boot = {
-    extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+    # TODO(temp): acpi_call installs the module manually, bypassing
+    # modules_install; the kernel-modules aggregator now requires a per-module
+    # .cer for every external module. Install via modules_install until the fix
+    # lands upstream, then revert to `[ acpi_call ]`.
+    extraModulePackages = [
+      (config.boot.kernelPackages.acpi_call.overrideAttrs (old: {
+        makeFlags = old.makeFlags ++ [
+          "INSTALL_MOD_PATH=${placeholder "out"}"
+          "INSTALL_MOD_DIR=misc"
+          "DEPMOD=true"
+        ];
+        installPhase = null;
+        postInstall = ''
+          install -D -m755 examples/turn_off_gpu.sh $out/bin/test_discrete_video_off.sh
+        '';
+      }))
+    ];
     kernelModules = [ "acpi_call" ];
     loader = {
       efi.canTouchEfiVariables = true;
