@@ -6,6 +6,7 @@
     ../common/packages.nix
     ../common/darwin.nix
     ../programs/firefox.nix
+    ../programs/element.nix
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix

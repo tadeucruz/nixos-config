@@ -11,6 +11,7 @@
     "/System/Applications/Photos.app"
     "/System/Applications/Calendar.app"
     "/Users/${username}/Applications/Home Manager Apps/Obsidian.app"
+    "/Users/${username}/Applications/Home Manager Apps/Element.app"
     "/System/Applications/Reminders.app"
     "/System/Applications/Notes.app"
     "/System/Applications/TV.app"
