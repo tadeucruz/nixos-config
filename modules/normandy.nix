@@ -6,7 +6,7 @@
   system.defaults.dock.persistent-apps = [
     "/System/Cryptexes/App/System/Applications/Safari.app"
     "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"
-    "/Users/${username}/Applications/Home Manager Apps/Visual Studio Code.app"
+    "/Users/${username}/Applications/Home Manager Apps/VSCodium.app"
     "/System/Applications/Mail.app"
     "/System/Applications/Photos.app"
     "/System/Applications/Calendar.app"

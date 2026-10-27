@@ -46,8 +46,9 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
 - **Home Manager:** integrated into the flake, not standalone.
-- **AI agent profile (`home/ai.nix`), all 5 hosts:** imports `home/programs/opencode.nix` and `home/programs/pi.nix` — no HM modules, so both are package wrappers (`opencode` also writes the llama-cpp provider config pointing at citadel over tailscale; `pi` is just `pkgs.pi-coding-agent`) — so any machine (incl. headless omega) can run the AI CLIs remotely/agent-style without the dev toolchain. Split out of `home/development.nix` (now `vscode`, `go`, `godot_4`, `jdk`, `nodejs` only, still prothean + normandy).
-- **Neovim (LazyVim), meant to eventually replace VSCode** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is Ghostty on normandy (dock in `modules/normandy.nix`; chosen because Terminal.app lacks OSC 52, which broke tmux mouse-copy over SSH).
+- **AI agent profile (`home/ai.nix`), all 5 hosts:** imports `home/programs/opencode.nix` and `home/programs/pi.nix` — no HM modules, so both are package wrappers (`opencode` also writes the llama-cpp provider config pointing at citadel over tailscale; `pi` is just `pkgs.pi-coding-agent`) — so any machine (incl. headless omega) can run the AI CLIs remotely/agent-style without the dev toolchain. Split out of `home/development.nix` (now `vscodium`, `zed`, `go`, `godot_4`, `jdk`, `nodejs` only, still prothean + normandy).
+- **GUI editors on the dev profile: VSCodium + Zed** (`home/programs/{vscodium,zed}.nix`, imported by `home/development.nix` → prothean + normandy). VS Code was dropped in favor of VSCodium: Home Manager has a dedicated `programs.vscodium` module, and `programs.vscode.package = pkgs.vscodium` now only warns (it writes VS Code's own paths). Zed uses `programs.zed-editor`; its config dir is `~/.config/zed` on Linux *and* macOS (Zed keeps the XDG path on darwin), so one file covers both OSes. `pkgs.vscodium` ships prebuilt for x86_64-linux + aarch64-darwin, but `pkgs.zed-editor` has no `-bin` variant → normandy builds it from source (Rust + lld). normandy's dock lists only VSCodium (`modules/normandy.nix`); Zed is installed but off the dock.
+- **Neovim (LazyVim), meant to eventually replace the GUI editors** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is Ghostty on normandy (dock in `modules/normandy.nix`; chosen because Terminal.app lacks OSC 52, which broke tmux mouse-copy over SSH).
 - **tmux** (`home/programs/tmux.nix`, all 5 hosts): declarative `programs.tmux` — prefix `C-b`, `keyMode = emacs`, `mouse = true`, splits. Plugins: `sensibleOnTop` + `tmuxPlugins.{dracula,resurrect,continuum}`. **Plugin options must go in the plugin submodule `extraConfig`, never the top-level `extraConfig`**: Home Manager emits the plugin `run-shell`s before top-level `extraConfig`, and `run-shell` blocks — so top-level options are read only after the plugin ran with defaults. `zsh-autosuggestions` is disabled in `home/programs/zsh.nix` (it broke backspace editing after history search inside tmux).
 - **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
 - **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
@@ -146,7 +147,8 @@ home/
     neovim/                      # nvim config copied to ~/.config/nvim    opencode.nix                 # opencode package + llama-cpp provider config — imported by ai.nix
     pi.nix                       # pi coding agent (pkgs.pi-coding-agent) — imported by ai.nix
     llama-cpp.nix                # llama.cpp LLM runner (metal/rocm/cuda per host) — all hosts
-    vscode.nix                   # VS Code — programs.vscode.enable (HM module) — imported by development.nix
+    vscodium.nix                 # VSCodium — programs.vscodium.enable (HM module) — imported by development.nix
+    zed.nix                      # Zed — programs.zed-editor.enable (HM module) — imported by development.nix
     java.nix                     # JDK — programs.java.enable (HM module) — imported by development.nix
     go.nix                       # Go — package wrapper — imported by development.nix
     godot.nix                    # Godot 4 — package wrapper (pkgs.godot_4) — imported by development.nix
@@ -154,7 +156,7 @@ home/
     flutter.nix                  # Flutter (Linux) — package wrapper — imported by home/hosts/prothean.nix (normandy uses the Homebrew cask)
     obsidian.nix                 # Obsidian — package wrapper — imported by common/darwin.nix
     steam.nix                    # Steam session glue (Proton env vars + autostart entry) — imported by gaming.nix
-  development.nix                # dev toolchain profile — imports programs/{go,godot,java,nodejs,vscode}.nix — prothean + normandy
+  development.nix                # dev toolchain profile — imports programs/{go,godot,java,nodejs,vscodium,zed}.nix — prothean + normandy
   ai.nix                         # AI agent tooling (opencode) — all 5 hosts
   gaming.nix                     # gaming profile — imports programs/{mangohud,steam}.nix
 ```
