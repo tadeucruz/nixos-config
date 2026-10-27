@@ -29,6 +29,7 @@ in
     ../../modules/networking/networkmanager.nix
     ../../modules/networking/firewall.nix
     ../../modules/networking/dns.nix
+    ../../modules/networking/ipv6.nix
     ../../modules/desktop/fonts.nix
     ../../modules/desktop/bluetooth.nix
     ../../modules/desktop/rtkit.nix

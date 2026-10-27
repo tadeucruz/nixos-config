@@ -19,6 +19,7 @@
     ../../modules/users/server.nix
     ../../modules/networking/firewall.nix
     ../../modules/networking/dns.nix
+    ../../modules/networking/ipv6.nix
     ../../modules/services/avahi.nix
     ../../modules/services/openssh.nix
     ../../modules/services/tailscale.nix
@@ -52,7 +53,6 @@
   networking = {
     hostName = hostname;
     useDHCP = false;
-    enableIPv6 = false;
 
     bridges.br0.interfaces = [ "enp1s0" ];
 
