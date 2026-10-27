@@ -17,6 +17,7 @@
     ../programs/tmux.nix
     ../programs/home-manager.nix
     ../programs/llama-cpp.nix
+    ../programs/stable-diffusion-cpp.nix
     ../development.nix
     ../ai.nix
     ../programs/neovim.nix
