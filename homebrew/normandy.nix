@@ -16,6 +16,7 @@
       "cryptomator"
       "steam"
       "ungoogled-chromium"
+      "unsloth"
     ];
     masApps = {
       WhatsApp = 310633997;
