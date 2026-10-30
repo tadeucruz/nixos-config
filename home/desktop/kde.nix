@@ -10,9 +10,11 @@
   programs.plasma = {
     enable = true;
 
-    # Incremental: only write what is declared here, leave the rest of the KDE
-    # config alone (editable via the GUI). Nothing is reset on login.
-    overrideConfig = false;
+    # Fully declarative: plasma-manager owns the config and resets anything not
+    # declared here back to the Plasma default on rebuild (the GUI can't win) —
+    # the same model as the GNOME dconf config. Applied identically on every
+    # host that imports modules/desktop/kde.nix.
+    overrideConfig = true;
 
     # Dark mode as the default.
     workspace.lookAndFeel = "org.kde.breezedark.desktop";
@@ -22,6 +24,37 @@
       battery.powerProfile = "powerSaving";
       lowBattery.powerProfile = "powerSaving";
     };
+
+    # Default panel layout, with a fixed set of pinned launchers on the Icon
+    # Tasks widget (the same useful apps that were on GNOME's dash, mapped to
+    # their KDE equivalents). `applications:` URIs are stable — unlike the
+    # file:///nix/store/... paths Plasma saves when you pin via the GUI, which
+    # break once that store path is GC'd. Declaring `panels` replaces the
+    # existing panel(s) on activation.
+    panels = [
+      {
+        location = "bottom";
+        widgets = [
+          "org.kde.plasma.kickoff"
+          "org.kde.plasma.pager"
+          {
+            iconTasks = {
+              launchers = [
+                "applications:firefox.desktop"
+                "applications:md.obsidian.Obsidian.desktop"
+                "applications:org.kde.konsole.desktop"
+                "applications:org.kde.dolphin.desktop"
+                "applications:systemsettings.desktop"
+              ];
+            };
+          }
+          "org.kde.plasma.marginsseparator"
+          "org.kde.plasma.systemtray"
+          "org.kde.plasma.digitalclock"
+          "org.kde.plasma.showdesktop"
+        ];
+      }
+    ];
   };
 
   home.activation.rebuildKdeSycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
