@@ -5,6 +5,11 @@
   username,
   ...
 }:
+let
+  # Folder synced from the hub — see modules/services/syncthing.nix.
+  wallpapers = "/home/${username}/Pictures/Wallpapers";
+  slideInterval = 1800; # seconds between slides
+in
 {
   imports = [ inputs.plasma-manager.homeModules.plasma-manager ];
 
@@ -20,19 +25,36 @@
     # Dark mode as the default.
     workspace.lookAndFeel = "org.kde.breezedark.desktop";
 
-    # Rotate the desktop wallpaper through the folder synced from the hub (see
-    # modules/services/syncthing.nix). That is a runtime home path, not a store
-    # path, so it is written as a plain string; `interval` is in seconds.
+    # Rotate the desktop wallpaper on every screen. Not keyed by monitor name
+    # or index: plasma-manager's script loops over all desktops (containments),
+    # so this follows whatever screens exist.
     workspace.wallpaperSlideShow = {
-      path = "/home/${username}/Pictures/Wallpapers";
-      interval = 1800;
+      path = wallpapers;
+      interval = slideInterval;
     };
     workspace.wallpaperFillMode = "preserveAspectCrop";
 
-    # Same folder on the lockscreen.
+    # plasma-manager desktop scripts run only once (tracked by content hash), so
+    # a monitor plugged in later would sit on Plasma's default wallpaper. Re-apply
+    # on every login so any screen converges, including ones added afterwards.
+    startup.desktopScript."wallpaper_all_screens" = {
+      priority = 4; # after plasma-manager's own wallpaper script (priority 3)
+      runAlways = true;
+      text = ''
+        for (const desktop of desktops()) {
+            desktop.wallpaperPlugin = "org.kde.slideshow";
+            desktop.currentConfigGroup = ["Wallpaper", "org.kde.slideshow", "General"];
+            desktop.writeConfig("SlidePaths", "${wallpapers}");
+            desktop.writeConfig("SlideInterval", "${toString slideInterval}");
+            desktop.writeConfig("FillMode", "2"); # preserveAspectCrop
+        }
+      '';
+    };
+
+    # Same folder on the lockscreen. kscreenlockerrc is global, not per-screen.
     kscreenlocker.appearance.wallpaperSlideShow = {
-      path = "/home/${username}/Pictures/Wallpapers";
-      interval = 1800;
+      path = wallpapers;
+      interval = slideInterval;
     };
 
     powerdevil = {
