@@ -2,6 +2,7 @@
   pkgs,
   lib,
   inputs,
+  username,
   ...
 }:
 {
@@ -18,6 +19,21 @@
 
     # Dark mode as the default.
     workspace.lookAndFeel = "org.kde.breezedark.desktop";
+
+    # Rotate the desktop wallpaper through the folder synced from the hub (see
+    # modules/services/syncthing.nix). That is a runtime home path, not a store
+    # path, so it is written as a plain string; `interval` is in seconds.
+    workspace.wallpaperSlideShow = {
+      path = "/home/${username}/Pictures/Wallpapers";
+      interval = 1800;
+    };
+    workspace.wallpaperFillMode = "preserveAspectCrop";
+
+    # Same folder on the lockscreen.
+    kscreenlocker.appearance.wallpaperSlideShow = {
+      path = "/home/${username}/Pictures/Wallpapers";
+      interval = 1800;
+    };
 
     powerdevil = {
       AC.powerProfile = "balanced";
