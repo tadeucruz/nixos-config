@@ -3,6 +3,7 @@
     enable = true;
     packages = [
       "com.bitwarden.desktop"
+      "com.github.tchx84.Flatseal"
       "md.obsidian.Obsidian"
       "net.retrodeck.retrodeck"
     ];
