@@ -53,45 +53,74 @@ in
           "node.description" = "Speaker EQ (Dell G15)";
           "media.name" = "Speaker EQ (Dell G15)";
           "audio.channels" = 2;
-          "audio.position" = [ "FL" "FR" ];
+          "audio.position" = [
+            "FL"
+            "FR"
+          ];
           "filter.graph" = {
             nodes = [
               {
                 type = "builtin";
                 name = "highpass";
                 label = "bq_highpass";
-                control = { "Freq" = eq.highPassFreq; "Q" = 0.707; };
+                control = {
+                  "Freq" = eq.highPassFreq;
+                  "Q" = 0.707;
+                };
               }
               {
                 type = "builtin";
                 name = "mud";
                 label = "bq_peaking";
-                control = { "Freq" = eq.mudFreq; "Q" = 1.0; "Gain" = eq.mudGain; };
+                control = {
+                  "Freq" = eq.mudFreq;
+                  "Q" = 1.0;
+                  "Gain" = eq.mudGain;
+                };
               }
               {
                 type = "builtin";
                 name = "presence";
                 label = "bq_peaking";
-                control = { "Freq" = eq.presenceFreq; "Q" = 1.0; "Gain" = eq.presenceGain; };
+                control = {
+                  "Freq" = eq.presenceFreq;
+                  "Q" = 1.0;
+                  "Gain" = eq.presenceGain;
+                };
               }
               {
                 type = "builtin";
                 name = "air";
                 label = "bq_highshelf";
-                control = { "Freq" = eq.airFreq; "Q" = 0.7; "Gain" = eq.airGain; };
+                control = {
+                  "Freq" = eq.airFreq;
+                  "Q" = 0.7;
+                  "Gain" = eq.airGain;
+                };
               }
             ];
             links = [
-              { output = "highpass:Out"; input = "mud:In"; }
-              { output = "mud:Out"; input = "presence:In"; }
-              { output = "presence:Out"; input = "air:In"; }
+              {
+                output = "highpass:Out";
+                input = "mud:In";
+              }
+              {
+                output = "mud:Out";
+                input = "presence:In";
+              }
+              {
+                output = "presence:Out";
+                input = "air:In";
+              }
             ];
           };
           "capture.props" = {
             "media.class" = "Audio/Sink";
             "filter.smart" = true;
             "filter.smart.name" = "filter.sink.speaker-eq";
-            "filter.smart.target" = { "node.name" = speakerSink; };
+            "filter.smart.target" = {
+              "node.name" = speakerSink;
+            };
           };
           "playback.props" = {
             # keep the real sink suspended when nothing plays
