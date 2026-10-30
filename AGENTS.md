@@ -14,7 +14,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 | Host       | Hardware                                   | Role                                            |
 | ---------- | ------------------------------------------ | ------------------------------------------------ |
 | `citadel`  | AMD desktop (CPU + GPU)                    | Gaming console-like, Jovian gamescope+Steam + KDE fallback |
-| `prothean` | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, KDE Plasma desktop + gaming, PRIME |
+| `prothean` | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, GNOME desktop (test) + gaming, PRIME |
 | `legion`   | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + KDE fallback |
 | `omega`    | Home server (x86_64, VT-x/AMD-V)           | Headless NAS + containers + VMs, **NixOS stable** |
 | `normandy` | MacBook Apple Silicon                      | nix-darwin: apps + dotfiles (no gaming) |
@@ -24,7 +24,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **Jovian on citadel and legion** (`modules/jovian.nix`): gamescope+Steam (`jovian.steam.autoStart`) with KDE Plasma 6 fallback, no display manager. Both also import `modules/gaming.nix`.
   - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
   - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
-- **prothean: no Jovian, KDE Plasma 6** (`modules/desktop/kde.nix` + `modules/gaming.nix`, plasma-login-manager). PRIME offload + AWCC fan control. This is the same KDE module citadel/legion import as the Jovian fallback. (GNOME was tried for a while but has been fully removed from the repo — no `gnome.nix` remains.)
+- **prothean: no Jovian, GNOME (test)** (`modules/desktop/gnome.nix` + `modules/gaming.nix`, GDM). PRIME offload + AWCC fan control. The KDE module (`modules/desktop/kde.nix`, plasma-login-manager + laminix) is now only imported by citadel/legion as the Jovian fallback. The two desktop modules are drop-in replacements — **never import both** (display-manager conflict + duplicate `desktop.sessionName` declaration); switching = swap the import in `hosts/prothean/configuration.nix` (home bits follow automatically).
 - **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,zsh,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
   - **Samba + btrfs** (`modules/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
   - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
@@ -41,7 +41,7 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 - **Two Proton flavors, pinned to latest upstream, auto-bumped by CI.** `programs.steam.extraCompatPackages` ships **GE-Proton** (`modules/proton-ge.nix`) and **Proton-CachyOS** (`modules/proton-cachyos.nix`), both `fetchurl` + `tar` with a `steamcompattool` output (`--strip-components=1`). Bumps via `scripts/update.sh ge|cachyos`, surfaced by `check-updates.yml`. `version = "latest"` keeps store paths `proton-ge-latest`/`proton-cachyos-latest`. **Why not `pkgs.proton-ge-bin`:** GE-Proton11-3 aborts on `icuuc.dll.u_setMemoryFunctions_65` (upstream #651, fixed 11-4); pinned 11-5 + CachyOS 11.0 avoid it. **FSR4 upgrade:** `home/programs/steam.nix` sets `PROTON_FSR4_UPGRADE=1` and `PROTON_FSR4_RDNA3_UPGRADE=1` (CachyOS-specific RDNA3 path) session-wide.
 - **legion: InputPlumber + SteamOS-Manager stack** (`hosts/legion/configuration.nix`), aligned with Bazzite 44. `services.inputplumber.enable = true` with udev rules; `hid_lenovo_go` loaded. **TDP via Steam QAM → SteamOS-Manager → amd-pmf** (validated 8→20→30W). `jovian.decky-loader` re-enabled for the LegionGoRemapper plugin only (button remap); SimpleDeckyTDP is gone. **scx_lavd scheduler** enabled on boot via `systemd.services.scx.wantedBy = lib.mkOverride 0 [ "multi-user.target" ]` (Jovian's `mkForce []` bypassed).
   - **History**: HHD was a previous stack (commit `a20ef09`); gyro/RGB/fan-curves lost with InputPlumber but Tadeu doesn't care about gyro. **Future check on nixpkgs bumps:** InputPlumber/PowerStation maturity on the original Legion Go.
-- **GNOME removed:** prothean was on GNOME for a while (GDM + dconf tray), then reverted to KDE Plasma 6. The GNOME modules (`modules/desktop/gnome.nix`, `home/desktop/gnome.nix`) and the `clean-gnome.sh`/`clean-kde.sh` migration scripts were deleted. KDE is the only desktop module; citadel/legion import it as the Jovian fallback.
+- **GNOME module notes** (`modules/desktop/gnome.nix` + `home/desktop/gnome.nix`, restored from `d33836c^`): tray via `gnomeExtensions.appindicator` (system-wide, enabled per-user through dconf); options are `services.desktopManager.gnome` + `services.displayManager.gdm` (no `.wayland` sub-option — removed with GNOME 50) + `programs.dconf.enable`; **no `services.xserver.enable`** — GNOME 50/GDM are Wayland-only (Xwayland ships with the session). Dash favorites use `codium.desktop` (VSCodium's desktop id in nixpkgs — not `code.desktop`/`com.vscodium.codium.desktop`). No migration scripts: the old `clean-gnome.sh`/`clean-kde.sh` were deleted and deliberately not restored, so KDE leftovers (Plasma/KWallet state) stay in `$HOME` — harmless under GNOME. Brightness control (backlight + DDC/CI) deferred to a v2. If dconf behaves weird after a switch, `dconf reset -f /` (wiki).
 - **Username:** `tadeucruz` (single variable in `flake.nix`).
 - **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
 - **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
@@ -80,7 +80,8 @@ modules/
     networkmanager.nix           # NetworkManager — desktop only
     firewall.nix                 # firewall.enable — server only
   desktop/
-    kde.nix                      # all KDE: plasma6 + SDDM (mkDefault, jovian mkForce) + DrKonqi mask + sycoca hook + jovian session
+    kde.nix                      # all KDE: plasma6 + plasma-login-manager (mkDefault, jovian mkForce) + laminix + sycoca hook — citadel/legion only
+    gnome.nix                    # GNOME: gnome + GDM + AppIndicator tray — drop-in for kde.nix (imported by prothean)
     fonts.nix                    # nerd-fonts.jetbrains-mono — desktop only
     bluetooth.nix                # hardware.bluetooth — desktop only
     rtkit.nix                    # security.rtkit (audio scheduling) — desktop only
@@ -131,6 +132,7 @@ home/
     darwin.nix                   # macOS-only glue: nh (programs.nh, with GC) + imports programs/obsidian.nix
   desktop/
     kde.nix                      # KDE home bits (sycoca hook) — wired via modules/desktop/kde.nix
+    gnome.nix                    # GNOME home bits (tray/favorites dconf) — wired via modules/desktop/gnome.nix
   programs/                      # one file per configured program (programs.* options)
     git.nix                      # cross-platform git config
     starship.nix                 # cross-platform starship prompt
