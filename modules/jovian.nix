@@ -48,15 +48,11 @@
   };
 
   # Jovian's autoStart runs its own SDDM (auto-login straight into the
-  # gamescope-wayland session), so any traditional display manager pulled in by
-  # the desktop module must be forced off — otherwise the DE and Jovian fight
-  # over the display manager. Covers KDE (plasma-login-manager) and GNOME (gdm);
-  # the DE still provides the session Jovian switches to.
+  # gamescope-wayland session), so the desktop module's display manager must be
+  # forced off — otherwise the DE and Jovian fight over the display manager.
+  # The DE still provides the session Jovian switches to.
   services = {
-    displayManager = {
-      plasma-login-manager.enable = lib.mkForce false;
-      gdm.enable = lib.mkForce false;
-    };
+    displayManager.plasma-login-manager.enable = lib.mkForce false;
     xserver.enable = false;
   };
 
