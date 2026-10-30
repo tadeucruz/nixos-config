@@ -1,7 +1,9 @@
-# GNOME desktop stack — imported by prothean.
-# Drop-in replacement for modules/desktop/kde.nix (imported by citadel/legion):
+# GNOME desktop stack — imported by prothean and legion.
+# Drop-in replacement for modules/desktop/kde.nix (imported by citadel):
 # import one or the other per host, never both (they fight over the display
 # manager and both declare options.desktop.sessionName).
+# On legion Jovian forces this module's GDM off (it runs its own SDDM) and uses
+# desktop.sessionName as the gamescope fallback session.
 {
   lib,
   pkgs,
