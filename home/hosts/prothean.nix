@@ -20,6 +20,7 @@
     ../programs/neovim.nix
     ../programs/flutter.nix
     ../programs/unsloth-desktop.nix
+    ../programs/easyeffects.nix
     ../gaming.nix
   ];
 
