@@ -15,16 +15,16 @@ NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz
 | ---------- | ------------------------------------------ | ------------------------------------------------ |
 | `citadel`  | AMD desktop (CPU + GPU)                    | Gaming console-like, Jovian gamescope+Steam + KDE fallback |
 | `prothean` | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, GNOME desktop (test) + gaming, PRIME |
-| `legion`   | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + GNOME fallback |
+| `legion`   | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + KDE fallback |
 | `omega`    | Home server (x86_64, VT-x/AMD-V)           | Headless NAS + containers + VMs, **NixOS stable** |
 | `normandy` | MacBook Apple Silicon                      | nix-darwin: apps + dotfiles (no gaming) |
 
 ## Key decisions
 
-- **Jovian on citadel and legion** (`modules/jovian.nix`): gamescope+Steam (`jovian.steam.autoStart`) with a desktop fallback for the *Switch to Desktop* option (KDE Plasma 6 on citadel, GNOME on legion), no user-facing display manager (Jovian's autoStart drives its own hidden SDDM for auto-login; `modules/jovian.nix` forces the desktop module's DM off — KDE's plasma-login-manager and GNOME's gdm). Both also import `modules/gaming.nix`.
+- **Jovian on citadel and legion** (`modules/jovian.nix`): gamescope+Steam (`jovian.steam.autoStart`) with KDE Plasma 6 as the desktop fallback for the *Switch to Desktop* option, no user-facing display manager (Jovian's autoStart drives its own hidden SDDM for auto-login; `modules/jovian.nix` forces the desktop module's DM off — KDE's plasma-login-manager, and GNOME's gdm as insurance). Both also import `modules/gaming.nix`.
   - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
   - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
-- **prothean: no Jovian, GNOME (test)** (`modules/desktop/gnome.nix` + `modules/gaming.nix`, GDM). PRIME offload + AWCC fan control. The KDE module (`modules/desktop/kde.nix`, plasma-login-manager + laminix) is now only imported by citadel; GNOME is imported by prothean and legion (on legion Jovian forces its GDM off, since it drives its own SDDM). The two desktop modules are drop-in replacements — **never import both** (display-manager conflict + duplicate `desktop.sessionName` declaration); switching = swap the import in `hosts/<host>/configuration.nix` (home bits follow automatically).
+- **prothean: no Jovian, GNOME (test)** (`modules/desktop/gnome.nix` + `modules/gaming.nix`, GDM). PRIME offload + AWCC fan control. The KDE module (`modules/desktop/kde.nix`, plasma-login-manager + laminix) is imported by citadel and legion (the Jovian hosts — chosen over GNOME because KDE is far better on handhelds: virtual keyboard everywhere, joystick-as-mouse, etc.); GNOME is imported by prothean only. The two desktop modules are drop-in replacements — **never import both** (display-manager conflict + duplicate `desktop.sessionName` declaration); switching = swap the import in `hosts/<host>/configuration.nix` (home bits follow automatically).
 - **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,zsh,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
   - **Samba + btrfs** (`modules/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
   - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
@@ -81,8 +81,8 @@ modules/
     networkmanager.nix           # NetworkManager — desktop only
     firewall.nix                 # firewall.enable — server only
   desktop/
-    kde.nix                      # all KDE: plasma6 + plasma-login-manager (mkDefault, jovian mkForce) + laminix + sycoca hook — citadel only
-    gnome.nix                    # GNOME: gnome + GDM + AppIndicator tray — drop-in for kde.nix (imported by prothean + legion; Jovian forces GDM off on legion)
+    kde.nix                      # all KDE: plasma6 + plasma-login-manager (mkDefault, jovian mkForce) + laminix + sycoca hook — citadel/legion only
+    gnome.nix                    # GNOME: gnome + GDM + AppIndicator tray — drop-in for kde.nix (imported by prothean)
     fonts.nix                    # nerd-fonts.jetbrains-mono — desktop only
     bluetooth.nix                # hardware.bluetooth — desktop only
     rtkit.nix                    # security.rtkit (audio scheduling) — desktop only
