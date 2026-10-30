@@ -9,11 +9,18 @@
 # re-run your rebuild afterwards to regenerate the declarative state (configs,
 # packages, dconf/plasma defaults come back from home-manager).
 #
+# The Steam client and its games (~/.steam + ~/.local/share/Steam) are ALWAYS
+# kept: they are big downloaded data, not desktop state, so re-downloading them
+# on every wipe would be painful. (On citadel the library lives on /GAMES, a
+# separate filesystem outside $HOME, so it is safe either way.)
+#
 #   ./scripts/reset-home.sh                     # interactive confirmation (needs a tty)
 #   ./scripts/reset-home.sh --yes               # skip confirmation
 #   ./scripts/reset-home.sh --dry-run           # only print what would be deleted
 #   ./scripts/reset-home.sh --keep .ssh         # also keep ~/.ssh (repeatable; paths
-#                                               # are relative to $HOME or absolute)
+#                                               # are relative to $HOME or absolute,
+#                                               # and may be nested, e.g.
+#                                               # .local/share/Steam)
 #   ./scripts/reset-home.sh --ignore-mounts    # proceed even if mount points found
 #
 # Safety rails (there on purpose — don't bypass casually):
@@ -39,7 +46,10 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)" # always preserved
 DRY_RUN=0
 YES=0
 IGNORE_MOUNTS=0
-KEEPS=("$REPO")
+# Always kept: the repo (so the flake survives) and the Steam client + games
+# (big downloaded data, not desktop state — kept so a wipe never forces a
+# re-download). Paths may be nested; see collect() below.
+KEEPS=("$REPO" "$HOME/.steam" "$HOME/.local/share/Steam")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -48,10 +58,11 @@ while [[ $# -gt 0 ]]; do
     --ignore-mounts) IGNORE_MOUNTS=1 ;;
     --keep)
       [[ $# -ge 2 ]] || die "--keep needs a path (relative to \$HOME, or absolute)"
-      if [[ "$2" == /* ]]; then
-        KEEPS+=("$2")
+      v="${2%/}" # drop a trailing slash so matching stays exact
+      if [[ "$v" == /* ]]; then
+        KEEPS+=("$v")
       else
-        KEEPS+=("$HOME/$2")
+        KEEPS+=("$HOME/$v")
       fi
       shift
       ;;
@@ -63,21 +74,40 @@ done
 [[ "$YES" -eq 1 || -t 0 ]] || die "stdin is not a terminal and --yes was not given"
 
 # Everything at the top of $HOME, including dotfiles (dotglob), minus keeps.
-shopt -s dotglob nullglob
-entries=("$HOME"/*)
-shopt -u dotglob nullglob
+# Keeps may be nested, so walk the tree: skip a keep, recurse into an ancestor
+# of a keep (deleting the ancestor's other children), delete everything else.
+is_keep() {
+  local p="$1" k
+  for k in "${KEEPS[@]}"; do
+    [[ "$p" == "$k" ]] && return 0
+  done
+  return 1
+}
+
+is_ancestor_of_keep() {
+  local p="$1" k
+  for k in "${KEEPS[@]}"; do
+    [[ "$k" == "$p"/* ]] && return 0
+  done
+  return 1
+}
 
 to_delete=()
-for entry in "${entries[@]}"; do
-  keep=0
-  for k in "${KEEPS[@]}"; do
-    if [[ "$entry" == "$k" ]]; then
-      keep=1
-      break
+collect() {
+  local dir="$1" entry
+  shopt -s dotglob nullglob
+  for entry in "$dir"/*; do
+    if is_keep "$entry"; then
+      continue
+    elif is_ancestor_of_keep "$entry"; then
+      collect "$entry"
+    else
+      to_delete+=("$entry")
     fi
   done
-  [[ "$keep" -eq 1 ]] || to_delete+=("$entry")
-done
+  shopt -u dotglob nullglob
+}
+collect "$HOME"
 
 if [[ ${#to_delete[@]} -eq 0 ]]; then
   echo "nothing to wipe under $HOME" >&2
