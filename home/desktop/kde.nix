@@ -40,13 +40,17 @@ in
     startup.desktopScript."wallpaper_all_screens" = {
       priority = 4; # after plasma-manager's own wallpaper script (priority 3)
       runAlways = true;
+      # NOTE: this is JavaScript, not Nix — comments are // (a # would be a
+      # syntax error). Mirrors plasma-manager's own slideshow script.
       text = ''
-        for (const desktop of desktops()) {
+        var allDesktops = desktops();
+        for (var i = 0; i < allDesktops.length; i++) {
+            var desktop = allDesktops[i];
             desktop.wallpaperPlugin = "org.kde.slideshow";
-            desktop.currentConfigGroup = ["Wallpaper", "org.kde.slideshow", "General"];
+            desktop.currentConfigGroup = Array("Wallpaper", "org.kde.slideshow", "General");
             desktop.writeConfig("SlidePaths", "${wallpapers}");
             desktop.writeConfig("SlideInterval", "${toString slideInterval}");
-            desktop.writeConfig("FillMode", "2"); # preserveAspectCrop
+            desktop.writeConfig("FillMode", "2"); // preserveAspectCrop
         }
       '';
     };
