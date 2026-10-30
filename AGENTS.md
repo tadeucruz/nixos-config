@@ -96,7 +96,7 @@ modules/
     syncthing-server.nix         # Syncthing hub (root sync server): /mnt/data/Sync base, GUI 8384, imperative pairing
   services/                      # generic system services (desktop/server) + omega workloads: VMs, LXCs, host services
     avahi.nix                    # avahi/mDNS, nssmdns4, publish
-    flatpak.nix                  # flatpak apps (bitwarden, obsidian, retrodeck) — desktop only
+    flatpak.nix                  # flatpak apps (obsidian, retrodeck) — desktop only
     fwupd.nix                    # firmware updates — desktop only
     openssh.nix                  # sshd, no password auth
     pipewire.nix                 # audio (alsa + pulse) — desktop only
@@ -127,7 +127,7 @@ home/
   common/                        # platform glue + bare package lists (no program config, no profiles)
     base.nix                     # cross-platform base settings (username; stateVersion is per-host in home/hosts/)
     packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
-    linux.nix                    # Linux-only: bitwarden SSH agent
+    linux.nix                    # Linux-only: homeDirectory (/home/<user>) glue
     darwin.nix                   # macOS-only glue: nh (programs.nh, with GC) + imports programs/obsidian.nix
   desktop/
     kde.nix                      # KDE home bits (sycoca hook) — wired via modules/desktop/kde.nix
@@ -141,6 +141,7 @@ home/
     ghostty.nix                  # Ghostty darwin (pkgs.ghostty-bin; pkgs.ghostty is Linux-only) — normandy only
     zoom.nix                     # Zoom (pkgs.zoom-us) — package wrapper — normandy only
     ddc.nix                      # m1ddc — DDC/CI external displays, package wrapper — normandy only
+    bitwarden.nix                # Bitwarden desktop (pkgs.bitwarden-desktop) + SSH agent socket — package wrapper — citadel/legion/prothean
     home-manager.nix             # enable home-manager program
     mangohud.nix                 # mangohud overlay — imported by gaming.nix
     neovim.nix                   # LazyVim (java + go extras) — prothean + normandy

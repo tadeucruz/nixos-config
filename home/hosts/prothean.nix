@@ -7,6 +7,7 @@
     ../programs/firefox.nix
     ../programs/ungoogled-chromium.nix
     ../programs/element.nix
+    ../programs/bitwarden.nix
     ../programs/git.nix
     ../programs/starship.nix
     ../programs/fzf.nix
