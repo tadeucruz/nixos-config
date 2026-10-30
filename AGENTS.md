@@ -156,6 +156,7 @@ home/
     flutter.nix                  # Flutter (Linux) — package wrapper — imported by home/hosts/prothean.nix (normandy uses the Homebrew cask)
     obsidian.nix                 # Obsidian — package wrapper — imported by common/darwin.nix
     steam.nix                    # Steam session glue (Proton env vars + autostart entry) — imported by gaming.nix
+    return-to-steam.nix          # "Return to Steam" desktop + menu entry (gamescope-session) — imported by citadel + legion
   development.nix                # dev toolchain profile — imports programs/{go,godot,java,nodejs,vscodium,zed}.nix — prothean + normandy
   ai.nix                         # AI agent tooling (opencode) — all 5 hosts
   gaming.nix                     # gaming profile — imports programs/{mangohud,steam}.nix

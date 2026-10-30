@@ -12,18 +12,10 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
+    ../programs/return-to-steam.nix
     ../ai.nix
     ../gaming.nix
   ];
 
   home.stateVersion = "26.11";
-
-  xdg.desktopEntries.return-to-steam = {
-    name = "Return to Steam";
-    comment = "Switch back to Steam Big Picture session";
-    exec = "start-gamescope-session";
-    icon = "steam";
-    terminal = false;
-    categories = [ "Game" ];
-  };
 }
