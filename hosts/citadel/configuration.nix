@@ -22,6 +22,7 @@ in
     ../../modules/boot/base.nix
     ../../modules/boot/eac-kexec.nix
     ../../modules/boot/eac-iommu.nix
+    ../../modules/boot/eac-lockdown.nix
     ../../modules/boot/gaming.nix
     ../../modules/security/tpm2.nix
     ../../modules/users/base.nix
