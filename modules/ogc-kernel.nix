@@ -1,7 +1,7 @@
 { pkgs, lib, ... }:
 
 let
-  ogcRelease = "v7.2.11-ogc4";
+  ogcRelease = "v7.2.14-ogc3";
 
   # OGC renumbers the kernel (Makefile VERSION=7), so the source tarball
   # reports e.g. 7.2.9. Built directly from OGC's git-archive source (patches
@@ -10,7 +10,7 @@ let
 
   ogcSrc = pkgs.fetchurl {
     url = "https://github.com/OpenGamingCollective/linux/archive/refs/tags/${ogcRelease}.tar.gz";
-    hash = "sha256-6g+SLUzgKKj9Vc87lTlcVf1FyUUU62ctJwFj0Vm7SM8=";
+    hash = "sha256-6tf/T27oR7/R2sLsTec1F6kROAXI6ohJa6Xuk2Q6Q1I=";
   };
 in
 # linux_latest.override does not propagate src/version, so build the kernel
