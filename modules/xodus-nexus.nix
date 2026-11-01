@@ -25,11 +25,13 @@ pkgs.appimageTools.wrapType2 {
   # "latest" keeps the store path stable across bumps (like proton-ge-latest).
   version = "latest";
 
-  # 64-bit only: the runtime's wine/wineserver, prefix bootstrap, games and the
-  # VC++ redist it installs are all x86_64. `multiArch = true` would pull the
-  # i686 half of every FHS library (not in the binary cache anymore → heavy
-  # local compiles) only for 32-bit titles. Re-add it if a 32-bit game needs it.
-  multiArch = false;
+  # 32-bit support is required: launching a game dies with
+  # "/lib/ld-linux.so.2: could not open" without it (some link in the launch
+  # chain needs the 32-bit loader inside the FHS env, even though the runtime's
+  # wine/wineserver, prefix bootstrap and VC++ redist are all x86_64).
+  # The i686 half of the FHS libraries is no longer in the binary cache, so the
+  # first build compiles it locally — after that it stays in the store.
+  multiArch = true;
 
   extraPkgs =
     pkgs2: with pkgs2; [
