@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  config,
   inputs,
   username,
   ...
@@ -11,7 +12,18 @@ let
   slideInterval = 1800; # seconds between slides
 in
 {
-  imports = [ inputs.plasma-manager.homeModules.plasma-manager ];
+  imports = [
+    inputs.plasma-manager.homeModules.plasma-manager
+    ./kickoff-favorites.nix
+  ];
+
+  # Single source of truth for the menu favorites — the kickoff-favorites
+  # module re-seeds the KActivities DB from this on every login.
+  programs.kickoffFavorites.favorites = [
+    "steam.desktop"
+    "xodus-nexus.desktop"
+    "net.retrodeck.retrodeck.desktop"
+  ];
 
   programs.plasma = {
     enable = true;
@@ -79,16 +91,11 @@ in
         floating = true;
         widgets = [
           {
-            # Menu favorites — bare menu IDs, not the applications: URIs the
-            # taskbar launchers below use. Kickoff reads favorites from the
-            # KActivities DB; this list only seeds it while that DB is empty.
+            # Menu favorites — declared in programs.kickoffFavorites above;
+            # the kickoff-favorites module re-seeds the KActivities DB each login.
             kickoff = {
               settings.General = {
-                favorites = [
-                  "steam.desktop"
-                  "xodus-nexus.desktop"
-                  "net.retrodeck.retrodeck.desktop"
-                ];
+                favorites = config.programs.kickoffFavorites.favorites;
                 favoritesPortedToKAstats = false;
               };
             };

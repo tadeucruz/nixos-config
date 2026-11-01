@@ -28,6 +28,6 @@
     # under Plasma's Wayland session.
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-    home-manager.users.${username}.imports = [ ../../home/desktop/kde.nix ];
+    home-manager.users.${username}.imports = [ ../../home/desktop/kde/default.nix ];
   };
 }
