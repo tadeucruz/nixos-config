@@ -78,7 +78,17 @@ in
         location = "bottom";
         floating = true;
         widgets = [
-          "org.kde.plasma.kickoff"
+          {
+            # Menu favorites — bare menu IDs, not the applications: URIs the
+            # taskbar launchers below use.
+            kickoff = {
+              settings.General.favorites = [
+                "steam.desktop"
+                "xodus-nexus.desktop"
+                "net.retrodeck.retrodeck.desktop"
+              ];
+            };
+          }
           "org.kde.plasma.pager"
           {
             iconTasks = {
