@@ -88,9 +88,16 @@ pkgs.appimageTools.wrapType2 {
         #     locked at session start (e.g. gamescope autologin on citadel/legion).
         #   (The launcher's real Microsoft credentials still go to the wallet via
         #    its own D-Bus Secret Service flow in keyring.ts — untouched by this.)
+        # APPIMAGE advertises this wrapper as the persistent launcher path: the
+        # app derives "Add to Steam"/desktop shortcuts from it (index.ts), and
+        # without it both APPIMAGE and the /.mount_ execPath checks come up empty
+        # ("Shortcuts require an installed Linux launcher or AppImage with a
+        # persistent executable path"). It is not a writable AppImage, so the
+        # in-app launcher updater stays disabled — updates come from Nix.
         mv $out/bin/xodus-nexus $out/bin/.xodus-nexus-wrapped
         cat > $out/bin/xodus-nexus <<EOF
     #!/bin/sh
+    export APPIMAGE="$out/bin/xodus-nexus"
     exec $out/bin/.xodus-nexus-wrapped --no-sandbox --password-store=basic "\$@"
     EOF
         chmod 0755 $out/bin/xodus-nexus
