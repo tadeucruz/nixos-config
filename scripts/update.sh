@@ -4,6 +4,7 @@
 #   ge       GE-Proton      modules/proton-ge.nix
 #   cachyos  Proton-CachyOS modules/proton-cachyos.nix
 #   ogc      OpenGamingCollective kernel modules/ogc-kernel.nix
+#   xodus    Xodus Nexus     modules/xodus-nexus.nix
 #   flake    nix flake lock  flake.lock
 #
 # Used manually and by .github/workflows/check-updates.yml (single pipeline
@@ -20,7 +21,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TOOLS=(flake ge cachyos ogc)
+TOOLS=(flake ge cachyos ogc xodus)
 # Tools with pending updates, printed on stdout so the workflow can use them
 # in the PR body. Human messages go to stderr.
 PENDING=""
@@ -39,6 +40,7 @@ tool_file() {
     ge) echo "$ROOT/modules/proton-ge.nix" ;;
     cachyos) echo "$ROOT/modules/proton-cachyos.nix" ;;
     ogc) echo "$ROOT/modules/ogc-kernel.nix" ;;
+    xodus) echo "$ROOT/modules/xodus-nexus.nix" ;;
     flake) echo "$ROOT/flake.lock" ;;
     *) die "unknown tool: $1 (expected ${TOOLS[*]})" ;;
   esac
@@ -49,6 +51,7 @@ tool_repo() {
     ge) echo "GloriousEggroll/proton-ge-custom" ;;
     cachyos) echo "CachyOS/proton-cachyos" ;;
     ogc) echo "OpenGamingCollective/linux" ;;
+    xodus) echo "domsvoboda/xodus-nexus" ;;
     flake) die "flake has no upstream repo" ;;
     *) die "unknown tool: $1" ;;
   esac
@@ -59,6 +62,7 @@ tool_label() {
     ge) echo "GE-Proton" ;;
     cachyos) echo "Proton-CachyOS" ;;
     ogc) echo "OGC kernel" ;;
+    xodus) echo "Xodus Nexus" ;;
     flake) echo "flake.lock" ;;
   esac
 }
@@ -68,6 +72,7 @@ current_release() {
     ge) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     cachyos) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     ogc) sed -n 's/^  ogcRelease = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
+    xodus) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     flake) die "flake.lock has no pinned release" ;;
   esac
 }
@@ -92,6 +97,7 @@ version_of_tag() {
     ge) echo "$tag" ;;
     cachyos) [[ "$tag" == cachyos-* ]] && echo "${tag#cachyos-}" || die "unexpected cachyos tag: $tag" ;;
     ogc) echo "$tag" ;;
+    xodus) [[ "$tag" == v* ]] && echo "${tag#v}" || die "unexpected xodus tag: $tag" ;;
     flake) die "flake has no tags" ;;
   esac
 }
@@ -102,6 +108,7 @@ asset_url() {
     ge) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/${tag}-x86_64.tar.gz" ;;
     cachyos) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/proton-cachyos-${version}-x86_64.tar.xz" ;;
     ogc) echo "https://github.com/$(tool_repo "$tool")/archive/refs/tags/${tag}.tar.gz" ;;
+    xodus) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/Xodus-Nexus-${version}-x86_64.AppImage" ;;
     flake) die "flake has no assets" ;;
   esac
 }
@@ -219,13 +226,13 @@ apply_all() {
 }
 
 usage() {
-  die "usage: $0 check | apply | <ge|cachyos|ogc|flake> --check | --apply [tag]"
+  die "usage: $0 check | apply | <ge|cachyos|ogc|xodus|flake> --check | --apply [tag]"
 }
 
 case "${1:-}" in
   check) check_all ;;
   apply) apply_all ;;
-  ge|cachyos|ogc|flake)
+  ge|cachyos|ogc|xodus|flake)
     tool="$1"
     shift
     case "${1:-}" in

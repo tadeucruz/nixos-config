@@ -84,7 +84,7 @@ git-check:
 update-check: ## Report available dependency bumps without touching files
 	@./scripts/update.sh check
 
-update: ## Apply dependency bumps (flake.lock, Proton, OGC kernel)
+update: ## Apply dependency bumps (flake.lock, Proton, OGC kernel, Xodus Nexus)
 	@./scripts/update.sh apply
 
 clean: ## Remove nix build result symlinks

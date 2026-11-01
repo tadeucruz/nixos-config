@@ -4,5 +4,6 @@
   imports = [
     ./programs/mangohud.nix
     ./programs/steam.nix
+    ./programs/xodus-nexus.nix
   ];
 }
