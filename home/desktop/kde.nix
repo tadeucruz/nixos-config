@@ -80,13 +80,17 @@ in
         widgets = [
           {
             # Menu favorites — bare menu IDs, not the applications: URIs the
-            # taskbar launchers below use.
+            # taskbar launchers below use. Kickoff reads favorites from the
+            # KActivities DB; this list only seeds it while that DB is empty.
             kickoff = {
-              settings.General.favorites = [
-                "steam.desktop"
-                "xodus-nexus.desktop"
-                "net.retrodeck.retrodeck.desktop"
-              ];
+              settings.General = {
+                favorites = [
+                  "steam.desktop"
+                  "xodus-nexus.desktop"
+                  "net.retrodeck.retrodeck.desktop"
+                ];
+                favoritesPortedToKAstats = false;
+              };
             };
           }
           "org.kde.plasma.pager"
