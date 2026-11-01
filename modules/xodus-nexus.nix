@@ -30,6 +30,11 @@ pkgs.appimageTools.wrapType2 {
 
   extraPkgs =
     pkgs2: with pkgs2; [
+      # The Nexus runtime's `proton` script is `#!/usr/bin/env python3`; NixOS
+      # has no system python3, so prefix creation (`proton run cmd /c exit`)
+      # died with "python3: No such file or directory" and games failed with
+      # "The Proton prefix was not prepared correctly".
+      python3
       webkitgtk_4_1 # Microsoft account sign-in (the backend's own WebView)
       gnutls # Wine loads it dynamically for Xbox sign-in / crypto
       libgudev # managed runtime's GStreamer device support
