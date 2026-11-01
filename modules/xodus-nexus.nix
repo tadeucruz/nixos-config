@@ -25,8 +25,11 @@ pkgs.appimageTools.wrapType2 {
   # "latest" keeps the store path stable across bumps (like proton-ge-latest).
   version = "latest";
 
-  # Games launched through the managed Nexus runtime (Wine) can be 32-bit.
-  multiArch = true;
+  # 64-bit only: the runtime's wine/wineserver, prefix bootstrap, games and the
+  # VC++ redist it installs are all x86_64. `multiArch = true` would pull the
+  # i686 half of every FHS library (not in the binary cache anymore → heavy
+  # local compiles) only for 32-bit titles. Re-add it if a 32-bit game needs it.
+  multiArch = false;
 
   extraPkgs =
     pkgs2: with pkgs2; [
