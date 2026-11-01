@@ -98,6 +98,12 @@ pkgs.appimageTools.wrapType2 {
         cat > $out/bin/xodus-nexus <<EOF
     #!/bin/sh
     export APPIMAGE="$out/bin/xodus-nexus"
+    # Steam exports its own glibc/runtime through LD_LIBRARY_PATH and injects
+    # the overlay through LD_PRELOAD. Inside the bwrap FHS env that mixes
+    # foreign libraries with the env's glibc and bwrap aborts ("Can't make
+    # symlink at /bin", libattr version mismatch), so shortcuts launched from
+    # Steam die right away. Sanitize before entering the FHS.
+    unset LD_LIBRARY_PATH LD_PRELOAD
     exec $out/bin/.xodus-nexus-wrapped --no-sandbox --password-store=basic "\$@"
     EOF
         chmod 0755 $out/bin/xodus-nexus
