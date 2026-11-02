@@ -15,7 +15,7 @@ in
   imports = [
     inputs.plasma-manager.homeModules.plasma-manager
     ./kickoff-favorites.nix
-    ./portal-permissions.nix
+    ./xwayland-input.nix
   ];
 
   # Single source of truth for the menu favorites — the kickoff-favorites
