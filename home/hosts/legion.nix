@@ -18,5 +18,9 @@
     ../gaming.nix
   ];
 
+  # Steam Input controller-as-mouse on the KDE desktop: the prompt never
+  # persists (XWayland has no app-id), so re-assert the permission each login.
+  programs.kdePortalPermissions.remoteDesktop = true;
+
   home.stateVersion = "26.11";
 }
