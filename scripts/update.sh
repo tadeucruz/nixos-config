@@ -77,14 +77,44 @@ current_release() {
   esac
 }
 
+# /releases/latest answers with the most recently published release, which for
+# OGC is usually the LTS branch (v6.18.60-lts-ogc1) — a downgrade from 7.x.
+latest_tag_ogc() {
+  local tag
+  tag="$(git ls-remote --tags --refs "https://github.com/$(tool_repo ogc)" \
+    | sed -n 's#.*refs/tags/\(v[0-9][^ ]*-ogc[0-9][0-9]*\)$#\1#p' \
+    | python3 -c '
+import sys
+
+def key(tag):
+    # v7.3.1-ogc5 / v7.3-ogc1 / v7.4-rc1-ogc2
+    core, _, rev = tag.rpartition("-ogc")
+    core = core.removeprefix("v")
+    rc = core.split("-rc")
+    parts = [int(p) for p in rc[0].split(".")]
+    parts += [0] * (3 - len(parts))
+    # rcs sort below the final release of the same base
+    return (parts, 0 if len(rc) == 2 else 1, int(rc[1]) if len(rc) == 2 else 0, int(rev))
+
+tags = [t for t in (line.strip() for line in sys.stdin) if t and "-lts-" not in t]
+print(max(tags, key=key) if tags else "")
+')" || die "could not list OGC tags"
+  [[ -n "$tag" ]] || die "could not resolve the latest non-LTS OGC tag"
+  echo "$tag"
+}
+
 # Resolve the web redirect instead of hitting api.github.com — unauthenticated
 # API calls get rate-limited (HTTP 403) on CI runners, which previously made
 # the proton pipeline collapse into garbage URLs ("" <tag> "").
 latest_tag() {
-  local redir
+  local redir tag
+  if [[ "$1" == ogc ]]; then
+    latest_tag_ogc
+    return
+  fi
   redir="$(curl -fsS --http1.1 -o /dev/null -w '%{redirect_url}' \
     "https://github.com/$(tool_repo "$1")/releases/latest")" || die "could not resolve latest release"
-  local tag="${redir##*/}"
+  tag="${redir##*/}"
   [[ "$redir" == */releases/tag/* && -n "$tag" ]] || die "unexpected latest-release redirect: $redir"
   echo "$tag"
 }
