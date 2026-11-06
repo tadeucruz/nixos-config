@@ -96,6 +96,7 @@ modules/
     lxc.nix                      # generic LXC infra (lxc + lxc-net bridge + autostart)
     podman.nix                   # Podman + Quadlet infra — replaces Docker Compose
     syncthing-server.nix         # Syncthing hub (root sync server): /mnt/data/Sync base, GUI 8384, imperative pairing
+    watchdog.nix                 # hardware watchdog (RuntimeWatchdogSec=30s) so a hung server self-reboots (SP5100 TCO)
   services/                      # generic system services (desktop/server) + omega workloads: VMs, LXCs, host services
     avahi.nix                    # avahi/mDNS, nssmdns4, publish
     flatpak.nix                  # flatpak apps (obsidian, retrodeck) — desktop only
