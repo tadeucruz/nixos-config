@@ -9,7 +9,6 @@
     powertop.enable = true;
   };
 
-  # pcie_aspm.policy=performance disables ASPM L1 globally: r8169 froze on
-  # every link flap, even after dropping pcie_aspm=force (BIOS-enabled ASPM).
-  boot.kernelParams = [ "pcie_aspm.policy=performance" ];
+  # No ASPM overrides, BIOS defaults: the 2026-11-06 repro powered the box
+  # off ~18s after a link flap even with ASPM off — fault is below the kernel.
 }
