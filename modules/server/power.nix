@@ -9,5 +9,5 @@
     powertop.enable = true;
   };
 
-  boot.kernelParams = [ "pcie_aspm=force" ];
+  # No pcie_aspm=force: forced ASPM hangs r8169 on link flap (omega froze on router reboots).
 }
