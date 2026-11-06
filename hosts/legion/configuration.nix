@@ -96,12 +96,8 @@ in
 
   services.inputplumber.enable = true;
 
-  services.scx = {
-    enable = true;
-    package = lib.mkDefault pkgs.scx.rustscheds;
-    scheduler = lib.mkDefault "scx_lavd";
-  };
-
+  # Jovian ships the scx unit itself (vendor scx_lavd flags); nixpkgs'
+  # services.scx must stay off — both define systemd.services.scx and break eval.
   systemd.services.scx.wantedBy = lib.mkOverride 0 [ "multi-user.target" ];
 
   services.udev.packages = [ pkgs.inputplumber ];
