@@ -33,10 +33,8 @@
     ../../modules/services/bazarr.nix
     ../../modules/server/libvirt.nix
     ../../modules/server/podman.nix
-    ../../modules/server/power.nix
     ../../modules/server/syncthing-server.nix
     ../../modules/server/watchdog.nix
-    ../../modules/server/crash-capture.nix
     ../../modules/services/haos.nix
     ../../modules/services/open-webui.nix
     ../../modules/services/forgejo.nix
