@@ -1,181 +1,23 @@
-# nixos-config — agent context
+# nixos-config — Agent Context
 
-NixOS + nix-darwin flakes repo for 4 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
+NixOS + nix-darwin flakes repository for 4 machines belonging to Tadeu Cruz (tadeucruz@gmail.com).
 
-## Agent scope
+## Agent Scope
 
-- Only edit repo files (`.nix`/`.jsonc`/`.md`). Never run validation: `make check`, `nix build`, `nix eval`, `nix fmt` — that's the user's responsibility. If a change needs a build, just tell the user which command to run.
-- Never compare nix builds/hashes in context (`.drvPath`, evals, store paths).
-- Never ssh into remote machines on your own. If the user asks for remote debugging, ask for explicit confirmation, warn it burns context (suggest switching to a free model first) and remind the user to compact the context when the debug is over.
-- Git: only `git status` / `git diff --stat`; never a full `git diff`. Commit only when asked. Exception: after creating a new file, run `git add -N <file>` (intent-to-add, no content staged) so `make check`/`nix eval` can see it — see the `git-check` gotcha below.
-- Comments in Nix/config files stay short — one line per non-obvious decision, no narratives or error transcripts (context lives in AGENTS.md and git history).
+- Act as an expert in Nix configuration, always following best practices and idiomatic patterns.
+- After any file change, ensure the code is formatted using `nix fmt`.
+- After any change, run `make check` to validate that all evaluations and builds pass successfully.
+- Keep comments concise and minimal; avoid verbose or redundant explanations in code files.
+- You need commit the file for `make check` to work 
+- **Never** push changes to Git before explicit review and approval.
 
-## Machines
+## Remote Access (SSH)
 
-| Host       | Hardware                                   | Role                                            |
-| ---------- | ------------------------------------------ | ------------------------------------------------ |
-| `citadel`  | AMD desktop (CPU + GPU)                    | Gaming console-like, Jovian gamescope+Steam + KDE fallback |
-| `prothean` | Dell G15 5525 — Ryzen 6800H + Nvidia dGPU | Laptop, KDE desktop + gaming, PRIME |
-| `legion`   | Legion Go — APU AMD Z1 Extreme             | Handheld, Jovian gamescope+Steam + KDE fallback |
-| `omega`    | Home server (x86_64, VT-x/AMD-V)           | Headless NAS + containers + VMs, **NixOS stable** |
-| `normandy` | MacBook Apple Silicon                      | nix-darwin: apps + dotfiles (no gaming) |
+- Only initiate an SSH connection to a remote host after receiving explicit confirmation.
+- Keep diagnostic checks on remote hosts simple and consistent.
 
-## Key decisions
+## Memory Management
 
-- **Jovian on citadel and legion** (`modules/jovian.nix`): gamescope+Steam (`jovian.steam.autoStart`) with KDE Plasma 6 as the desktop fallback for the *Switch to Desktop* option, no user-facing display manager (Jovian's autoStart drives its own hidden SDDM for auto-login; `modules/jovian.nix` forces the desktop module's DM off — KDE's plasma-login-manager). Both also import `modules/gaming.nix`.
-  - **citadel HDR fix**: Jovian's `gamescope-session` omits `--hdr-enabled` (HDR looks washed out). Fixed via a `gamescope` shim in `hosts/citadel/configuration.nix` that injects `--hdr-enabled` then re-execs `/run/wrappers/bin/gamescope`, wired through `/etc/jovian/gamescope-session/pre-start`. Verified with Cyberpunk 2077. citadel only.
-  - **Jovian steam-launcher hardcodes its steam package**, so `STEAM_EXTRA_COMPAT_TOOLS_PATHS` never reaches Steam on citadel/legion. Fix in `modules/jovian.nix`: injected via `jovian.steam.environment` → `/etc/xdg/gamescope-session/environment` → `%t/gamescope-environment` → `steam-launcher.service` EnvironmentFile.
-- **Desktop: KDE everywhere** (`modules/desktop/kde.nix` + `home/desktop/kde/`) — citadel, legion and prothean. KDE won over GNOME (which prothean briefly tested — commits `d57b497`/`d33836c`, and GNOME was also tried as legion's fallback) because it's far better on handhelds (virtual keyboard everywhere, joystick-as-mouse, ...) and keeps a **single source of truth** instead of two parallel DE stacks. `modules/desktop/gnome.nix` + `home/desktop/gnome.nix` were **removed**; the old `gdm.enable = mkForce false` guard in `modules/jovian.nix` went with them (Jovian hosts only run KDE now). prothean is the only desktop without Jovian (`kde.nix` + `modules/gaming.nix`, plasma-login-manager + laminix, PRIME offload + AWCC fan control); citadel/legion are Jovian hosts (see above). **Wallpaper + lockscreen rotate through the Syncthing-shared folder** (`home/desktop/kde/default.nix`: `workspace.wallpaperSlideShow` / `kscreenlocker.appearance.wallpaperSlideShow` on `~/Pictures/Wallpapers`, `wallpaperFillMode = "preserveAspectCrop"`) — a runtime home path, so it stays a plain string, not a store path. The desktop script loops over all containments, so it covers **every screen with no per-monitor config**; since plasma-manager's desktop scripts only run once (content-hash tracked), a `runAlways` `desktopScript."wallpaper_all_screens"` re-applies it on every login so a monitor plugged in later converges too. The **login screen is not themed yet** (plasmalogin; its config is `/etc/plasmalogin.conf` — main file, beats the `.d` drop-ins — plus the greeter's look-and-feel from `/etc/xdg/kdeglobals`). **Kickoff favorites live in the KActivities DB**, not the appletsrc (Plasma 6 reads them exclusively via `KAStatsFavoritesModel`; the `favorites` key is only a migration seed used when that DB is empty and `favoritesPortedToKAstats=false`). Declared via `programs.kickoffFavorites.favorites` in `home/desktop/kde/default.nix` (module `home/desktop/kde/kickoff-favorites.nix`): a `runAlways` startup script reconciles the KAstats links through kactivitymanagerd's D-Bus API (`ResourcesLinking.{Unlink,Link}ResourceToActivity`, agent `org.kde.plasma.favorites.applications`, activity `:global`) and rewrites the `ordering` groups in `kactivitymanagerd-statsrc` on every login — the running kickoff picks the changes up live, the declared list wins and GUI pins don't survive a logout. Upstream has no config-only path (plasma-manager dropped it in PR #238 and #642; issue #539 open).
-- **omega: NixOS stable, headless server** (`modules/server/`, no flatpak — `mkServer` helper in `flake.nix`, tracks `nixpkgs-stable` = `nixos-26.05`). Migrated from Proxmox. **`mkServer` now supports home-manager** (same wiring as `mkHost` minus flatpak); omega's user config is `home/hosts/omega.nix`, importing only the CLI pieces directly (`common/{base,packages}` + `programs/{git,starship,fzf,zsh,home-manager}`, no firefox/KDE). `modules/server/` holds only generic infrastructure; workloads (VMs, LXCs, services) live in `modules/services/`:
-  - **Samba + btrfs** (`modules/services/samba.nix`) replaces OMV. Storage is btrfs (no NTFS). The `fileSystems` mounts live in `hosts/omega/configuration.nix` (host-specific storage, same pattern as citadel's `/GAMES`); `samba.nix` only exports the SMB shares. UUIDs are placeholders — fill via `blkid`; SMB password set once with `smbpasswd -a tadeucruz`.
-  - **Podman + Quadlet** (`modules/server/podman.nix`) replaces the Docker Compose stacks. `dockerCompat` + `dockerSocket` + `podman-compose` keep old compose files working while services are ported to quadlet units (declared via `environment.etc."containers/systemd/..."`, since there's no `virtualisation.quadlet` option on nixos-26.05). Image updates: a weekly `podman auto-update --rollback` timer lives here (generic); workloads opt in per-unit with `AutoUpdate=registry`.
-  - **HAOS as a libvirt VM** (`modules/services/haos.nix`): qcow2 pinned via `fetchurl` (version + sha256 are TODO), decompressed on first boot, domain XML declared in the repo (bridge `br0` — TODO: create the bridge on the host). HAOS is an appliance, must stay a VM. The `haos-vm` service is idempotent — the qcow2 (HAOS configs) is only written once; `virsh define` only applies the hardware definition. Depends on generic `modules/server/libvirt.nix` (asserted).
-  - **HermesAgent as LXC** (`modules/services/hermesagent.nix`): classic LXC (`virtualisation.lxc`), Debian trixie via download template, created on first boot by a oneshot service, autostarted by `lxc.service`. Rootfs is imperative (apk/apt inside). lxcbr0 bridge via `lxc-net.service`. Depends on generic `modules/server/lxc.nix` (asserted).
-  - **cloudflared as a host systemd service** (`modules/services/cloudflared.nix`): remotely-managed tunnel (token-based), so nixpkgs' `services.cloudflared.tunnels` (credentials-file) doesn't apply — custom unit reads `TUNNEL_TOKEN` from `/etc/cloudflared/token` (outside git). `DynamicUser` + hardening.
-  - **Syncthing root sync server** (`modules/server/syncthing-server.nix`): omega is the always-on hub for all machines. Runs as dedicated `syncthing` user, GUI bound to `0.0.0.0:8384` (LAN + tailscale; firewall opens 8384 TCP, 22000 TCP/UDP, 21027 UDP via `openDefaultPorts`). Folders are **imperative** — `overrideDevices`/`overrideFolders = false` so GUI-created devices/folders survive rebuilds; shared folders land under `/mnt/data/Sync` (base dir created by tmpfiles, setgid, group `syncthing`; tadeucruz added to the group for ssh access). Pairing + folder sharing (Send & Receive) done via the GUI (same pattern as samba password/forgejo token). **The desktop clients are declarative hub-and-spoke** (`modules/services/syncthing.nix`): citadel/prothean/legion declare omega as their only peer plus the shared folder (id `xifdn-zyhbo` → `~/Pictures/Wallpapers`), so they never talk to each other directly and nothing needs to be paired by hand on their side — but the hub must still know each desktop's ID (added once, imperatively). Declaring `settings` turns on `overrideDevices`/`overrideFolders` (both default true): anything added by hand on a desktop is wiped on the next boot. Device IDs are public (SHA-256 fingerprint of the peer's cert, announced to discovery/relay anyway), so they are safe to keep in git; the private key (`~/.config/syncthing/key.pem`) and `config.xml` (holds the GUI API key) are not, and Nix never touches them.
-  - **arr stack** (`modules/services/{qbittorrent,prowlarr,sonarr,radarr,bazarr}.nix`): one file per app, as **native NixOS services** (decided over the original Podman Quadlet port from rannoch's `arrservice/docker-compose.yaml`). Media access via the `media` group (setgid dirs on `/mnt/data/Media`, `chgrp -R media` applied on the machine); the group is auto-created by the arr apps' `extraGroups`, tadeucruz membership via `users.groups.media.members` in `modules/users/server.nix`. Prowlarr keeps its DynamicUser. **FlareSolverr** (`modules/services/flaresolverr.nix`): native nixpkgs service (v3.5.0) on port 8191, LAN-only (`openFirewall = false`) — Prowlarr points to `http://localhost:8191` (configured via Prowlarr UI, Settings → Indexers). qbittorrent's `openFirewall` only opens TCP — UDP 6881 is added manually. **Migration from docker was discarded — all apps started from scratch**; old configs remain at `/mnt/data/Docker/arrservice/configs` for reference only.
-  - **Jellyfin** (`modules/services/jellyfin.nix`): media server (porta 8096), HW accel vaapi em `/dev/dri/renderD128`, media group membership. Also started from scratch (old docker config at `/mnt/data/Docker/jellyfin` left as reference). Serves `/mnt/data/Media/{Movies,Shows}`.
-  - **Forgejo** (`modules/services/forgejo.nix`): self-hosted git forge, native NixOS service, SQLite + `/var/lib/forgejo` (defaults). HTTP em **3001** (3000 é do open-webui), SSH interno em **2222** (`START_SSH_SERVER`, não toca no sshd). Exposed via LAN + tailscale + Cloudflare Tunnel (TLS no CF → `ROOT_URL=https://git.tadeucruz.com/`, `DOMAIN=git.tadeucruz.com`); SSH clone via tailscale (`SSH_DOMAIN=omega.tail0a0fce.ts.net`, porta 2222). `DISABLE_REGISTRATION`, admin via CLI. No `openFirewall` no módulo → porta aberta via `networking.firewall.allowedTCPPorts`. **Actions runner** (`modules/services/forgejo-runner.nix`): nixpkgs `services.gitea-actions-runner` com `package = pkgs.forgejo-runner` (docs oficiais do Forgejo, http://forgejo.org/docs/v15.0/admin/actions/installation/packaging/), instância `omega`, label `ubuntu-latest:host` (execução nativa, sem container). Usa o fluxo legado `register` → `tokenFile` espera EnvironmentFile `TOKEN=<registration-token>` em `/etc/forgejo-runner/token` (fora do git; a antiga unidade com `server.connections`/UUID foi substituída — runner UUID antigo foi órfão).
-  - `hosts/omega/hardware-configuration.nix` is a placeholder — regenerate with `nixos-generate-config`.
-- **omega hard freezes** (~10x since Aug 2026), trigger confirmed: **network link flap** (router/switch) → death ~18-35s later. Two faces: **S5 power-off** (LED off — the TCO dies with the board, dark until manual power) and **kernel hang** (board stays up — the SP5100 TCO then resets and recovers the box; **verified once, deliberate test 2026-11-06**: freezing PID 1 (`echo 1 > /sys/fs/cgroup/init.scope/cgroup.freeze`) stopped the pets → TCO self-reboot 52s later, `bootstatus=32` (= `WDIOF_CARDRESET`, the only flag the driver can set; `0` on a cold button boot), no power button involved — the 21:33 boot that same night was a **manual** press that beat the TCO by ~5s). The watchdog never powered anything down — the crash itself does when it goes to S5. ASPM exonerated (died with `pcie_aspm.policy=performance` too) → `modules/server/power.nix` reverted to BIOS defaults (powersave + powertop stay); `modules/server/watchdog.nix` keeps the 45s runtime watchdog (proven). **Root cause sits below the OS (EC/board) — next: BIOS update + memtest86+; if it persists → USB NIC (drops `r8169`) or retire the box.** Instrumented: `modules/server/crash-capture.nix` (kdump + `softlockup/hardlockup_panic=1` + `panic=10`) — the next kernel-side hang panics into a vmcore in `/var/crash` and self-reboots. Public precedent: r8169 system hangs (proxmox #4807, HAOS #5044 on the same RTL8168); amdgpu 6.18/6.19 hard hangs are suspect #2 (headless server, amdgpu active). Every dirty death of 2026-11-06 had the HAOS VM (vnet0) attached to br0 and the link still down ~34s later.
-- **normandy: nix-darwin** (`darwinConfigurations.normandy`), split into reusable baseline + normandy-only so a future Mac can import just the baseline: `modules/common/darwin.nix` (touch ID sudo, Nerd Font, Tailscale, Syncthing, defaults) + `modules/darwin/xcode.nix` (Xcode xcode-select/license postActivation) + `modules/normandy.nix` (dock persistent-apps with Ghostty, displayplacer "More Space" scaling; all NixOS hosts install `pkgs.ghostty.terminfo` via `modules/common/ghostty.nix` so `TERM=xterm-ghostty` works over SSH). Homebrew has no home-manager equivalent, so it gets its own top-level `homebrew/` dir: `common.nix` (bootstrap), `normandy.nix` (personal/hardware), `development.nix` (mobile dev toolchain). **Homebrew is the fallback, not the default**: only apps with no nixpkgs `aarch64-darwin` support stay there (appcleaner, balenaetcher, bitwarden, comfy, crossover, cryptomator, rectangle — moved out of nixpkgs so its stable `/Applications` path survives TCC permission resets on rebuild — steam, ungoogled-chromium — nixpkgs chromium is linux-only, displayplacer — hardwired in the activation script + masApps). Apps nixpkgs does ship for darwin live in `home/programs/` as package wrappers: `ghostty.nix` (`pkgs.ghostty-bin` — the official dmg, since `pkgs.ghostty` is the Linux GTK build), `zoom.nix` (`pkgs.zoom-us`, bundle `zoom.us.app`); GUI apps from `home.packages` land in `~/Applications/Home Manager Apps/` (dock paths must use that, see `modules/normandy.nix`). llama.cpp is NOT in brew — `home/programs/llama-cpp.nix` already provides it (metal). Firefox from nixpkgs (not cask) so shared `programs.firefox` policies apply. **Display DDC brightness** (external monitors) is handled by `pkgs.m1ddc` via `home/programs/ddc.nix` (package-wrapped, CLI-only for now) instead of BetterDisplay/Lunar — an app-free, limit-free replacement; hotkey mapping (skhd) is planned once the CLI is explored. `.github/workflows/check.yml` validates evaluation of all configurations on Ubuntu.
-- **Kernel: OGC on citadel, vanilla `linuxPackages_latest` on legion + prothean.** citadel's `modules/ogc-kernel.nix` builds OGC's kernel directly from the git-archive source tarball (`fetchurl` of `.../archive/refs/tags/<tag>.tar.gz`, `kernelPatches = []` — no nixpkgs patches on top), instead of patching nixpkgs's `linux_latest` with `monolithic.patch`. OGC renumbers the kernel (Makefile `VERSION=7`), so the source reports e.g. `7.2.9`; `version`/`modDirVersion` are derived from the tag base (`ogcVersion`). Built via `pkgs.buildLinux` (generic.nix) — **`linux_latest.override` does NOT propagate `src`/`version`**, so the source is swapped at the `buildLinux` level; this keeps nixpkgs's common config (ntsync, amdgpu) and the `features` attrset NixOS asserts on (efiBootStub, netfilterRPFilter, ia32Emulation). (`customPackage`/`manualConfig` does NOT set `features`, which breaks those assertions.) citadel wires it via `boot.kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; }`. `fetchurl` (never `fetchzip`) keeps the hash of the raw tar.gz stable across nix versions. Buys citadel: **AMD HDMI 2.1 VRR/ALLM** + harmless handheld drivers. legion/prothean stay on the same stock `linux_latest` (everything from cache.nixos.org). Bumps via `scripts/update.sh ogc` (tag + tar.gz hash), surfaced by `check-updates.yml`. **No base-match guard** (removed): the OGC source is self-contained so bumps always apply — the old guard compared OGC's `7.x` base against nixpkgs's `linux_latest` `6.x` and always skipped. The kernel now reports OGC's `7.2.9`, not nixpkgs's `linux_latest` version.
-- **Two Proton flavors, pinned to latest upstream, auto-bumped by CI.** `programs.steam.extraCompatPackages` ships **GE-Proton** (`modules/proton-ge.nix`) and **Proton-CachyOS** (`modules/proton-cachyos.nix`), both `fetchurl` + `tar` with a `steamcompattool` output (`--strip-components=1`). Bumps via `scripts/update.sh ge|cachyos`, surfaced by `check-updates.yml`. `version = "latest"` keeps store paths `proton-ge-latest`/`proton-cachyos-latest`. **Why not `pkgs.proton-ge-bin`:** GE-Proton11-3 aborts on `icuuc.dll.u_setMemoryFunctions_65` (upstream #651, fixed 11-4); pinned 11-5 + CachyOS 11.0 avoid it. **FSR4 upgrade:** `home/programs/steam.nix` sets `PROTON_FSR4_UPGRADE=1` and `PROTON_FSR4_RDNA3_UPGRADE=1` (CachyOS-specific RDNA3 path) session-wide.
-- **Xodus Nexus** (`modules/xodus-nexus.nix`): Xbox/Microsoft Store launcher, packaged from the upstream AppImage (`fetchurl` + pin, `x86_64` only), wired into `home/gaming.nix` for all gaming hosts. `appimageTools.wrapType2` FHS-env with `multiArch = true` (required: launching a game dies with "/lib/ld-linux.so.2: could not open" without the 32-bit loader in the FHS env, even though the runtime's `wine`/`wineserver`, prefix bootstrap and VC++ redist are all x86_64; the i686 half of the FHS libraries is no longer in the binary cache, so the first build compiles it locally — the store keeps it after that), `extraPkgs` with python3 (the runtime's `proton` script is `#!/usr/bin/env python3` and NixOS ships no system python — without it prefix creation dies with "The Proton prefix was not prepared correctly") and webkitgtk_4_1 (account sign-in). The FHS bin symlink is replaced by a wrapper forcing `--no-sandbox --password-store=basic` (no SUID chrome-sandbox on NixOS; keep Chromium out of the KWallet that starts locked under gamescope autologin — crucially the launcher's real MS credentials still go to the wallet via its own D-Bus Secret Service flow in `keyring.ts`, untouched by the flag). The wrapper also exports `APPIMAGE` pointing at itself: the launcher derives *Add to Steam*/desktop shortcuts from that path (`index.ts`), and without it (binary running out of the AppImage's temporary `/.mount_` dir) it reports "Shortcuts require an installed Linux launcher or AppImage with a persistent executable path". Because the store path is not a writable AppImage, the in-app launcher updater stays disabled — updates come from Nix. The wrapper also unsets `LD_LIBRARY_PATH`/`LD_PRELOAD`: Steam launches non-Steam shortcuts with its own runtime on `LD_LIBRARY_PATH` and the overlay on `LD_PRELOAD`, and inside the bwrap FHS env that mix aborts with `bwrap: Can't make symlink at /bin` (libattr `ATTR_1.3` version mismatch), killing the shortcut ~5s after launch. `.desktop` + icons installed from the extracted AppDir. Bumps via `scripts/update.sh xodus` (tag `v0.4.1` → release `0.4.1`, asset `Xodus-Nexus-<v>-x86_64.AppImage`), surfaced by `check-updates.yml`. **The Nexus game runtime is downloaded in-app (Settings → Update runtime)** and lives outside the store — survives rebuilds but is wiped by `reset-home.sh` (add `--keep` for its dir after first use). The `update.yml` workflow's `git add` list includes `modules/xodus-nexus.nix`.
-- **legion: InputPlumber + SteamOS-Manager stack** (`hosts/legion/configuration.nix`), aligned with Bazzite 44. `services.inputplumber.enable = true` with udev rules; `hid_lenovo_go` loaded. **TDP via Steam QAM → SteamOS-Manager → amd-pmf** (validated 8→20→30W). `jovian.decky-loader` re-enabled for the LegionGoRemapper plugin only (button remap); SimpleDeckyTDP is gone. **scx_lavd scheduler**: Jovian (2026-11-04+) defines the `systemd.services.scx` unit itself (vendor `scx_lavd --pinned-slice-us 500 --dd-max-wait-us 0`), so **nixpkgs' `services.scx` module must stay off on Jovian hosts** — enabling it defines the unit twice and breaks eval (conflicting `description`/`ExecStart`, hit on the 2026-11-03 nixpkgs+Jovian bump). legion starts it on boot via `systemd.services.scx.wantedBy = mkOverride 0 [ "multi-user.target" ]` (Jovian sets no `wantedBy`).
-  - **History**: HHD was a previous stack (commit `a20ef09`); gyro/RGB/fan-curves lost with InputPlumber but Tadeu doesn't care about gyro. **Future check on nixpkgs bumps:** InputPlumber/PowerStation maturity on the original Legion Go.
-- **Home reset script (`scripts/reset-home.sh`)** — full-wipe of `$HOME` (everything, incl. personal data and secrets like `~/.ssh`) keeping only the repo, for testing desktop migrations (GNOME ↔ KDE ↔ Hyprland) from a clean slate; re-run `nixos-rebuild switch` afterwards to regenerate the declarative state. **Always keeps the Steam client + games** (`~/.steam`, `~/.local/share/Steam`) — big downloaded data, not desktop state, so a wipe never forces a re-download (on citadel the library is on `/GAMES`, outside `$HOME`, so it is safe either way). Safety rails: refuses root, aborts on mount points under `$HOME` (`--ignore-mounts` to override after checking), needs `--yes` or typed confirmation (refuses non-tty stdin), plus `--dry-run` / `--keep <path>` (repeatable, accepts nested paths like `.local/share/Steam`). This is the general successor to the deleted `clean-gnome.sh`/`clean-kde.sh`: it clears every DE's leftovers (dconf, Plasma/KWallet, `~/.config/hypr`, ...) in one shot.
-- **Username:** `tadeucruz` (single variable in `flake.nix`).
-- **`result*` is gitignored** — `nix build` at the root leaves a `result` symlink into the store.
-- **nixpkgs channel:** desktop/laptop machines track `nixos-unstable`; omega tracks `nixos-26.05` (stable) via the `nixpkgs-stable` input.
-- **Home Manager:** integrated into the flake, not standalone.
-- **AI agent profile (`home/ai.nix`), all 5 hosts:** imports `home/programs/opencode.nix` and `home/programs/pi.nix` — no HM modules, so both are package wrappers (`opencode` also writes the llama-cpp provider config pointing at citadel over tailscale; `pi` is just `pkgs.pi-coding-agent`) — so any machine (incl. headless omega) can run the AI CLIs remotely/agent-style without the dev toolchain. Split out of `home/development.nix` (now `vscodium`, `zed`, `go`, `godot_4`, `jdk`, `nodejs` only, still prothean + normandy).
-- **GUI editors on the dev profile: VSCodium + Zed** (`home/programs/{vscodium,zed}.nix`, imported by `home/development.nix` → prothean + normandy). VS Code was dropped in favor of VSCodium: Home Manager has a dedicated `programs.vscodium` module, and `programs.vscode.package = pkgs.vscodium` now only warns (it writes VS Code's own paths). Zed uses `programs.zed-editor`; its config dir is `~/.config/zed` on Linux *and* macOS (Zed keeps the XDG path on darwin), so one file covers both OSes. `pkgs.vscodium` ships prebuilt for x86_64-linux + aarch64-darwin, but `pkgs.zed-editor` has no `-bin` variant → normandy builds it from source (Rust + lld). normandy's dock lists only VSCodium (`modules/normandy.nix`); Zed is installed but off the dock.
-- **Neovim (LazyVim), meant to eventually replace the GUI editors** — prothean + normandy only (`home/programs/neovim.nix`). Config from `LazyVim/starter`, deployed read-only via `xdg.configFile.nvim.source`; only `lang.java`/`lang.go` extras enabled. `lockfile` redirected to `stdpath("data")`; LSP servers left to Mason (not nix) due to Mason's install layout. Terminal is Ghostty on normandy (dock in `modules/normandy.nix`; chosen because Terminal.app lacks OSC 52, which broke tmux mouse-copy over SSH).
-- **tmux** (`home/programs/tmux.nix`, all 5 hosts): declarative `programs.tmux` — prefix `C-b`, `keyMode = emacs`, `mouse = true`, splits. Plugins: `sensibleOnTop` + `tmuxPlugins.{dracula,resurrect,continuum}`. **Plugin options must go in the plugin submodule `extraConfig`, never the top-level `extraConfig`**: Home Manager emits the plugin `run-shell`s before top-level `extraConfig`, and `run-shell` blocks — so top-level options are read only after the plugin ran with defaults. `zsh-autosuggestions` is disabled in `home/programs/zsh.nix` (it broke backspace editing after history search inside tmux).
-- **prothean PRIME bus IDs** in `hosts/prothean/configuration.nix` are **placeholders** — replace with real `lspci | grep -E 'VGA|3D'` values.
-- **`hosts/prothean/hardware-configuration.nix` is a placeholder** — regenerate with `nixos-generate-config`. citadel/legion are real; normandy has none.
-- **`Makefile` validates all five hosts** (`make check` = `fmt-check` + `eval` of all hosts) — but the user runs it, not the agent. One gotcha affects editing: **`git-check`** — flakes copy the git tree to the store *excluding untracked files*, so a new module is invisible to `nix eval` until `git add -N`. The target fails early with instructions (bypass with `ALLOW_UNTRACKED=1`). **Whenever you create a new file, run `git add -N <file>` yourself** (it only marks intent-to-add, staging no content) — otherwise the user's `make check` fails on the new file.
-
-## File layout
-
-```
-Makefile                         # local validation entrypoint (also used by check.yml)
-flake.nix                        # inputs + mkHost + mkDarwin + 3 nixosConfigurations + 1 darwinConfiguration
-modules/
-  common/all.nix                 # cross-platform: nix features, allowUnfree, timezone
-  common/ghostty.nix             # ghostty terminfo — NixOS only (xterm-ghostty over SSH)
-  common/nix.nix                 # nix optimise + programs.nh (system-level GC service) — NixOS only
-  common/locale.nix              # i18n + console.keyMap mkDefault us-acentos (hosts override with br-abnt2)
-  common/zsh.nix                 # programs.zsh.enable
-  common/zram.nix                # zramSwap.enable
-  common/darwin.nix              # nix-darwin shared baseline (any Mac): touch ID sudo, fonts, tailscale, syncthing, defaults
-  darwin/
-    xcode.nix                    # Xcode xcode-select/license postActivation (darwin only)
-  boot/
-    base.nix                     # common kernel tuning: consoleLogLevel=3, initrd.verbose=false, sysctl fq+bbr
-    gaming.nix                   # desktop/gaming boot: plymouth, quiet/splash, linuxPackages_latest, ntsync, max_map_count
-  users/
-    base.nix                     # tadeucruz user: description, isNormalUser, ssh key, shell
-    gaming.nix                   # desktop extraGroups (audio, gamemode, i2c, input, uinput, video, ...)
-    server.nix                   # server extraGroups (wheel)
-  networking/
-    networkmanager.nix           # NetworkManager — desktop only
-    firewall.nix                 # firewall.enable — server only
-  desktop/
-    kde.nix                      # all KDE: plasma6 + plasma-login-manager (mkDefault, jovian mkForce) + laminix + sycoca hook — citadel/legion/prothean
-    fonts.nix                    # nerd-fonts.jetbrains-mono — desktop only
-    bluetooth.nix                # hardware.bluetooth — desktop only
-    rtkit.nix                    # security.rtkit (audio scheduling) — desktop only
-    rocm.nix                     # nixpkgs.config.rocmSupport — desktop only
-  normandy.nix                   # normandy-only: dock persistent-apps, displayplacer postActivation (personal, not dev)
-  gaming.nix                     # Steam + gamemode + controllers (citadel + prothean + legion)
-  jovian.nix                     # gamescope+Steam session + KDE fallback (citadel + legion)
-  btrfs-tuning.nix               # shared btrfs mount options + fstrim (citadel + legion + omega)
-  server/
-    libvirt.nix                  # generic libvirt/KVM infra (libvirtd + qemu_kvm)
-    lxc.nix                      # generic LXC infra (lxc + lxc-net bridge + autostart)
-    podman.nix                   # Podman + Quadlet infra — replaces Docker Compose
-    syncthing-server.nix         # Syncthing hub (root sync server): /mnt/data/Sync base, GUI 8384, imperative pairing
-    watchdog.nix                 # hardware watchdog (RuntimeWatchdogSec=45s) so a hung server self-reboots (SP5100 TCO)
-    crash-capture.nix            # kdump + lockup panic: a hang leaves a vmcore in /var/crash and self-reboots
-  services/                      # generic system services (desktop/server) + omega workloads: VMs, LXCs, host services
-    avahi.nix                    # avahi/mDNS, nssmdns4, publish
-    flatpak.nix                  # flatpak apps (obsidian, retrodeck) — desktop only
-    fwupd.nix                    # firmware updates — desktop only
-    openssh.nix                  # sshd, no password auth
-    pipewire.nix                 # audio (alsa + pulse) — desktop only
-    syncthing.nix                # syncthing — desktop only, declarative hub-and-spoke (declares omega + the shared folder; hub via server/syncthing-server.nix)
-    tailscale.nix                # tailscale
-    samba.nix                    # Samba shares (media + public guest rw) + avahi Mac mini advertising — replaces OMV
-    cloudflared.nix              # Cloudflare Tunnel (token-based, host systemd service)
-    haos.nix                     # HAOS VM (qcow2 pinned + domain XML) — needs server/libvirt.nix
-    hermesagent.nix              # HermesAgent LXC container — needs server/lxc.nix
-    qbittorrent.nix              # qBittorrent (native service, media group, UDP 6881)
-    prowlarr.nix                 # Prowlarr (native service, DynamicUser)
-    flaresolverr.nix             # FlareSolverr (native service, port 8191, LAN-only)
-    sonarr.nix                   # Sonarr (native service, media group)
-    radarr.nix                   # Radarr (native service, media group)
-    bazarr.nix                   # Bazarr (native service, media group)
-    jellyfin.nix                 # Jellyfin media server (vaapi HW accel, media group)
-    forgejo.nix                  # Forgejo git forge (SQLite, HTTP 3001, SSH 2222)
-    forgejo-runner.nix           # Actions runner via services.gitea-actions-runner (token outside git)
-homebrew/                        # no home-manager equivalent → top-level dir, split like modules/
-  common.nix                     # bootstrap (enable, cleanup mode, taps) — any Mac
-  normandy.nix                   # normandy-only personal/hardware (not dev): displayplacer, cryptomator, WhatsApp
-  development.nix                # normandy-only mobile dev toolchain: cocoapods, android-studio, flutter, Xcode (activation in modules/darwin/xcode.nix)
-hosts/
-  <host>/configuration.nix       # per-host system config
-  <host>/hardware-configuration.nix  # NixOS only; see placeholder note above
-home/
-  hosts/<host>.nix               # per-host user overrides
-  common/                        # platform glue + bare package lists (no program config, no profiles)
-    base.nix                     # cross-platform base settings (username; stateVersion is per-host in home/hosts/)
-    packages.nix                 # cross-platform CLI packages (btop, curl, ripgrep, vim, wget)
-    linux.nix                    # Linux-only: homeDirectory (/home/<user>) glue
-    darwin.nix                   # macOS-only glue: nh (programs.nh, with GC) + imports programs/obsidian.nix
-  desktop/
-    kde/                         # KDE home customizations — wired via modules/desktop/kde.nix
-      default.nix                # plasma-manager base: look&feel, wallpaper, panel, powerdevil
-      kickoff-favorites.nix      # Kickoff menu favorites option + per-login KAstats reconcile via D-Bus
-  programs/                      # one file per configured program (programs.* options)
-    git.nix                      # cross-platform git config
-    starship.nix                 # cross-platform starship prompt
-    fzf.nix                      # cross-platform fzf (no nushell — option doesn't exist on home-manager 26.05)
-    zsh.nix                      # cross-platform zsh config (per-OS rebuild alias; OSC 0 tab titles — kgx has no title setting)
-    tmux.nix                     # cross-platform tmux (prefix C-b, emacs, mouse, splits) + dracula theme + resurrect/continuum + set-titles passthrough
-    firefox.nix                  # firefox policies — desktop only
-    ghostty.nix                  # Ghostty darwin (pkgs.ghostty-bin; pkgs.ghostty is Linux-only) — normandy only
-    zoom.nix                     # Zoom (pkgs.zoom-us) — package wrapper — normandy only
-    ddc.nix                      # m1ddc — DDC/CI external displays, package wrapper — normandy only
-    bitwarden.nix                # Bitwarden desktop (pkgs.bitwarden-desktop) + SSH agent socket — package wrapper — citadel/legion/prothean
-    home-manager.nix             # enable home-manager program
-    mangohud.nix                 # mangohud overlay — imported by gaming.nix
-    neovim.nix                   # LazyVim (java + go extras) — prothean + normandy
-    neovim/                      # nvim config copied to ~/.config/nvim    opencode.nix                 # opencode package + llama-cpp provider config — imported by ai.nix
-    pi.nix                       # pi coding agent (pkgs.pi-coding-agent) — imported by ai.nix
-    llama-cpp.nix                # llama.cpp LLM runner (metal/rocm/cuda per host) — all hosts
-    vscodium.nix                 # VSCodium — programs.vscodium.enable (HM module) — imported by development.nix
-    zed.nix                      # Zed — programs.zed-editor.enable (HM module) — imported by development.nix
-    java.nix                     # JDK — programs.java.enable (HM module) — imported by development.nix
-    go.nix                       # Go — package wrapper — imported by development.nix
-    godot.nix                    # Godot 4 — package wrapper (pkgs.godot_4) — imported by development.nix
-    nodejs.nix                   # Node.js — package wrapper — imported by development.nix
-    flutter.nix                  # Flutter (Linux) — package wrapper — imported by home/hosts/prothean.nix (normandy uses the Homebrew cask)
-    obsidian.nix                 # Obsidian — package wrapper — imported by common/darwin.nix
-    steam.nix                    # Steam session glue (Proton env vars + autostart entry) — imported by gaming.nix
-    return-to-steam.nix          # "Return to Steam" desktop + menu entry (gamescope-session) — imported by citadel + legion
-  development.nix                # dev toolchain profile — imports programs/{go,godot,java,nodejs,vscodium,zed}.nix — prothean + normandy
-  ai.nix                         # AI agent tooling (opencode) — all 5 hosts
-  gaming.nix                     # gaming profile — imports programs/{mangohud,steam}.nix
-```
-
-## Conventions
-
-- All file content (comments, READMEs, inline notes) in **English**.
-- Conversation with the user in Portuguese.
-- Keep modules flat — avoid deep nesting or extra abstraction unless clearly needed.
-- **Program config (`programs.*`) lives in `home/programs/`, one file per program.** `home/common/` only holds platform glue and bare package lists — never a program's own config. Each `home/hosts/<host>.nix` imports its pieces explicitly (no aggregators). `home/ai.nix`, `home/gaming.nix` and `home/development.nix` are feature profiles composed by hosts.
-- Cross-platform user packages in `home/common/packages.nix` (all hosts); OS-specific glue in `home/common/{linux,darwin}.nix`. System `modules/` should not install user apps — that's `home/`'s job. `programs.nh` is system-level on NixOS (wires the `nh clean` GC service) but `home/common/darwin.nix` on darwin. **Note:** `programs.nh.clean` uses a systemd timer, which macOS ignores → darwin replaces it with a `launchd.agents.nh-clean` job (same args).
-- `system.stateVersion` is `"26.05"` on NixOS; normandy uses `7` (nix-darwin).
-- Any `homebrew.*` option goes under `homebrew/`, never `modules/` or `home/`. Split like `modules/`: `common.nix` baseline + per-purpose files.
+- Maintain context and notes inside the `.memory/` folder.
+- Separate memory files per machine to avoid cross-contamination.
+- **Never** create or update memory files before validation and approval.
