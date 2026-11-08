@@ -104,6 +104,7 @@ in
 
   services = {
     hardware.openrgb.enable = true;
+    power-profiles-daemon.enable = false;
 
     xserver.xkb = lib.mkDefault {
       layout = "br";
