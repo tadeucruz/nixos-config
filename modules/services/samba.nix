@@ -10,7 +10,8 @@
         "security" = "user";
         "map to guest" = "Bad User";
         "server min protocol" = "SMB2";
-        "hosts allow" = "127.0.0.1 192.168.0.0/16";
+        # 100.64.0.0/10 covers Tailscale CGNAT (tailnet clients).
+        "hosts allow" = "127.0.0.1 192.168.0.0/16 100.64.0.0/10";
       };
 
       media = {
