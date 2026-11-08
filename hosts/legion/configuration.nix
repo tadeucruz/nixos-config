@@ -85,6 +85,12 @@ in
     };
   };
 
+  # EAC v2 #6 lives on its own boot entry: if the rebuilt image still rejects
+  # modules, the default (non-lockdown) generation stays bootable.
+  specialisation.eac-lockdown.configuration = {
+    imports = [ ../../modules/boot/eac-lockdown.nix ];
+  };
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
