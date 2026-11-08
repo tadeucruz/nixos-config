@@ -50,7 +50,7 @@ in
 
   boot = {
     initrd.kernelModules = [ "amdgpu" ];
-    kernelPackages = import ../../modules/ogc-kernel.nix { inherit pkgs lib; };
+    kernelPackages = pkgs.linuxPackages_testing;
     kernelParams = [
       "transparent_hugepage=always"
       "amdgpu.dcfeaturemask=0x402"
