@@ -118,6 +118,14 @@ Reverted commit `ba69f4b` on all hosts, keeping this file for tracking.
    - `normandy`: N/A (macOS).
 5. Re-verify measured boot (#4) once Secure Boot is on.
 
+## References
+
+- [NixOS/nixpkgs#549372 — Tracking: End-to-end NixOS boot security](https://github.com/NixOS/nixpkgs/issues/549372)
+  — upstream work (autopen, NixOS signing keys, shim review, measured boot,
+  lockdown) that unblocks #1, #3 and #6. Track it instead of watching for a
+  key list update; do not contact Epic individually (see the Discourse thread).
+  - Discourse: [EAC Linux v2 requirements vs boot security work](https://discourse.nixos.org/t/eac-linux-v2-requirements-vs-boot-security-work-in-549372/80560)
+
 ## Rebuild notes
 
 - `kernelParams` lists are concatenated across modules (base + gaming + host),
