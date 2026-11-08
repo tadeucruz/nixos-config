@@ -51,7 +51,7 @@ tool_repo() {
     ge) echo "GloriousEggroll/proton-ge-custom" ;;
     cachyos) echo "CachyOS/proton-cachyos" ;;
     ogc) echo "OpenGamingCollective/linux" ;;
-    xodus) echo "domsvoboda/xodus-nexus" ;;
+    xodus) echo "domsvoboda/nexus-launcher" ;;
     flake) die "flake has no upstream repo" ;;
     *) die "unknown tool: $1" ;;
   esac
@@ -106,16 +106,18 @@ print(max(tags, key=key) if tags else "")
 # Resolve the web redirect instead of hitting api.github.com — unauthenticated
 # API calls get rate-limited (HTTP 403) on CI runners, which previously made
 # the proton pipeline collapse into garbage URLs ("" <tag> "").
+# Follow the whole chain: a renamed repo redirects to its new name first and
+# only then to the release tag, so looking at a single hop is not enough.
 latest_tag() {
-  local redir tag
+  local url tag
   if [[ "$1" == ogc ]]; then
     latest_tag_ogc
     return
   fi
-  redir="$(curl -fsS --http1.1 -o /dev/null -w '%{redirect_url}' \
+  url="$(curl -fsSL --http1.1 -o /dev/null -w '%{url_effective}' \
     "https://github.com/$(tool_repo "$1")/releases/latest")" || die "could not resolve latest release"
-  tag="${redir##*/}"
-  [[ "$redir" == */releases/tag/* && -n "$tag" ]] || die "unexpected latest-release redirect: $redir"
+  tag="${url##*/}"
+  [[ "$url" == */releases/tag/* && -n "$tag" ]] || die "unexpected latest-release redirect: $url"
   echo "$tag"
 }
 

@@ -8,7 +8,7 @@ let
   pname = "xodus-nexus";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/domsvoboda/xodus-nexus/releases/download/v${release}/Xodus-Nexus-${release}-x86_64.AppImage";
+    url = "https://github.com/domsvoboda/nexus-launcher/releases/download/v${release}/Xodus-Nexus-${release}-x86_64.AppImage";
     hash = "sha256-bphrk9FT3MbCN8FahF2iIr50SGe1lSI4Gseiouqj4ds=";
   };
 
@@ -67,7 +67,7 @@ pkgs.appimageTools.wrapType2 {
 
   meta = {
     description = "Xbox-inspired launcher for Microsoft Store / Game Pass PC games on Linux";
-    homepage = "https://github.com/domsvoboda/xodus-nexus";
+    homepage = "https://github.com/domsvoboda/nexus-launcher";
     license = lib.licenses.mit;
     platforms = [ "x86_64-linux" ];
   };
