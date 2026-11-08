@@ -34,6 +34,19 @@ let
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  # Temporary diagnostics for the lockdown investigation: print everything to
+  # the console so a failed boot is visible instead of a black screen.
+  verboseBoot = {
+    boot.plymouth.enable = lib.mkForce false;
+    boot.consoleLogLevel = lib.mkForce 7;
+    boot.kernelParams = [
+      "ignore_loglevel"
+      "loglevel=7"
+      "systemd.log_level=debug"
+      "systemd.log_target=kmsg"
+    ];
+  };
 in
 {
   imports = [
@@ -85,10 +98,25 @@ in
     };
   };
 
-  # EAC v2 #6 lives on its own boot entry: if the rebuilt image still rejects
-  # modules, the default (non-lockdown) generation stays bootable.
-  specialisation.eac-lockdown.configuration = {
-    imports = [ ../../modules/boot/eac-lockdown.nix ];
+  # Diagnostic boot entries for EAC v2 #6. Both use the same rebuilt image, so
+  # only the cmdline differs:
+  #   eac-sigenforce -> proves the rebuilt image boots and its module certs work
+  #   eac-lockdown   -> the actual requirement, verbose to expose any failure
+  specialisation = {
+    eac-sigenforce.configuration = {
+      imports = [
+        ../../modules/boot/eac-image.nix
+        verboseBoot
+      ];
+      boot.kernelParams = [ "module.sig_enforce=1" ];
+    };
+
+    eac-lockdown.configuration = {
+      imports = [
+        ../../modules/boot/eac-lockdown.nix
+        verboseBoot
+      ];
+    };
   };
 
   hardware.graphics = {
