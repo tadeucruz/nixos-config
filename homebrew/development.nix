@@ -9,6 +9,7 @@
     casks = [
       "android-studio"
       "flutter"
+      "godot"
     ];
     masApps = {
       Xcode = 497799835;

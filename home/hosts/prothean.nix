@@ -21,6 +21,7 @@
     ../programs/flutter.nix
     ../programs/unsloth-desktop.nix
     ../programs/easyeffects.nix
+    ../programs/godot.nix
     ../gaming.nix
   ];
 
