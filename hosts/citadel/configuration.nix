@@ -92,11 +92,6 @@ in
   jovian.steam.environment = {
     SteamDeck = "0";
     DXVK_FRAME_RATE = "120";
-    LD_PRELOAD = "libgamemodeauto.so.0";
-    LD_LIBRARY_PATH = lib.makeLibraryPath [
-      config.programs.gamemode.package.lib
-      pkgs.pkgsi686Linux.gamemode.lib
-    ];
   };
 
   environment.etc."jovian/gamescope-session/pre-start".text = ''
