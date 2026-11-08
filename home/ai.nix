@@ -2,6 +2,5 @@
 {
   imports = [
     ./programs/opencode.nix
-    ./programs/pi.nix
   ];
 }
