@@ -24,7 +24,7 @@
       "models": [
         {
           "id": "Qwen3.8-27B-Uncensored-GGU",
-          "name": "Qwen3.8-27B-Uncensored-GGU",
+          "name": "Qwen3.8-27B-Uncensored-GGU (citadel)",
           "input": [
             "text"
           ]
