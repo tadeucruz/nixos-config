@@ -1,29 +1,28 @@
-# Hermes Agent (omega): runs inside a Podman-backed Ubuntu container so it is
-# not running loose on the host. Secrets live in /etc/hermes/env (mode 0600).
+# Hermes Agent (omega): gateway runs inside a Podman-backed Ubuntu container.
 { ... }:
-let
-  envFile = ''
-    OPENAI_BASE_URL="http://prothean:9931/v1"
-    OPENAI_API_KEY="EMPTY"
-    MODEL="ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M"
-  '';
-in
 {
   services.hermes-agent = {
     enable = true;
     container = {
       enable = true;
       backend = "podman"; # omega runs containers via Podman (dockerCompat socket)
+      hostUsers = [ "tadeucruz" ]; # group access to HERMES_HOME + ~/.hermes bridge
     };
-    settings.model.default = "anthropic/claude-sonnet-4"; # placeholder
-    environmentFiles = [ "/etc/hermes/env" ];
-    addToSystemPackages = true; # hermes no PATH + HERMES_HOME compartilhada com o service (container mode)
+
+    # llama.cpp on prothean (same id used by opencode.nix).
+    settings.model = {
+      default = "ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M";
+      provider = "custom";
+      base_url = "http://prothean:9931/v1";
+    };
+
+    # Not secrets: written to $HERMES_HOME/.env (0640). OPENAI_BASE_URL must
+    # match model.base_url so the module hands OPENAI_API_KEY to the endpoint.
+    environment = {
+      OPENAI_BASE_URL = "http://prothean:9931/v1";
+      OPENAI_API_KEY = "EMPTY";
+    };
+
+    addToSystemPackages = true; # hermes on PATH + shared HERMES_HOME
   };
-
-  virtualisation.docker.enable = false; # hermes auto-enables Docker by default; omega uses Podman instead
-
-  systemd.tmpfiles.rules = [
-    "d /etc/hermes 750 root root -"
-    "f /etc/hermes/env 600 root root ${envFile}"
-  ];
 }
