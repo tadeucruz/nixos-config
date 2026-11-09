@@ -1,45 +1,52 @@
 {
   "$schema": "https://pi.dev/schemas/models.schema.json",
   "providers": {
-    "ornith": {
-      "name": "Ornith (local)",
+    "Local": {
+      "name": "Local",
       "baseUrl": "http://localhost:9931/v1",
       "api": "openai-completions",
       "apiKey": "EMPTY",
       "models": [
         {
-          "id": "ornith-1.5-9b",
-          "name": "Ornith-1.5-9B",
+          "id": "ornith-ai/Ornith-1.5-9B-GGUF:BF16",
+          "name": "Ornith-1.0-9B-GGUF:BF16",
           "input": [
             "text"
           ]
         }
       ]
     },
-    "ornith-citadel": {
-      "name": "Ornith (citadel)",
+    "Citadel": {
+      "name": "Citadel",
       "baseUrl": "http://citadel:9931/v1",
       "api": "openai-completions",
       "apiKey": "EMPTY",
       "models": [
         {
-          "id": "Qwen3.8-27B-Uncensored-GGU",
-          "name": "Qwen3.8-27B-Uncensored-GGU (citadel)",
+          "id": "JonathanColetti/Qwen3.8-27B-Uncensored-GGUF:Q4_K_M",
+          "name": "Qwen3.8-27B-Uncensored-GGUF:Q4_K_M",
+          "input": [
+            "text"
+          ]
+        },
+        {
+          "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q8_0",
+          "name": "Ornith-1.0-9B-GGUF:Q8_0",
           "input": [
             "text"
           ]
         }
       ]
     },
-    "ornith-prothean": {
-      "name": "Ornith (prothean)",
+    "Prothean": {
+      "name": "Prothean",
       "baseUrl": "http://prothean:9931/v1",
       "api": "openai-completions",
       "apiKey": "EMPTY",
       "models": [
         {
-          "id": "ornith-1.5-9b",
-          "name": "Ornith-1.5-9B (prothean)",
+          "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M",
+          "name": "Ornith-1.0-9B-GGUF:Q4_K_M",
           "input": [
             "text"
           ]
