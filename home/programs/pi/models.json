@@ -8,8 +8,81 @@
       "apiKey": "EMPTY",
       "models": [
         {
-          "id": "ornith-ai/Ornith-1.5-9B-GGUF:BF16",
-          "name": "Ornith-1.0-9B-GGUF:BF16",
+          "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M",
+          "name": "Ornith-1.5-9B Q4_K_M",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": null,
+            "medium": "medium",
+            "high": null,
+            "xhigh": null
+          },
+          "contextWindow": 65536,
+          "maxTokens": 65536,
+          "samplingParams": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0
+          },
+          "samplingParamsByThinkingLevel": {
+            "medium": {
+              "temperature": 1,
+              "presence_penalty": 1.5
+            }
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          },
+          "input": [
+            "text"
+          ]
+        },
+        {
+          "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q8_0",
+          "name": "Ornith-1.5-9B Q8_0",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": null,
+            "medium": "medium",
+            "high": null,
+            "xhigh": null
+          },
+          "contextWindow": 32768,
+          "maxTokens": 32768,
+          "samplingParams": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0
+          },
+          "samplingParamsByThinkingLevel": {
+            "medium": {
+              "temperature": 1,
+              "presence_penalty": 1.5
+            }
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          },
           "input": [
             "text"
           ]
@@ -25,13 +98,52 @@
         {
           "id": "JonathanColetti/Qwen3.8-27B-Uncensored-GGUF:Q4_K_M",
           "name": "Qwen3.8-27B-Uncensored-GGUF:Q4_K_M",
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens"
+          },
           "input": [
             "text"
           ]
         },
         {
           "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q8_0",
-          "name": "Ornith-1.0-9B-GGUF:Q8_0",
+          "name": "Ornith-1.5-9B Q8_0",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": null,
+            "medium": "medium",
+            "high": null,
+            "xhigh": null
+          },
+          "contextWindow": 131072,
+          "maxTokens": 131072,
+          "samplingParams": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0
+          },
+          "samplingParamsByThinkingLevel": {
+            "medium": {
+              "temperature": 1,
+              "presence_penalty": 1.5
+            }
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          },
           "input": [
             "text"
           ]
@@ -46,7 +158,40 @@
       "models": [
         {
           "id": "ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M",
-          "name": "Ornith-1.0-9B-GGUF:Q4_K_M",
+          "name": "Ornith-1.5-9B Q4_K_M",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "off",
+            "minimal": null,
+            "low": null,
+            "medium": "medium",
+            "high": null,
+            "xhigh": null
+          },
+          "contextWindow": 65536,
+          "maxTokens": 65536,
+          "samplingParams": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0
+          },
+          "samplingParamsByThinkingLevel": {
+            "medium": {
+              "temperature": 1,
+              "presence_penalty": 1.5
+            }
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "supportsUsageInStreaming": true,
+            "supportsStrictMode": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          },
           "input": [
             "text"
           ]
