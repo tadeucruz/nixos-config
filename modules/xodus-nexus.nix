@@ -32,7 +32,6 @@ pkgs.appimageTools.wrapType2 {
     ];
 
   extraInstallCommands = ''
-    # .desktop entry and icons from the AppDir.
     desktop="$(find ${appimageContents} -maxdepth 4 -name '*.desktop' ! -name 'AppRun' | head -n1)"
     if [ -z "$desktop" ]; then
       echo "xodus-nexus: no .desktop file found in the extracted AppImage" >&2

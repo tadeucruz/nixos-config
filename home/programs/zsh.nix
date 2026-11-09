@@ -36,7 +36,6 @@
     shellAliases = {
       ls = if pkgs.stdenv.hostPlatform.isDarwin then "ls -G" else "ls --color=auto";
       ll = "ls -alh";
-      # Reattach to the most recent tmux session, or create one if there's none.
       # Bare `tmux` always spawns a NEW session — it never reattaches on its own.
       ta = "tmux attach 2>/dev/null || tmux new-session";
       rebuild =

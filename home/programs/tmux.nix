@@ -12,7 +12,6 @@ in
   programs.tmux = {
     enable = true;
 
-    # Core: standard prefix, emacs keys, mouse, sensible splits, generous scrollback.
     prefix = "C-b";
     keyMode = "emacs";
     mouse = true;
@@ -25,9 +24,6 @@ in
     newSession = true;
     sensibleOnTop = true;
 
-    # Plugins.
-    #  - dracula: theme (owns status-left/status-right)
-    #  - resurrect + continuum: manual and automatic session state save/restore
     plugins = with pkgs.tmuxPlugins; [
       {
         plugin = dracula;

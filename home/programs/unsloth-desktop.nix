@@ -19,9 +19,8 @@ let
     hash = "sha256-+cnQDzwp2pdwHIPyiAI+BujfGp1DcRmVHGhMT1SA/ds=";
   };
 
-  # wrapType2 exposes $out/bin/unsloth-desktop. The env var works around the
-  # blank-window Tauri/WebKitGTK bug on NVIDIA (prothean's dGPU, and the usual
-  # culprit on Wayland/Mesa stacks).
+  # The env var works around the blank-window Tauri/WebKitGTK bug on NVIDIA
+  # (prothean's dGPU, and the usual culprit on Wayland/Mesa stacks).
   unsloth-desktop = pkgs.writeShellScriptBin "unsloth-desktop" ''
     export WEBKIT_DISABLE_DMABUF_RENDERER=1
     exec ${pkgs.appimageTools.wrapType2 { inherit pname version src; }}/bin/unsloth-desktop "$@"

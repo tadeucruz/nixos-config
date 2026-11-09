@@ -7,7 +7,6 @@
 {
   virtualisation.lxc.enable = true;
 
-  # Packaged units: lxc.service (lxc-autostart) + lxc-net.service (lxcbr0 bridge).
   systemd.packages = [ pkgs.lxc ];
 
   systemd.services.lxc-net = {

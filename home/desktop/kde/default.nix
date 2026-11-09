@@ -35,12 +35,10 @@ in
     # host that imports modules/desktop/kde.nix.
     overrideConfig = true;
 
-    # Dark mode as the default.
     workspace.lookAndFeel = "org.kde.breezedark.desktop";
 
-    # Rotate the desktop wallpaper on every screen. Not keyed by monitor name
-    # or index: plasma-manager's script loops over all desktops (containments),
-    # so this follows whatever screens exist.
+    # Not keyed by monitor name or index: plasma-manager's script loops over all
+    # desktops (containments), so this follows whatever screens exist.
     workspace.wallpaperSlideShow = {
       path = wallpapers;
       interval = slideInterval;
@@ -92,8 +90,6 @@ in
         floating = true;
         widgets = [
           {
-            # Menu favorites — declared in programs.kickoffFavorites above;
-            # the kickoff-favorites module re-seeds the KActivities DB each login.
             kickoff = {
               settings.General = {
                 favorites = config.programs.kickoffFavorites.favorites;
