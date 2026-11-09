@@ -15,8 +15,9 @@ in
       enable = true;
       backend = "podman"; # omega runs containers via Podman (dockerCompat socket)
     };
-    settings.model.default = "anthropic/claude-sonnet-4"; # placeholder: set your provider/model + keys in /etc/hermes/env
+    settings.model.default = "anthropic/claude-sonnet-4"; # placeholder
     environmentFiles = [ "/etc/hermes/env" ];
+    addToSystemPackages = true; # hermes no PATH + HERMES_HOME compartilhada com o service (container mode)
   };
 
   virtualisation.docker.enable = false; # hermes auto-enables Docker by default; omega uses Podman instead
