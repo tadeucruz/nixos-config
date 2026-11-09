@@ -1,0 +1,50 @@
+{
+  "$schema": "https://pi.dev/schemas/models.schema.json",
+  "providers": {
+    "ornith": {
+      "name": "Ornith (local)",
+      "baseUrl": "http://localhost:9931/v1",
+      "api": "openai-completions",
+      "apiKey": "EMPTY",
+      "models": [
+        {
+          "id": "ornith-1.5-9b",
+          "name": "Ornith-1.5-9B",
+          "input": [
+            "text"
+          ]
+        }
+      ]
+    },
+    "ornith-citadel": {
+      "name": "Ornith (citadel)",
+      "baseUrl": "http://citadel:9931/v1",
+      "api": "openai-completions",
+      "apiKey": "EMPTY",
+      "models": [
+        {
+          "id": "ornith-1.5-9b",
+          "name": "Ornith-1.5-9B (citadel)",
+          "input": [
+            "text"
+          ]
+        }
+      ]
+    },
+    "ornith-prothean": {
+      "name": "Ornith (prothean)",
+      "baseUrl": "http://prothean:9931/v1",
+      "api": "openai-completions",
+      "apiKey": "EMPTY",
+      "models": [
+        {
+          "id": "ornith-1.5-9b",
+          "name": "Ornith-1.5-9B (prothean)",
+          "input": [
+            "text"
+          ]
+        }
+      ]
+    }
+  }
+}
