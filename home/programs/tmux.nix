@@ -50,7 +50,7 @@ in
         extraConfig = ''
           set -g @resurrect-dir '~/.tmux/resurrect'
           set -g @resurrect-default-processes '__none__'
-          set -g @resurrect-processes 'btop opencode'
+          set -g @resurrect-processes 'btop opencode pi'
           set -g @resurrect-capture-pane-contents 'on'
         '';
       }
