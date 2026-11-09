@@ -20,19 +20,9 @@
         log.level = "info";
         runner.capacity = 2;
         runner.timeout = "3h";
-        # Serve actions/cache (data.forgejo.org/actions/cache) so the ephemeral
-        # job containers reuse fetched nix inputs across runs instead of
-        # re-downloading. Already the upstream default; pinned so upgrades can't
-        # regress it. Blobs persist in /var/lib/gitea-runner/<name>/.cache/actcache.
-        #
-        # ACTIONS_CACHE_URL points job containers at a one-shot cache proxy; its
-        # host/port come from cache.host/cache.proxy_port (both random by
-        # default). cache.host is the static br0 LAN IP, confirmed reachable from
-        # real job containers via the cache-diag run (avoiding tailscale). The
-        # proxy_port MUST be pinned so the host firewall can allow it — port 5059
-        # is opened below, keep both in sync. The proxy authenticates with a
-        # per-job secret, so LAN exposure is safe. The internal backend
-        # (cache.port) stays random and only the proxy talks to it locally.
+        # One-shot cache proxy for ephemeral job containers; keeps actions/cache
+        # across runs. pin proxy_port — the host firewall allows it (5059 below);
+        # a random value would drop every request.
         cache = {
           enabled = true;
           host = "192.168.0.2";

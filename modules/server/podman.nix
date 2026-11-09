@@ -1,17 +1,6 @@
-# Podman + Quadlet (omega) — replaces the Docker Compose stacks. Quadlet turns
-# each container into a systemd unit generated from /etc/containers/systemd.
-#
-# Quadlet is active by default on NixOS: podman ships podman-systemd-generator
-# (wired via systemd.packages). There is no `virtualisation.quadlet` option on
-# nixos-26.05, so quadlet units are declared with environment.etc.
-#
-# Migration path: `dockerCompat` + `dockerSocket` + `podman-compose` keep the
-# existing compose files working as-is while services are ported one by one to
-# quadlet units below (compose keys map 1:1).
-#
-# Container image updates: workloads opt in per-unit with `AutoUpdate=registry`;
-# the weekly `podman auto-update --rollback` timer below then pulls and
-# restarts only the containers whose image actually changed.
+# Podman + Quadlet (omega): replaces Docker Compose. Each workload is a systemd
+# unit via environment.etc — NixOS has no `virtualisation.quadlet`, so podman's
+# podman-systemd-generator declares them here.
 {
   pkgs,
   ...

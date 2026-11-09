@@ -1,12 +1,6 @@
-# Kickoff application-menu favorites, enforced declaratively.
-#
-# Plasma 6 kickoff reads favorites from the KActivities DB (per-activity
-# links), not from the appletsrc — the `favorites` config key is only a
-# migration seed, consumed once while the DB is empty. There is no config-only
-# path for this upstream (plasma-manager tried and dropped it in PR #238 and
-# PR #642; issue #539 is still open), so this module reconciles the KAstats
-# links through kactivitymanagerd's own D-Bus API on every login: the running
-# kickoff picks the changes up live and the declared list always wins.
+# Favorites live in the KActivities DB, not the `favorites` config key (consumed
+# once). Config-only patching is dead upstream (plasma-manager dropped it), so
+# reconcile the KAstats links via kactivitymanagerd's D-Bus API on every login.
 {
   config,
   lib,

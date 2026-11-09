@@ -1,13 +1,6 @@
-# KWin's XWayland input-emulation prompt ("steam is asking to control
-# input devices").
-#
-# On Plasma 6.8 X11 input emulation goes through libei, and KWin's
-# eisprompter asks on every request because X11 apps can claim any
-# WM_CLASS. The "Always allow apps claiming to be <app>" checkbox writes
-# XwaylandEisNoPromptApps to kwinrc — re-asserted here by a systemd user
-# service on every login, so it lands before kwin even starts. Written via
-# kwriteconfig instead of plasma-manager because owning kwinrc would wipe
-# GUI-set keys (overrideConfig) like Xwayland.Scale.
+# KWin's XWayland input prompt ("steam is asking to control input devices").
+# Re-asserted by a systemd user service so it lands before kwin starts; use
+# kwriteconfig, not plasma-manager — owning kwinrc would wipe GUI keys (overrideConfig).
 {
   config,
   lib,

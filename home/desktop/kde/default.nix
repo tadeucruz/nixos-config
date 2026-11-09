@@ -78,12 +78,8 @@ in
       lowBattery.powerProfile = "powerSaving";
     };
 
-    # Default panel layout, with a fixed set of pinned launchers on the Icon
-    # Tasks widget (the same useful apps that were on GNOME's dash, mapped to
-    # their KDE equivalents). `applications:` URIs are stable — unlike the
-    # file:///nix/store/... paths Plasma saves when you pin via the GUI, which
-    # break once that store path is GC'd. Declaring `panels` replaces the
-    # existing panel(s) on activation.
+    # Declare `panels` here: `applications:` URIs survive GC, GUI-saved store
+    # paths don't. Replaces existing panels on activation.
     panels = [
       {
         location = "bottom";
