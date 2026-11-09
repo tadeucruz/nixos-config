@@ -43,6 +43,7 @@
     ../../modules/storage-health.nix
     ../../modules/services/cloudflared.nix
     ../../modules/services/wake-on-lan.nix
+    ../../hosts/omega/hermes.nix
   ];
 
   boot.loader = {

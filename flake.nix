@@ -42,6 +42,11 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
   };
 
   outputs =
@@ -132,7 +137,7 @@
         citadel = mkHost nixpkgs "citadel" [ jovian.nixosModules.default ];
         prothean = mkHost nixpkgs "prothean" [ ];
         legion = mkHost nixpkgs "legion" [ jovian.nixosModules.default ];
-        omega = mkServer nixpkgs-stable "omega" [ ];
+        omega = mkServer nixpkgs-stable "omega" [ inputs.hermes-agent.nixosModules.default ];
       };
 
       darwinConfigurations = {
