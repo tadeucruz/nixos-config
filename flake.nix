@@ -43,9 +43,13 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
+    # hermes-agent's pm-packages.nix patches the default `patchelf` assuming
+    # 0.19.2, but nixpkgs (stable and unstable) still ships 0.15.2. Follow the
+    # rev hermes-agent itself pins, which has 0.19.2.
+    nixpkgs-hermes.url = "github:NixOS/nixpkgs/02c087f3fe673c9e317f206a627cb6b910336dbe";
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs-hermes";
     };
   };
 

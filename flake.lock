@@ -46,7 +46,7 @@
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "nixpkgs": [
-          "nixpkgs-stable"
+          "nixpkgs-hermes"
         ],
         "pyproject-build-systems": "pyproject-build-systems",
         "pyproject-nix": "pyproject-nix",
@@ -241,6 +241,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-hermes": {
+      "locked": {
+        "lastModified": 1792502884,
+        "narHash": "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "type": "github"
+      }
+    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1793865203,
@@ -341,6 +357,7 @@
         "nix-darwin": "nix-darwin",
         "nix-flatpak": "nix-flatpak",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-hermes": "nixpkgs-hermes",
         "nixpkgs-stable": "nixpkgs-stable",
         "plasma-manager": "plasma-manager"
       }
