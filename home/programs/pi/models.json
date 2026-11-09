@@ -23,8 +23,8 @@
       "apiKey": "EMPTY",
       "models": [
         {
-          "id": "ornith-1.5-9b",
-          "name": "Ornith-1.5-9B (citadel)",
+          "id": "Qwen3.8-27B-Uncensored-GGU",
+          "name": "Qwen3.8-27B-Uncensored-GGU",
           "input": [
             "text"
           ]
