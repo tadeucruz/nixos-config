@@ -3,7 +3,9 @@
 { ... }:
 let
   envFile = ''
-    OPENROUTER_API_KEY=sk-or-REPLACE_ME_WITH_YOUR_KEY
+    OPENAI_BASE_URL="http://prothean:9931/v1"
+    OPENAI_API_KEY="EMPTY"
+    MODEL="ornith-ai/Ornith-1.5-9B-GGUF:Q4_K_M"
   '';
 in
 {
