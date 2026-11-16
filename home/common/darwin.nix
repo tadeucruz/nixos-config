@@ -4,9 +4,11 @@
   ...
 }:
 {
-  imports = [ ../programs/obsidian.nix ];
-
   home = {
+    # nix-darwin injects `mas` only inside its own brew bundle call; the
+    # `rebuild` alias needs it on PATH to upgrade masApps.
+    packages = [ pkgs.mas ];
+
     sessionVariables = {
       NH_DARWIN_FLAKE = "/Users/${username}/nixos-config";
       SSH_AUTH_SOCK = "/Users/${username}/.bitwarden-ssh-agent.sock";

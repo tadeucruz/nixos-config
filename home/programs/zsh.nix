@@ -38,9 +38,15 @@
       ll = "ls -alh";
       # Bare `tmux` always spawns a NEW session — it never reattaches on its own.
       ta = "tmux attach 2>/dev/null || tmux new-session";
+      # darwin: homebrew.onActivation.upgrade is off, so this alias owns the
+      # brew/mas bumps — they need the user session (and an App Store login),
+      # which activation does not have. Failure there must not block the switch.
+      # Upgrade runs AFTER the switch on purpose: the taps are pinned to flake
+      # inputs, so activation is what installs the new tap snapshot `brew upgrade`
+      # then reads from.
       rebuild =
         if pkgs.stdenv.hostPlatform.isDarwin then
-          "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && nh clean all --keep-since 4d --keep 3"
+          "cd $NH_DARWIN_FLAKE && git pull && nh darwin switch -H ${hostname} && { brew upgrade; mas upgrade || echo 'warning: mas upgrade failed (App Store signed in?)' >&2; } && nh clean all --keep-since 4d --keep 3"
         else
           "cd $NH_FLAKE && git pull && systemd-inhibit --what=sleep --why='Nix build' nh os switch && nh clean all --keep-since 4d --keep 3";
     };

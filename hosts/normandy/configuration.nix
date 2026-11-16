@@ -2,6 +2,7 @@
 {
   imports = [
     ../../modules/common/darwin.nix
+    ../../modules/darwin/nix-homebrew.nix
     ../../modules/darwin/xcode.nix
     ../../modules/normandy.nix
     ../../homebrew/common.nix

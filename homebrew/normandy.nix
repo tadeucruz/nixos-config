@@ -1,8 +1,8 @@
 # normandy-only personal/hardware apps via Homebrew (not dev tooling — that's
-# development.nix). Only apps with no nixpkgs darwin equivalent — or that need a
-# stable path so macOS TCC permissions survive rebuilds (rectangle) — live here;
-# ghostty/zoom (and other nixpkgs-supported apps) are in home/programs/. Dock and
-# activation scripts live in modules/normandy.nix.
+# development.nix). Repo rule: GUI apps live here as casks — /Applications is a
+# stable path (TCC permissions survive rebuilds) and each app's own auto-updater
+# keeps working. CLI tools and config-managed apps stay in nix (home/programs/).
+# Dock and activation scripts live in modules/normandy.nix.
 { ... }:
 {
   homebrew = {
@@ -14,10 +14,16 @@
       "comfy"
       "crossover"
       "cryptomator"
+      "element"
+      "ghostty"
+      "obsidian"
       "rectangle"
       "steam"
       "ungoogled-chromium"
       "unsloth"
+      "vscodium"
+      "zed"
+      "zoom"
     ];
     masApps = {
       WhatsApp = 310633997;

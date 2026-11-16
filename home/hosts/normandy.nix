@@ -6,10 +6,6 @@
     ../common/packages.nix
     ../common/darwin.nix
     ../programs/firefox.nix
-    ../programs/element.nix
-    ../programs/ghostty.nix
-
-    ../programs/zoom.nix
     ../programs/ddc.nix
     ../programs/git.nix
     ../programs/starship.nix

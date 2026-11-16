@@ -29,6 +29,19 @@
 
     nix-flatpak.url = "git+https://github.com/gmodena/nix-flatpak";
 
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+
+    # Pinned taps for nix-homebrew (flake = false: repo contents, not a flake).
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     plasma-manager = {
