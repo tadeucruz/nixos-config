@@ -4,12 +4,12 @@
   ...
 }:
 let
-  release = "0.5.0";
+  release = "0.5.1";
   pname = "xodus-nexus";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/domsvoboda/nexus-launcher/releases/download/v${release}/Xodus-Nexus-${release}-x86_64.AppImage";
-    hash = "sha256-migpStsgNF3MVnPmCFtEgk1fzhBQYOgihnzp03WmM/8=";
+    url = "https://github.com/domsvoboda/nexus-launcher/releases/download/v${release}/Nexus-Launcher-${release}-x86_64.AppImage";
+    hash = "sha256-gsod5hcMZ6hSUT/DI8LMvNuBRiyrP8o/YUkEWUiMA8I=";
   };
 
   appimageContents = pkgs.appimageTools.extract {

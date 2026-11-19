@@ -140,7 +140,7 @@ asset_url() {
     ge) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/${tag}-x86_64.tar.gz" ;;
     cachyos) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/proton-cachyos-${version}-x86_64.tar.xz" ;;
     ogc) echo "https://github.com/$(tool_repo "$tool")/archive/refs/tags/${tag}.tar.gz" ;;
-    xodus) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/Xodus-Nexus-${version}-x86_64.AppImage" ;;
+    xodus) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/Nexus-Launcher-${version}-x86_64.AppImage" ;;
     flake) die "flake has no assets" ;;
   esac
 }
@@ -197,15 +197,19 @@ check_flake() {
 }
 
 apply_tool() {
-  local tool="$1" tag="${2:-$(latest_tag "$1")}" current release hash
+  local tool="$1" tag="${2:-$(latest_tag "$1")}" current release hash path url
   [[ -n "$tag" ]] || die "empty tag; won't build a download URL from it"
   current="$(current_release "$tool")"
   release="$(version_of_tag "$tool" "$tag")"
   [[ "$release" != "$current" ]] || { echo "$(tool_label "$tool") already at ${release}" >&2; return 0; }
 
   echo "updating $(tool_label "$tool") ${current} -> ${release}" >&2
-  echo "fetching hash ($(asset_url "$tool" "$release" "$tag"))..." >&2
-  hash="$(sri "$(nix-prefetch-url "$(asset_url "$tool" "$release" "$tag")")")"
+  url="$(asset_url "$tool" "$release" "$tag")"
+  echo "fetching hash ($url)..." >&2
+  # Without this the empty output flows into sri and surfaces as an unrelated
+  # "hash '' has wrong length" error when an upstream asset gets renamed.
+  path="$(nix-prefetch-url "$url")" || die "could not fetch $url"
+  hash="$(sri "$path")"
   rewrite_pin "$tool" "$release" "$hash"
   echo "$(tool_label "$tool") pinned to ${release}" >&2
   APPLIED="$APPLIED $tool"
