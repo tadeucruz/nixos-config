@@ -50,7 +50,7 @@ in
 {
   programs.opencode = {
     enable = true;
-    inherit opencode;
+    package = opencode;
     # Global instructions, loaded in every session (shared with pi).
     context = ../ai/AGENTS.md;
 
