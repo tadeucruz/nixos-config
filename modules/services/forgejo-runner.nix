@@ -5,6 +5,8 @@
   ...
 }:
 {
+  # nixpkgs-stable reads this file as an EnvironmentFile, so it must contain
+  # TOKEN=<value> (not the raw token).
   age.secrets.forgejo-runner-token.file = ../../secrets/forgejo-runner-token.age;
 
   services.gitea-actions-runner = {

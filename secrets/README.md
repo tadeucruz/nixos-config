@@ -54,7 +54,7 @@ automatically. The `-i` flag is required because this is a native age key
 | --- | --- | --- |
 | `openroute-token.age` | `/run/agenix/openroute-token` | exported as `OPENROUTESERVICE_API_KEY` in zsh |
 | `cloudflared-token.age` | `/run/agenix/cloudflared-token` | must contain `TUNNEL_TOKEN=...` |
-| `forgejo-runner-token.age` | `/run/agenix/forgejo-runner-token` | raw registration token |
+| `forgejo-runner-token.age` | `/run/agenix/forgejo-runner-token` | `TOKEN=<token>` (read as an environment file on omega) |
 
 ## First deploy on NixOS
 
