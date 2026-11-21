@@ -46,6 +46,7 @@ in
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
     ../../modules/storage-health.nix
+    ../../modules/services/sops.nix
   ];
 
   boot = {

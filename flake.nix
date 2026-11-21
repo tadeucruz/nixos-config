@@ -31,6 +31,11 @@
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Pinned taps for nix-homebrew (flake = false: repo contents, not a flake).
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
@@ -88,6 +93,7 @@
             ./hosts/${hostname}/configuration.nix
 
             nix-flatpak.nixosModules.nix-flatpak
+            inputs.sops-nix.nixosModules.default
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
@@ -108,6 +114,7 @@
           modules = [
             ./hosts/${hostname}/configuration.nix
 
+            inputs.sops-nix.darwinModules.default
             home-manager.darwinModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
@@ -127,6 +134,7 @@
           modules = [
             ./hosts/${hostname}/configuration.nix
 
+            inputs.sops-nix.nixosModules.default
             home-manager-stable.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;

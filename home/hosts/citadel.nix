@@ -15,6 +15,7 @@
     ../programs/home-manager.nix
     ../programs/llama-cpp.nix
     ../programs/return-to-steam.nix
+    ../programs/sops.nix
     ../ai.nix
     ../gaming.nix
   ];

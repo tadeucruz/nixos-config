@@ -21,6 +21,7 @@
     ../programs/unsloth-desktop.nix
     ../programs/easyeffects.nix
     ../programs/godot.nix
+    ../programs/sops.nix
     ../gaming.nix
   ];
 

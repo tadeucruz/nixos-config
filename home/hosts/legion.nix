@@ -14,6 +14,7 @@
     ../programs/tmux.nix
     ../programs/home-manager.nix
     ../programs/return-to-steam.nix
+    ../programs/sops.nix
     ../ai.nix
     ../gaming.nix
   ];

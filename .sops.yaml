@@ -1,0 +1,6 @@
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    encryption_method: age
+    age:
+      - "age1mhp7pdfscyw3v6qqc2twlhz36r64ryqf7sx5g004j84p8f6ps57qzc0lld"  # Chave pública gerada
+    # Adicionar outras chaves públicas de outras máquinas aqui se necessário
