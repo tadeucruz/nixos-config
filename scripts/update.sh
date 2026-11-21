@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Bump all the pinned upstream dependencies in one shot:
 #
-#   ge       GE-Proton      modules/proton-ge.nix
-#   cachyos  Proton-CachyOS modules/proton-cachyos.nix
 #   ogc      OpenGamingCollective kernel modules/ogc-kernel.nix
 #   xodus    Xodus Nexus     modules/xodus-nexus.nix
 #   flake    nix flake lock  flake.lock
 #
 # Used manually and by .github/workflows/check-updates.yml (single pipeline
 # that opens one PR with every bump).
+#
+# Note: proton-ge and proton-cachyos are now provided by nixpkgs via
+#       pkgs.proton-ge-bin and pkgs.proton-cachyos-bin
+#       They are updated automatically through nixpkgs updates.
 #
 # Exit codes: 0 = success (nothing to do / applied), 1 = error. Results are
 # communicated on stdout: check prints "pending:<tools>", apply prints the
@@ -21,7 +23,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TOOLS=(flake ge cachyos ogc xodus)
+TOOLS=(flake ogc xodus)
 # Tools with pending updates, printed on stdout so the workflow can use them
 # in the PR body. Human messages go to stderr.
 PENDING=""
@@ -37,8 +39,6 @@ die() {
 
 tool_file() {
   case "$1" in
-    ge) echo "$ROOT/modules/proton-ge.nix" ;;
-    cachyos) echo "$ROOT/modules/proton-cachyos.nix" ;;
     ogc) echo "$ROOT/modules/ogc-kernel.nix" ;;
     xodus) echo "$ROOT/modules/xodus-nexus.nix" ;;
     flake) echo "$ROOT/flake.lock" ;;
@@ -48,8 +48,6 @@ tool_file() {
 
 tool_repo() {
   case "$1" in
-    ge) echo "GloriousEggroll/proton-ge-custom" ;;
-    cachyos) echo "CachyOS/proton-cachyos" ;;
     ogc) echo "OpenGamingCollective/linux" ;;
     xodus) echo "domsvoboda/nexus-launcher" ;;
     flake) die "flake has no upstream repo" ;;
@@ -59,8 +57,6 @@ tool_repo() {
 
 tool_label() {
   case "$1" in
-    ge) echo "GE-Proton" ;;
-    cachyos) echo "Proton-CachyOS" ;;
     ogc) echo "OGC kernel" ;;
     xodus) echo "Xodus Nexus" ;;
     flake) echo "flake.lock" ;;
@@ -69,8 +65,6 @@ tool_label() {
 
 current_release() {
   case "$1" in
-    ge) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
-    cachyos) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     ogc) sed -n 's/^  ogcRelease = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     xodus) sed -n 's/^[[:space:]]*release = "\(.*\)";$/\1/p' "$(tool_file "$1")" ;;
     flake) die "flake.lock has no pinned release" ;;
@@ -121,13 +115,9 @@ latest_tag() {
   echo "$tag"
 }
 
-# The version stored in the modules is the upstream tag without CachyOS's
-# "cachyos-" prefix (only part of the release tag, not of the asset name).
 version_of_tag() {
   local tool="$1" tag="$2"
   case "$tool" in
-    ge) echo "$tag" ;;
-    cachyos) [[ "$tag" == cachyos-* ]] && echo "${tag#cachyos-}" || die "unexpected cachyos tag: $tag" ;;
     ogc) echo "$tag" ;;
     xodus) [[ "$tag" == v* ]] && echo "${tag#v}" || die "unexpected xodus tag: $tag" ;;
     flake) die "flake has no tags" ;;
@@ -137,8 +127,6 @@ version_of_tag() {
 asset_url() {
   local tool="$1" version="$2" tag="$3"
   case "$tool" in
-    ge) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/${tag}-x86_64.tar.gz" ;;
-    cachyos) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/proton-cachyos-${version}-x86_64.tar.xz" ;;
     ogc) echo "https://github.com/$(tool_repo "$tool")/archive/refs/tags/${tag}.tar.gz" ;;
     xodus) echo "https://github.com/$(tool_repo "$tool")/releases/download/${tag}/Nexus-Launcher-${version}-x86_64.AppImage" ;;
     flake) die "flake has no assets" ;;
@@ -262,13 +250,13 @@ apply_all() {
 }
 
 usage() {
-  die "usage: $0 check | apply | <ge|cachyos|ogc|xodus|flake> --check | --apply [tag]"
+  die "usage: $0 check | apply | <ogc|xodus|flake> --check | --apply [tag]"
 }
 
 case "${1:-}" in
   check) check_all ;;
   apply) apply_all ;;
-  ge|cachyos|ogc|xodus|flake)
+  ogc|xodus|flake)
     tool="$1"
     shift
     case "${1:-}" in
