@@ -1,60 +1,60 @@
-# Gerenciamento de Secrets com SOPS-nix
+# Secrets Management with SOPS-nix
 
-## Configuração Inicial
+## Initial Setup
 
-### 1. Gerar Chave Age (se ainda não fez)
+### 1. Generate Age Key (if not done yet)
 
 ```bash
 nix shell nixpkgs#age --command age-keygen -o age-key.txt
 ```
 
-**Salve a chave privada no Bitwarden!**
+**Save the private key in Bitwarden!**
 
-Chave pública gerada: `age1mhp7pdfscyw3v6qqc2twlhz36r64ryqf7sx5g004j84p8f6ps57qzc0lld`
+Generated public key: `age1mhp7pdfscyw3v6qqc2twlhz36r64ryqf7sx5g004j84p8f6ps57qzc0lld`
 
-### 2. Configurar Chave Privada nas Máquinas
+### 2. Configure Private Key on Machines
 
-Em cada máquina NixOS (citadel, prothean, legion, omega):
+On each NixOS machine (citadel, prothean, legion, omega):
 
 ```bash
 mkdir -p ~/.config/sops/age
-# Cole o conteúdo de age-key.txt (chave privada) em:
+# Paste the content of age-key.txt (private key) into:
 vim ~/.config/sops/age/keys.txt
 chmod 600 ~/.config/sops/age/keys.txt
 ```
 
-### 3. Editar Secrets
+### 3. Edit Secrets
 
-Para adicionar/editar secrets:
+To add/edit secrets:
 
 ```bash
-# Instalar sops temporariamente
+# Install sops temporarily
 nix shell nixpkgs#sops --command sops secrets/secrets.yaml
 ```
 
-No editor que abrir, adicione/edite os valores:
+In the editor that opens, add/edit values:
 
 ```yaml
-openroute_token: "seu_token_aqui"
-# outros_secrets: "valores"
+openroute_token: "your_token_here"
+# other_secrets: "values"
 ```
 
-Salve e o arquivo será criptografado automaticamente.
+Save and the file will be automatically encrypted.
 
-### 4. Adicionar Secrets a Outras Máquinas
+### 4. Add Secrets to Other Machines
 
-Para cada máquina adicional:
+For each additional machine:
 
-1. Adicione o módulo `../../modules/services/sops.nix` às imports do host
-2. Adicione `../programs/sops.nix` às imports do home-manager do host
-3. Configure a chave privada como no passo 2
+1. Add the module `../../modules/services/sops.nix` to host imports
+2. Add `../programs/sops.nix` to the host's home-manager imports
+3. Configure the private key as in step 2
 
-## Secrets Atuais
+## Current Secrets
 
-- `openroute_token`: Token da API OpenRouteService para pi-agent e opencode
+- `openroute_token`: OpenRouteService API token for pi-agent and opencode
 
-## Adicionar Novos Secrets
+## Adding New Secrets
 
-1. Edite `secrets/secrets.yaml` com sops
-2. Adicione a entrada no módulo `modules/services/sops.nix` na seção `secrets`
-3. Atualize `home/programs/sops.nix` para expor como variável de ambiente se necessário
+1. Edit `secrets/secrets.yaml` with sops
+2. Add entry in `modules/services/sops.nix` module in the `secrets` section
+3. Update `home/programs/sops.nix` to expose as environment variable if needed

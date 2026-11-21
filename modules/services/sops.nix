@@ -5,31 +5,31 @@
   ...
 }:
 let
-  # Caminho absoluto para o diretório de secrets (relativo à raiz do repo)
+  # Absolute path to secrets directory (relative to repo root)
   secretsDir = ../../secrets;
 in
 {
   imports = [
-    # Nenhum import necessário aqui, apenas configurações
+    # No imports needed here, just configurations
   ];
 
   config = {
-    # Configuração do sops-nix
+    # sops-nix configuration
     sops = {
       defaultSopsFile = secretsDir + "/secrets.yaml";
-      # Para age key única em todas as máquinas
-      # A chave privada deve estar disponível em cada máquina no seguinte caminho:
-      # /home/tadeucruz/.config/sops/age/keys.txt
-      age.keyFile = "/home/tadeucruz/.config/sops/age/keys.txt";
-      # Não usar SSH keys pois as chaves privadas estão no Bitwarden
+      # For single age key across all machines
+      # Private key must be available on each machine at:
+      # /home/tadeucruz/.config/sops/age/age-secret-key.txt
+      age.keyFile = "/home/tadeucruz/.config/sops/age/age-secret-key.txt";
+      # Don't use SSH keys since private keys are in Bitwarden
       age.sshKeyPaths = [ ];
 
-      # Secrets - definiremos aqui os secrets específicos
+      # Secrets - define specific secrets here
       secrets = {
-        # Token do OpenRouteService para pi-agent e opencode
+        # OpenRouteService token for pi-agent and opencode
         openroute_token = {
           sopsFile = secretsDir + "/secrets.yaml";
-          # Path onde o secret será disponibilizado
+          # Path where secret will be available
           path = "/run/secrets/openroute_token";
           mode = "0400";
           owner = config.users.users.tadeucruz.name;
@@ -38,9 +38,9 @@ in
       };
     };
 
-    # Para outras máquinas além do prothean:
-    # 1. Copie o módulo sops para cada host
-    # 2. Adicione o módulo "home/programs/sops.nix" ao home-manager de cada host
-    # 3. Coloque a chave privada age em ~/.config/sops/age/keys.txt em cada máquina
+    # For other machines besides prothean:
+    # 1. Copy sops module to each host
+    # 2. Add "home/programs/sops.nix" module to each host's home-manager
+    # 3. Place age private key in ~/.config/sops/age/age-secret-key.txt on each machine
   };
 }

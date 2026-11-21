@@ -5,16 +5,16 @@
   ...
 }:
 let
-  # Lista de secrets e seus mapeamentos para env vars
-  # Formato: { secret_name = "ENV_VAR_NAME"; }
+  # List of secrets and their mappings to env vars
+  # Format: { secret_name = "ENV_VAR_NAME"; }
   secretMappings = {
     openroute_token = "OPENROUTESERVICE_API_KEY";
-    # Exemplos de outros mapeamentos:
+    # Examples of other mappings:
     # github_token = "GITHUB_TOKEN";
     # api_key = "API_KEY";
   };
 
-  # Gerar script bash que carrega todos os secrets
+  # Generate bash script that loads all secrets
   envScriptContent = lib.concatStrings (
     lib.mapAttrsToList (secret: envVar: ''
       # ${envVar}
@@ -24,44 +24,44 @@ let
     '') secretMappings
   );
 
-  # Script para recarregar que pode ser chamado via eval
+  # Script to reload that can be called via eval
   reloadScript = pkgs.writeShellScriptBin "reload-sops-secrets" ''
-    # Recarrega todas as environment variables de secrets
+    # Reload all secrets environment variables
     ${envScriptContent}
-    echo "SOPS secrets recarregados"
+    echo "SOPS secrets reloaded"
   '';
 in
 {
   config = {
     home.packages = [ reloadScript ];
 
-    # Arquivo que é sourceado no shell
+    # File that gets sourced in the shell
     home.file.".config/sops/env.sh" = {
       text = ''
-        # Environment variables de secrets (gerado automaticamente)
-        # Para recarregar: source ~/.config/sops/env.sh
-        # Ou usar: reload-sops-secrets
+        # Secrets environment variables (automatically generated)
+        # To reload: source ~/.config/sops/env.sh
+        # Or use: reload-sops-secrets
         ${envScriptContent}
       '';
       executable = false;
     };
 
-    # Source o arquivo no zsh
+    # Source the file in zsh
     programs.zsh.initContent = lib.mkAfter ''
-      # Carregar environment variables de secrets
+      # Load secrets environment variables
       if [[ -f "$HOME/.config/sops/env.sh" ]]; then
         source "$HOME/.config/sops/env.sh"
       fi
 
-      # Função helper para recarregar secrets
+      # Helper function to reload secrets
       reload-secrets() {
         if command -v reload-sops-secrets >/dev/null 2>&1; then
           eval "$(reload-sops-secrets)"
-          echo "SOPS secrets recarregados"
+          echo "SOPS secrets reloaded"
         else
           if [[ -f "$HOME/.config/sops/env.sh" ]]; then
             source "$HOME/.config/sops/env.sh"
-            echo "Secrets recarregados"
+            echo "Secrets reloaded"
           fi
         fi
       }
