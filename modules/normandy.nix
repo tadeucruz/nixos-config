@@ -11,7 +11,6 @@
     "/System/Applications/Photos.app"
     "/System/Applications/Calendar.app"
     "/Applications/Obsidian.app"
-    "/Applications/Element.app"
     "/System/Applications/Reminders.app"
     "/System/Applications/Notes.app"
     "/System/Applications/TV.app"

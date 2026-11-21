@@ -10,6 +10,7 @@ NixOS + nix-darwin flakes repository for 4 machines belonging to Tadeu Cruz (tad
 - Keep comments concise and minimal; avoid verbose or redundant explanations in code files.
 - You need commit the file for `make check` to work 
 - **Never** push changes to Git before explicit review and approval.
+- Alway commit Git changes in English
 
 ## Remote Access (SSH)
 

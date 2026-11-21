@@ -14,7 +14,6 @@
       "comfy"
       "crossover"
       "cryptomator"
-      "element"
       "ghostty"
       "obsidian"
       "rectangle"
