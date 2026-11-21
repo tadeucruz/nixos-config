@@ -8,8 +8,8 @@
     else
       [ "/etc/age/identity" ];
 
-  age.secrets.openroute-token = {
-    file = ../../secrets/openroute-token.age;
+  age.secrets.openrouter-token = {
+    file = ../../secrets/openrouter-token.age;
     owner = username;
     mode = "0400";
   };

@@ -21,7 +21,6 @@
     ../programs/unsloth-desktop.nix
     ../programs/easyeffects.nix
     ../programs/godot.nix
-    ../programs/secrets.nix
     ../gaming.nix
   ];
 

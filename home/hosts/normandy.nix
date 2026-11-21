@@ -13,7 +13,6 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
-    ../programs/secrets.nix
     ../programs/llama-cpp.nix
     ../programs/stable-diffusion-cpp.nix
     ../development.nix

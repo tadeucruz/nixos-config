@@ -6,6 +6,6 @@
   # pi writes to them (`pi install`, /settings, /login), so a store symlink breaks it.
   home.file = {
     ".pi/agent/models.json".source = ./pi/models.json;
-    ".pi/agent/AGENTS.md".source = ./pi/AGENTS.md;
+    ".pi/agent/AGENTS.md".source = ../ai/AGENTS.md;
   };
 }

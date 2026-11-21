@@ -10,7 +10,6 @@
     ../programs/zsh.nix
     ../programs/tmux.nix
     ../programs/home-manager.nix
-    ../programs/secrets.nix
     ../ai.nix
   ];
 

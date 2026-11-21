@@ -12,14 +12,14 @@ key is stored in Bitwarden.
 | NixOS hosts | `/etc/age/identity` |
 
 The `agenix` module decrypts to `/run/agenix/<name>` (owned by the target user
-when needed). Home Manager only exports the value that is already decrypted at
+when needed). Home Manager only consumes values that are already decrypted at
 the system level.
 
 ## Editing a secret
 
 ```bash
 cd secrets
-agenix -i ~/.config/age/keys.txt -e openroute-token.age
+agenix -i ~/.config/age/keys.txt -e openrouter-token.age
 ```
 
 Replace the placeholder with the real value, save, and the file is re-encrypted
@@ -52,7 +52,7 @@ automatically. The `-i` flag is required because this is a native age key
 
 | File | Runtime path | Notes |
 | --- | --- | --- |
-| `openroute-token.age` | `/run/agenix/openroute-token` | exported as `OPENROUTESERVICE_API_KEY` in zsh |
+| `openrouter-token.age` | `/run/agenix/openrouter-token` | OpenRouter key; written into `~/.local/share/opencode/auth.json` by home-manager activation |
 | `cloudflared-token.age` | `/run/agenix/cloudflared-token` | must contain `TUNNEL_TOKEN=...` |
 | `forgejo-runner-token.age` | `/run/agenix/forgejo-runner-token` | `TOKEN=<token>` (read as an environment file on omega) |
 
