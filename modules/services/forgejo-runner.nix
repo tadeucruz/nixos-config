@@ -1,16 +1,19 @@
 # Forgejo Actions runner (omega) — nixpkgs `services.gitea-actions-runner`
 {
+  config,
   pkgs,
   ...
 }:
 {
+  age.secrets.forgejo-runner-token.file = ../../secrets/forgejo-runner-token.age;
+
   services.gitea-actions-runner = {
     package = pkgs.forgejo-runner;
     instances.default = {
       enable = true;
       name = "omega-runner";
       url = "https://git.tadeucruz.com";
-      tokenFile = "/etc/forgejo-runner/token";
+      tokenFile = config.age.secrets.forgejo-runner-token.path;
       labels = [
         "nix:docker://git.tadeucruz.com/tadeucruz/nix-ci-builder:latest"
         "debian-latest:docker://node:current-trixie"

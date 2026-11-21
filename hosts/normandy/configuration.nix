@@ -4,6 +4,7 @@
     ../../modules/common/darwin.nix
     ../../modules/darwin/nix-homebrew.nix
     ../../modules/darwin/xcode.nix
+    ../../modules/services/agenix.nix
     ../../modules/normandy.nix
     ../../homebrew/common.nix
     ../../homebrew/normandy.nix

@@ -43,7 +43,7 @@
     ../../modules/storage-health.nix
     ../../modules/services/cloudflared.nix
     ../../modules/services/wake-on-lan.nix
-    ../../modules/services/sops.nix
+    ../../modules/services/agenix.nix
   ];
 
   boot.loader = {

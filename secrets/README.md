@@ -1,60 +1,78 @@
-# Secrets Management with SOPS-nix
+# Secrets (agenix)
 
-## Initial Setup
+All secrets are encrypted with [agenix](https://github.com/ryantm/agenix) to a
+single shared age key. The public key lives in `agenix-rules.nix`; the private
+key is stored in Bitwarden.
 
-### 1. Generate Age Key (if not done yet)
+## Key locations
 
-```bash
-nix shell nixpkgs#age --command age-keygen -o age-key.txt
-```
+| Machine | Private key |
+| --- | --- |
+| normandy (macOS) | `~/.config/age/keys.txt` |
+| NixOS hosts | `/etc/age/identity` |
 
-**Save the private key in Bitwarden!**
+The `agenix` module decrypts to `/run/agenix/<name>` (owned by the target user
+when needed). Home Manager only exports the value that is already decrypted at
+the system level.
 
-Generated public key: `age1mhp7pdfscyw3v6qqc2twlhz36r64ryqf7sx5g004j84p8f6ps57qzc0lld`
-
-### 2. Configure Private Key on Machines
-
-On each NixOS machine (citadel, prothean, legion, omega):
-
-```bash
-mkdir -p ~/.config/sops/age
-# Paste the content of age-key.txt (private key) into:
-vim ~/.config/sops/age/keys.txt
-chmod 600 ~/.config/sops/age/keys.txt
-```
-
-### 3. Edit Secrets
-
-To add/edit secrets:
+## Editing a secret
 
 ```bash
-# Install sops temporarily
-nix shell nixpkgs#sops --command sops secrets/secrets.yaml
+cd secrets
+agenix -i ~/.config/age/keys.txt -e openroute-token.age
 ```
 
-In the editor that opens, add/edit values:
+Replace the placeholder with the real value, save, and the file is re-encrypted
+automatically. The `-i` flag is required because this is a native age key
+(agenix only auto-detects SSH keys).
 
-```yaml
-openroute_token: "your_token_here"
-# other_secrets: "values"
+## Adding a secret
+
+1. Add the file to `agenix-rules.nix`:
+   ```nix
+   "my-token.age".publicKeys = [ key ];
+   ```
+2. Create it:
+   ```bash
+   cd secrets
+   agenix -i ~/.config/age/keys.txt -e my-token.age
+   ```
+3. Declare it in Nix:
+   ```nix
+   age.secrets.my-token = {
+     file = ../../secrets/my-token.age;
+     owner = username;      # only when a user must read it
+     mode = "0400";
+   };
+   ```
+4. Reference the runtime path (`config.age.secrets.my-token.path`) instead of
+   reading the file during evaluation.
+
+## Current secrets
+
+| File | Runtime path | Notes |
+| --- | --- | --- |
+| `openroute-token.age` | `/run/agenix/openroute-token` | exported as `OPENROUTESERVICE_API_KEY` in zsh |
+| `cloudflared-token.age` | `/run/agenix/cloudflared-token` | must contain `TUNNEL_TOKEN=...` |
+| `forgejo-runner-token.age` | `/run/agenix/forgejo-runner-token` | raw registration token |
+
+## First deploy on NixOS
+
+The private key must exist before the first rebuild, otherwise agenix cannot
+decrypt:
+
+```bash
+sudo install -d -m 700 /etc/age
+sudo install -m 600 /dev/stdin /etc/age/identity <<'EOF'
+AGE-SECRET-KEY-...
+EOF
 ```
 
-Save and the file will be automatically encrypted.
+Then `nixos-rebuild switch`. On normandy the launchd daemon reads
+`~/.config/age/keys.txt` directly.
 
-### 4. Add Secrets to Other Machines
+## Checking
 
-For each additional machine:
-
-1. Add the module `../../modules/services/sops.nix` to host imports
-2. Add `../programs/sops.nix` to the host's home-manager imports
-3. Configure the private key as in step 2
-
-## Current Secrets
-
-- `openroute_token`: OpenRouteService API token for pi-agent and opencode
-
-## Adding New Secrets
-
-1. Edit `secrets/secrets.yaml` with sops
-2. Add entry in `modules/services/sops.nix` module in the `secrets` section
-3. Update `home/programs/sops.nix` to expose as environment variable if needed
+`agenix -c` only validates SSH recipients, so it reports an error for native
+`age1...` keys. Skip it for this repo; the age files are validated when they are
+edited or decrypted.

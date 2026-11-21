@@ -42,7 +42,7 @@
     ../../modules/gaming.nix
     ../../modules/btrfs-tuning.nix
     ../../modules/storage-health.nix
-    ../../modules/services/sops.nix
+    ../../modules/services/agenix.nix
     ./stay-awake.nix
     inputs.awcc.nixosModules.default
   ];

@@ -1,8 +1,11 @@
 {
+  config,
   pkgs,
   ...
 }:
 {
+  age.secrets.cloudflared-token.file = ../../secrets/cloudflared-token.age;
+
   systemd.services.cloudflared = {
     description = "Cloudflare Tunnel client (remotely managed)";
     after = [ "network-online.target" ];
@@ -10,7 +13,7 @@
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run";
-      EnvironmentFile = "/etc/cloudflared/token";
+      EnvironmentFile = config.age.secrets.cloudflared-token.path;
       DynamicUser = true;
       NoNewPrivileges = true;
       PrivateTmp = true;
