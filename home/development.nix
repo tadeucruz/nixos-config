@@ -6,6 +6,7 @@
     ./programs/go.nix
     ./programs/java.nix
     ./programs/nodejs.nix
+    ./programs/nixd.nix
     ./programs/vscodium.nix
     ./programs/zed.nix
   ];
